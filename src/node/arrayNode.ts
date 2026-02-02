@@ -3,38 +3,90 @@ import { type IArrayConfig } from "../config/arrayConfig";
 import { type IEnumConfig } from "../config/enumConfig";
 import { type ISchemaConfig } from "../config/schemaConfig";
 import { type INodeSchema } from "../schema/nodeSchema";
-import { getAppCachedSchema, getCachedSchema, isSchemaPluginEnabled, NS_SYSTEM_JSON, NS_SYSTEM_LOCALE_STRING, NS_SYSTEM_STRING, validateSchemaValue } from "../utils/schemaProvider";
+import {
+  getAppCachedSchema,
+  getCachedSchema,
+  isSchemaPluginEnabled,
+  NS_SYSTEM_JSON,
+  NS_SYSTEM_LOCALE_STRING,
+  NS_SYSTEM_STRING,
+  validateSchemaValue,
+} from "../utils/schemaProvider";
 import { _L, _LS } from "../utils/locale";
-import { type AnySchemaNode, getSchemaNodeType, regSchemaNode, SchemaNode } from "./schemaNode";
+import {
+  type AnySchemaNode,
+  getSchemaNodeType,
+  regSchemaNode,
+  SchemaNode,
+} from "./schemaNode";
 import { EnumNode } from "./enumNode";
 import { ScalarNode } from "./scalarNode";
 import { StructNode } from "./structNode";
-import { clearDebounce, debounce, deepClone, isEqual, isNull, sformat } from "../utils/toolset";
+import {
+  clearDebounce,
+  debounce,
+  deepClone,
+  isEqual,
+  isNull,
+  sformat,
+} from "../utils/toolset";
 import { ArrayRule } from "../rule/arrayRule";
 import { pushAppData, queryAppData } from "../utils/appDataProvider";
 import { AppNode } from "./appNode";
-import type { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/appSchema";
+import type {
+  IAppDataFieldInfo,
+  IAppDataQueryOrder,
+} from "../schema/appSchema";
 import { RelationType } from "../enum/relationType";
-import type { IStructArrayFieldConfig, IStructFieldRelation } from "../schema/structSchema";
+import type {
+  IStructArrayFieldConfig,
+  IStructFieldRelation,
+} from "../schema/structSchema";
 import type { IFunctionCallArgument } from "../schema/functionSchema";
-import { FieldFilterMode, type FieldFilterModeValue} from "../enum/fieldFilterMode";
+import {
+  FieldFilterMode,
+  type FieldFilterModeValue,
+} from "../enum/fieldFilterMode";
 import { DataChangeWatcher } from "../utils/dataChangeWatcher";
-import { getTemplateProvider, ITemplateRequest, ITemplateUploadResponse } from "../plugin/templateProvider";
+import {
+  getTemplateProvider,
+  type ITemplateRequest,
+  type ITemplateUploadResponse,
+} from "../plugin/templateProvider";
 
 /**
  * The array schema data node
  */
 @regSchemaNode(SchemaType.Array)
-export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region Implementation
+export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
+  //#region Implementation
 
   // override properties && array properties
-  get schemaType(): SchemaType { return SchemaType.Array }
-  get valid(): boolean { return this._enode ? this._enode.valid : this.asSingle ? this._valid : this._elements.findIndex((e) => !e.valid) < 0}
-  get error(): any { return this._enode ? this._enode.error : this.asSingle ? this._error : this._elements.find((e) => !e.valid)?.error }
+  get schemaType(): SchemaType {
+    return SchemaType.Array;
+  }
+  get valid(): boolean {
+    return this._enode
+      ? this._enode.valid
+      : this.asSingle
+      ? this._valid
+      : this._elements.findIndex((e) => !e.valid) < 0;
+  }
+  get error(): any {
+    return this._enode
+      ? this._enode.error
+      : this.asSingle
+      ? this._error
+      : this._elements.find((e) => !e.valid)?.error;
+  }
   get changed(): boolean {
     if (this._enode) return this._enode.changed;
     if (this.asSingle) return !isEqual(this._data, this._original);
-    if (this._elements.find((e) => e.changed) || (this._original?.length || 0) !== (this._elements.length || 0)) return true;
+    if (
+      this._elements.find((e) => e.changed) ||
+      (this._original?.length || 0) !== (this._elements.length || 0)
+    )
+      return true;
     if (!this.incrUpdate) return false;
     for (let key in this._tracker) {
       const track = this._tracker[key];
@@ -42,90 +94,153 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
     }
     return false;
   }
-  get rawData() { return this._enode ? this._enode.rawData : this._data }
-  get original() { return this._enode ? this._enode.original : deepClone(this._original) }
-  get isEmpty() { return this._enode ? this._enode.isEmpty : Array.isArray(this._data) ? this._data.length === 0 : true }
+  get rawData() {
+    return this._enode ? this._enode.rawData : this._data;
+  }
+  get original() {
+    return this._enode ? this._enode.original : deepClone(this._original);
+  }
+  get isEmpty() {
+    return this._enode
+      ? this._enode.isEmpty
+      : Array.isArray(this._data)
+      ? this._data.length === 0
+      : true;
+  }
 
   get fullerror(): any {
-    if (this._enode) return this._enode.fullerror
-    if (this.asSingle) return this._valid ? this._errfld : undefined
-    const errs: any = {}
-    let hasErr = false
-    this._elements.forEach((e, i) => { if (!e.valid) { errs[i] = e.fullerror; hasErr = true }})
-    return hasErr ? errs : undefined
+    if (this._enode) return this._enode.fullerror;
+    if (this.asSingle) return this._valid ? this._errfld : undefined;
+    const errs: any = {};
+    let hasErr = false;
+    this._elements.forEach((e, i) => {
+      if (!e.valid) {
+        errs[i] = e.fullerror;
+        hasErr = true;
+      }
+    });
+    return hasErr ? errs : undefined;
   }
 
   /**
    * Gets the schema info of the array element
    */
-  get elementSchema(): INodeSchema { return this._eschema }
+  get elementSchema(): INodeSchema {
+    return this._eschema;
+  }
 
   /**
    * Gets the array elements
    */
-  get elements(): AnySchemaNode[] { return this._elements }
+  get elements(): AnySchemaNode[] {
+    return this._elements;
+  }
 
   /**
    * Gets the enum node if the element is enum schema node
    */
-  get enumNode(): EnumNode | undefined { return this._enode }
+  get enumNode(): EnumNode | undefined {
+    return this._enode;
+  }
 
   /**
    * Whether the array data be treated as single value, like Coordinates
    */
-  get asSingle(): boolean { return this._schema.array?.single || false }
+  get asSingle(): boolean {
+    return this._schema.array?.single || false;
+  }
 
   /**
    * Gets whether the array node is used as an incr update application field
    */
-  get incrUpdate(): boolean { return this._config.incrUpdate || false }
+  get incrUpdate(): boolean {
+    return this._config.incrUpdate || false;
+  }
 
   /**
    * Whether allow add new element
    */
-  get allowAdd(): boolean { return !this.readonly && this._fieldInfo?.allowCreate !== false && this._config.fieldInfo?.allowCreate !== false }
+  get allowAdd(): boolean {
+    return (
+      !this.readonly &&
+      this._fieldInfo?.allowCreate !== false &&
+      this._config.fieldInfo?.allowCreate !== false
+    );
+  }
 
   /**
    * Whether allow delete element
    */
-  get allowDelete(): boolean { return  !this.readonly && this._fieldInfo?.allowDelete !== false && this._config.fieldInfo?.allowDelete !== false }
+  get allowDelete(): boolean {
+    return (
+      !this.readonly &&
+      this._fieldInfo?.allowDelete !== false &&
+      this._config.fieldInfo?.allowDelete !== false
+    );
+  }
 
   /**
    * Whether allow update element
    */
-  get allowUpdate(): boolean { return  !this.readonly && this._fieldInfo?.allowUpdate !== false && this._config.fieldInfo?.allowUpdate !== false }
+  get allowUpdate(): boolean {
+    return (
+      !this.readonly &&
+      this._fieldInfo?.allowUpdate !== false &&
+      this._config.fieldInfo?.allowUpdate !== false
+    );
+  }
 
-  get blackColumns(): string[] { return this._fieldInfo?.blackColumns || this._config.fieldInfo?.blackColumns || [] }
+  get blackColumns(): string[] {
+    return (
+      this._fieldInfo?.blackColumns ||
+      this._config.fieldInfo?.blackColumns ||
+      []
+    );
+  }
 
   /**
    * Whether enable template download
    */
-  get enableTemplate(): boolean { return this._template === true }
+  get enableTemplate(): boolean {
+    return this._template === true;
+  }
 
   /**
    * Gets the current page
    */
-  get page() { return this._fieldInfo?.take ? Math.floor((this._fieldInfo.skip || 0) / this._fieldInfo.take) : 0 }
+  get page() {
+    return this._fieldInfo?.take
+      ? Math.floor((this._fieldInfo.skip || 0) / this._fieldInfo.take)
+      : 0;
+  }
 
   /**
    * Gets the page count
    */
-  get pageCount() { return this._fieldInfo?.take }
+  get pageCount() {
+    return this._fieldInfo?.take;
+  }
 
   /**
    * Gets the total count
    */
-  get total() { return this._fieldInfo?.total ?? this._elements.length }
+  get total() {
+    return this._fieldInfo?.total ?? this._elements.length;
+  }
 
   /**
    * Gets the query data
    */
-  get query() { return this._fieldInfo?.filter ? { ...this._fieldInfo.filter } : undefined }
+  get query() {
+    return this._fieldInfo?.filter ? { ...this._fieldInfo.filter } : undefined;
+  }
 
   /**
    * The order by info
    */
-  get orderBy(): IAppDataQueryOrder[] { return deepClone(this._fieldInfo?.orderBy) || [] }
+  get orderBy(): IAppDataQueryOrder[] {
+    return deepClone(this._fieldInfo?.orderBy) || [];
+  }
 
   /**
    * Set the array data
@@ -137,8 +252,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
     } else if (this.asSingle) {
       if (Array.isArray(this._data))
         this._data.splice(0, this._data.length, ...data.map(deepClone));
-      else 
-        this._data = deepClone(data);
+      else this._data = deepClone(data);
       this.validation().then(this.notify);
     } else if (this.incrUpdate) {
       throw `Can't set data to ${_L(this.display || this.name)}`;
@@ -247,7 +361,12 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
    * Gets the deleted data
    */
   get deletes(): any[] | undefined {
-    if (this.asSingle || this._enode || this._eschema.type !== SchemaType.Struct || !this._schema.array?.primary?.length)
+    if (
+      this.asSingle ||
+      this._enode ||
+      this._eschema.type !== SchemaType.Struct ||
+      !this._schema.array?.primary?.length
+    )
       return undefined;
     if (this.incrUpdate) {
       const deletes: any[] = [];
@@ -298,7 +417,9 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
   /**
    * Gets the array field filters
    */
-  get filters() { return this._appFieldFilter || [] }
+  get filters() {
+    return this._appFieldFilter || [];
+  }
 
   // override methods
 
@@ -363,7 +484,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       this.data = deepClone(this._original) || [];
       this.resetChanges();
     }
-    this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row)
+    this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
   }
 
   override dispose(): void {
@@ -397,7 +518,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
           if (
             !isEqual(
               ele.getField(primarys[k])?.rawData,
-              cele.getField(primarys[k])?.rawData
+              cele.getField(primarys[k])?.rawData,
             )
           )
             break;
@@ -405,7 +526,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
         if (k >= primarys.length) {
           const errfld = ele.getField(primarys[primarys.length - 1]);
           errfld?.setError(
-            sformat("ERR_ARRAY_PRIMARY_DUPLICATE", errfld.display)
+            sformat("ERR_ARRAY_PRIMARY_DUPLICATE", errfld.display),
           );
           this._errfld = errfld;
           return;
@@ -417,7 +538,10 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
   // refresh raw data
   private refreshRawData = debounce(() => {
     if (Array.isArray(this._data))
-      this._data.splice(0, this._data.length, ...this._elements.map((e) => e.rawData)
+      this._data.splice(
+        0,
+        this._data.length,
+        ...this._elements.map((e) => e.rawData),
       );
     else this._data = this._elements.map((e) => e.rawData);
 
@@ -431,41 +555,57 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
     let eleNode: AnySchemaNode | null = null;
     switch (this._eschema.type) {
       case SchemaType.Scalar:
-        eleNode = new ScalarNode({ ...this._config, type: this._eschema.name, require: false }, data, this)
-        break
+        eleNode = new ScalarNode(
+          { ...this._config, type: this._eschema.name, require: false },
+          data,
+          this,
+        );
+        break;
       case SchemaType.Enum:
-        eleNode = new EnumNode({ ...this._config, type: this._eschema.name, require: false }, data, this)
-        break
+        eleNode = new EnumNode(
+          { ...this._config, type: this._eschema.name, require: false },
+          data,
+          this,
+        );
+        break;
       case SchemaType.Struct:
-        eleNode = new StructNode({ ...this._config, type: this._eschema.name, require: false }, data,this)
+        eleNode = new StructNode(
+          { ...this._config, type: this._eschema.name, require: false },
+          data,
+          this,
+        );
         if (this.incrUpdate) {
           // make incr update data primary field immutable
-          const structNode = eleNode as StructNode
+          const structNode = eleNode as StructNode;
           this.schema.array?.primary?.forEach((f) => {
-            const fldNode = structNode.getField(f)
-            if (!fldNode) return
-            fldNode.config.immutable = true
-            fldNode.notifyState()
-          })
+            const fldNode = structNode.getField(f);
+            if (!fldNode) return;
+            fldNode.config.immutable = true;
+            fldNode.notifyState();
+          });
         }
 
-        if (!noDeepWatch)
-        {
-          const row = eleNode as StructNode
-          let changable = false
-          row.fields.forEach(e => {
+        if (!noDeepWatch) {
+          const row = eleNode as StructNode;
+          let changable = false;
+          row.fields.forEach((e) => {
             if (e instanceof ArrayNode)
-              e.subscribeLayoutChanged(type => {if (type == ArrayNodeLayoutChange.Row) this._layoutChangeWatcher.notify(type)})
-            if (row.isFieldChangable(e.name)) changable = true
-          })
+              e.subscribeLayoutChanged((type) => {
+                if (type == ArrayNodeLayoutChange.Row)
+                  this._layoutChangeWatcher.notify(type);
+              });
+            if (row.isFieldChangable(e.name)) changable = true;
+          });
           if (changable)
-            row.subscribeMemberChange(() => this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row))
+            row.subscribeMemberChange(() =>
+              this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row),
+            );
         }
 
-        break
+        break;
     }
-    if (!this.incrUpdate) eleNode?.subscribe(this.refreshRawData)
-    return eleNode
+    if (!this.incrUpdate) eleNode?.subscribe(this.refreshRawData);
+    return eleNode;
   }
 
   // get the unique key combine from primarys
@@ -506,7 +646,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
     if (!primarys?.length) return row;
 
     const fields = this._eschema.struct?.fields?.filter((f) =>
-      primarys.includes(f.name)
+      primarys.includes(f.name),
     );
     if (
       !fields?.length ||
@@ -568,7 +708,10 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
    * @param row the prepare row
    * @param forceSave force save even when the row data already exist
    */
-  async savePrepareRow(row: StructNode, forceSave: boolean = false): Promise<boolean> {
+  async savePrepareRow(
+    row: StructNode,
+    forceSave: boolean = false,
+  ): Promise<boolean> {
     if (!this.incrUpdate || !row.valid) return false;
     const primarys = this._schema.array?.primary;
     if (!primarys?.length) return false;
@@ -611,7 +754,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
             await this.setPage(
               Math.floor((this._fieldInfo?.total || 0) / count),
               count,
-              false
+              false,
             );
           }
         } else if (key) {
@@ -648,7 +791,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       this._elements.splice(index!, 0, newEle);
       newEle.activeRule(true);
       this.notify("add", this.elements.length); // @deprecated, use layoutChangeWatcher instead
-      this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row)
+      this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
     }
     return newEle;
   }
@@ -681,7 +824,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       const remove = this._elements.splice(start, count);
       remove.forEach((r) => r.dispose());
       this.notify("del", this.elements.length); // @deprecated, use layoutChangeWatcher instead
-      this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row)
+      this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
     }
   }
 
@@ -711,7 +854,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
     this._elements[x] = this._elements[y];
     this._elements[y] = temp;
     this.notify("swap", x, y); // @deprecated, use layoutChangeWatcher instead
-    this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row)
+    this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
   }
 
   /**
@@ -732,7 +875,13 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
    * @param filter the query keys, optional
    * @param orderBy the order by info, optional
    */
-  async setPage(page: number, count?: number, descend?: boolean, filter?: { [key: string]: any }, orderBy?: IAppDataQueryOrder[]) {
+  async setPage(
+    page: number,
+    count?: number,
+    descend?: boolean,
+    filter?: { [key: string]: any },
+    orderBy?: IAppDataQueryOrder[],
+  ) {
     //if (!this.incrUpdate) return
     count ||= this._fieldInfo?.take || 10; // default should be provided by server
     if (isNull(descend)) descend = this._fieldInfo?.descend;
@@ -751,7 +900,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
           hasQuery = true;
         } else if (
           this._appFieldFilter?.find(
-            (f) => f.filter.toLowerCase() === k.toLowerCase()
+            (f) => f.filter.toLowerCase() === k.toLowerCase(),
           )
         ) {
           temp[k] = filter[k];
@@ -847,7 +996,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
 
       // record query
       this.notify(); // @deprecated, use layoutChangeWatcher instead
-      this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row)
+      this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
     } catch (ex) {
       throw ex;
     }
@@ -919,11 +1068,11 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       return await appNode.loadRefField(
         row,
         this._eschema.struct!.fields.find(
-          (f) => f.name === refField
+          (f) => f.name === refField,
         ) as IStructArrayFieldConfig,
         refField,
         refInfo.func,
-        args
+        args,
       );
     } else {
       // @TODO: create a temp app node
@@ -966,7 +1115,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       0,
       this._fieldInfo?.take,
       this._fieldInfo?.descend,
-      filter
+      filter,
     ).catch(console.log);
   }
 
@@ -977,7 +1126,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
     if (!this._appFieldFilter?.length) return;
 
     this._appFieldFilter?.forEach((f) => {
-      f.nodes.forEach((n) => n.data = null)
+      f.nodes.forEach((n) => (n.data = null));
     });
 
     if (load) await this.processFilter().catch(console.log);
@@ -1008,8 +1157,10 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
   /**
    * Gets the template node for field
    */
-  getTemplateNode(name: string | undefined = undefined): AnySchemaNode | undefined {
-    if (!this._templateRow){
+  getTemplateNode(
+    name: string | undefined = undefined,
+  ): AnySchemaNode | undefined {
+    if (!this._templateRow) {
       this._templateRow = this.newElement({}, true) as StructNode;
       this._templateRow.resetChanges();
       this._templateRow.activeRule(true);
@@ -1024,18 +1175,18 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
    * @param immediate whether to call the handler immediately
    */
   subscribeLayoutChanged(func: Function, immediate?: boolean): Function {
-      const result = this._layoutChangeWatcher.addWatcher(func) 
-      if (immediate) func(ArrayNodeLayoutChange.All)
-      return result
+    const result = this._layoutChangeWatcher.addWatcher(func);
+    if (immediate) func(ArrayNodeLayoutChange.All);
+    return result;
   }
-  
+
   //#endregion
 
   //#region Template
 
   async downloadTemplate(): Promise<boolean> {
     const templateProvider = getTemplateProvider();
-    if (!this._template) return false
+    if (!this._template) return false;
 
     // reference check
     let appNode = this.parent;
@@ -1051,28 +1202,25 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       for (const field of this._eschema.struct?.fields || []) {
         if (field.displayOnly || field.invisible) continue;
         const fldNode = this.getTemplateNode(field.name);
-    
+
         // dynamic fields
-        if (field.type === NS_SYSTEM_JSON)
-        {
-          const dynamicType = fldNode.rule.type
-          if (dynamicType)
-          {
-            const schema = getCachedSchema(dynamicType)
-            if (schema && schema.type === SchemaType.Struct)
-            {
-              request.dynamicTypes ??= {}
-              request.dynamicTypes[field.name] = deepClone(schema.struct.fields)
+        if (field.type === NS_SYSTEM_JSON) {
+          const dynamicType = fldNode.rule.type;
+          if (dynamicType) {
+            const schema = getCachedSchema(dynamicType);
+            if (schema && schema.type === SchemaType.Struct) {
+              request.dynamicTypes ??= {};
+              request.dynamicTypes[field.name] = deepClone(
+                schema.struct.fields,
+              );
             }
           }
         }
         // entries
-        else if(fldNode instanceof ScalarNode)
-        {
-          if (fldNode.whiteList?.length)
-          {
-            request.entries ??= {}
-            request.entries[field.name] = deepClone(fldNode.whiteList)
+        else if (fldNode instanceof ScalarNode) {
+          if (fldNode.whiteList?.length) {
+            request.entries ??= {};
+            request.entries[field.name] = deepClone(fldNode.whiteList);
           }
         }
       }
@@ -1082,13 +1230,17 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
     return true;
   }
 
-  async uploadDataFile(file: File, autoCommit: boolean = false): Promise<ITemplateUploadResponse | undefined> {
+  async uploadDataFile(
+    file: File,
+    autoCommit: boolean = false,
+  ): Promise<ITemplateUploadResponse | undefined> {
     const templateProvider = getTemplateProvider();
 
     // reference check
     let appNode = this.parent;
     while (appNode && !(appNode instanceof AppNode)) appNode = appNode.parent;
-    if (!(appNode && appNode instanceof AppNode && appNode.target)) return undefined;
+    if (!(appNode && appNode instanceof AppNode && appNode.target))
+      return undefined;
 
     const request: ITemplateRequest = {
       app: appNode.name,
@@ -1101,28 +1253,25 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       for (const field of this._eschema.struct?.fields || []) {
         if (field.displayOnly || field.invisible) continue;
         const fldNode = this.getTemplateNode(field.name);
-    
+
         // dynamic fields
-        if (field.type === NS_SYSTEM_JSON)
-        {
-          const dynamicType = fldNode.rule.type
-          if (dynamicType)
-          {
-            const schema = getCachedSchema(dynamicType)
-            if (schema && schema.type === SchemaType.Struct)
-            {
-              request.dynamicTypes ??= {}
-              request.dynamicTypes[field.name] = deepClone(schema.struct.fields)
+        if (field.type === NS_SYSTEM_JSON) {
+          const dynamicType = fldNode.rule.type;
+          if (dynamicType) {
+            const schema = getCachedSchema(dynamicType);
+            if (schema && schema.type === SchemaType.Struct) {
+              request.dynamicTypes ??= {};
+              request.dynamicTypes[field.name] = deepClone(
+                schema.struct.fields,
+              );
             }
           }
         }
         // entries
-        else if(fldNode instanceof ScalarNode)
-        {
-          if (fldNode.whiteList?.length)
-          {
-            request.entries ??= {}
-            request.entries[field.name] = deepClone(fldNode.whiteList)
+        else if (fldNode instanceof ScalarNode) {
+          if (fldNode.whiteList?.length) {
+            request.entries ??= {};
+            request.entries[field.name] = deepClone(fldNode.whiteList);
           }
         }
       }
@@ -1143,13 +1292,24 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
   private _elements: AnySchemaNode[] = [];
   private _enode: EnumNode | undefined;
   private _fieldInfo: IAppDataFieldInfo | undefined;
-  public _tracker: {[key: string]: { origin?: {}; update?: {}; delete?: boolean }} = {};
+  public _tracker: {
+    [key: string]: { origin?: {}; update?: {}; delete?: boolean };
+  } = {};
   private _errfld: AnySchemaNode | undefined;
-  private _reffields: { [key: string]: { app: string; field: string; func: string; args: IFunctionCallArgument[]}} | undefined;
+  private _reffields:
+    | {
+        [key: string]: {
+          app: string;
+          field: string;
+          func: string;
+          args: IFunctionCallArgument[];
+        };
+      }
+    | undefined;
   private _appFieldFilter: IArrayFieldFilter[] | undefined;
   private _templateRow: StructNode | undefined;
-  private _layoutChangeWatcher: DataChangeWatcher = new DataChangeWatcher()
-  private _template?: boolean
+  private _layoutChangeWatcher: DataChangeWatcher = new DataChangeWatcher();
+  private _template?: boolean;
 
   //#endregion
 
@@ -1158,7 +1318,11 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
    * @param parent the parent node of the node.
    * @param config the config of the node.
    */
-  constructor(config: ISchemaConfig, data: any, parent: AnySchemaNode | undefined = undefined) {
+  constructor(
+    config: ISchemaConfig,
+    data: any,
+    parent: AnySchemaNode | undefined = undefined,
+  ) {
     super(config, data, parent);
     if (isNull(data) || !Array.isArray(data)) data = [];
 
@@ -1179,7 +1343,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
           multiple: true,
         } as IEnumConfig,
         data,
-        this
+        this,
       );
       this._enode.subscribe(this.notify);
       this._enode.subscribeState(this.notifyState);
@@ -1205,7 +1369,8 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
 
     const appSchema = getAppCachedSchema(appNode.name);
     const appField = appSchema?.fields.find((f) => f.name === this.name);
-    this._template = appField?.template === true && isSchemaPluginEnabled("*_TEMPLATE")
+    this._template =
+      appField?.template === true && isSchemaPluginEnabled("*_TEMPLATE");
 
     // field filters
     if (appField?.filters?.length && this._eschema.type === SchemaType.Struct) {
@@ -1238,7 +1403,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
                   require: false,
                 },
                 undefined,
-                undefined
+                undefined,
               );
               nodes.push(node);
             }
@@ -1254,7 +1419,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
         // light fitler, use the data field in the struct
         else {
           const fld = this._eschema.struct?.fields.find(
-            (sf) => sf.name?.toLowerCase() === f.filter.toLowerCase()
+            (sf) => sf.name?.toLowerCase() === f.filter.toLowerCase(),
           );
           if (fld) {
             if (fld.type === NS_SYSTEM_LOCALE_STRING) {
@@ -1266,7 +1431,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
                   require: false,
                 },
                 undefined,
-                undefined
+                undefined,
               );
               node.resetChanges();
 
@@ -1298,7 +1463,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
       this._eschema.type === SchemaType.Struct &&
       this._eschema.struct?.relations?.length &&
       this._eschema.struct.relations.some(
-        (r) => r.type === RelationType.Reference
+        (r) => r.type === RelationType.Reference,
       )
     ) {
       this._reffields = {};
@@ -1307,18 +1472,26 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> { //#region I
         if (rel.type !== RelationType.Reference) continue;
         this._reffields[rel.field] = resolveAppReference(
           this._eschema.name,
-          rel
+          rel,
         ) as any;
       }
     }
 
     // Json field check
-    if (this._eschema.type === SchemaType.Struct && this._eschema.struct?.fields.find(f => f.type === NS_SYSTEM_JSON)) {
-        const fldNode = this.getTemplateNode() as StructNode
-        if (!fldNode) return
+    if (
+      this._eschema.type === SchemaType.Struct &&
+      this._eschema.struct?.fields.find((f) => f.type === NS_SYSTEM_JSON)
+    ) {
+      const fldNode = this.getTemplateNode() as StructNode;
+      if (!fldNode) return;
 
-        // watch json type changes
-        fldNode.subscribeMemberChange(debounce(() => this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.All), 100))
+      // watch json type changes
+      fldNode.subscribeMemberChange(
+        debounce(
+          () => this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.All),
+          100,
+        ),
+      );
     }
   }
 }
@@ -1406,7 +1579,7 @@ export interface IArrayFieldFilter {
  * The array node layout change type
  */
 export enum ArrayNodeLayoutChange {
-    Row = "row",
-    Column = "column",
-    All = "all"
+  Row = "row",
+  Column = "column",
+  All = "all",
 }

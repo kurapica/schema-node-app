@@ -30,7 +30,7 @@ import {
 } from "../schema/structSchema";
 import { DataChangeWatcher } from "./dataChangeWatcher";
 import { type IAppSchema } from "../schema/appSchema";
-import { _L, _LS, combineLocaleString, type ILocaleString } from "./locale";
+import { _L, _LS, combineLocaleString, getLanguage, type ILocaleString } from "./locale";
 import axios from "axios";
 import { PolicyScope } from "../enum/policyScope";
 //#endregion
@@ -2382,6 +2382,14 @@ export async function postSchemaApi(
 
     if (site.endsWith("/")) site = site.substring(0, site.length - 1);
     if (url.startsWith("/")) url = url.substring(1);
+
+    // locale
+    const locale = getLanguage()
+    if (locale) {
+      if (typeof param === "object" && param !== null && !param["locale"]) {
+        param["locale"] = locale;
+      }
+    }
 
     // Read protocol meta if not yet defined
     if (!noProtocol) {
