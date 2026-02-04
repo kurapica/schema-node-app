@@ -12,24 +12,21 @@ export interface ITemplateProvider {
    */
   uploadData(
     request: ITemplateRequest,
-    file: File,
-  ): Promise<ITemplateUploadResponse>;
+    file?: File,
+  ): Promise<ITemplateUploadResponse | undefined>;
 }
 
 let templateProvider: ITemplateProvider | null = null;
 
 export const defaultTemplateProvider: ITemplateProvider = {
-  downloadTemplate: async (
-    request: ITemplateRequest,
-    file?: string,
-  ): Promise<void> => {
+  downloadTemplate: async (request: ITemplateRequest): Promise<void> => {
     if (isSchemaPluginEnabled("EXCEL_TEMPLATE"))
       await postSchemaApi("/excel-template", request, false, true);
   },
 
   uploadData: async (
     request: ITemplateRequest,
-    file: File,
+    file?: File,
   ): Promise<ITemplateUploadResponse | undefined> => {
     if (isSchemaPluginEnabled("EXCEL_TEMPLATE"))
       return await postSchemaApi(
@@ -88,6 +85,16 @@ export interface ITemplateRequest {
    * Whether to save the uploaded data
    */
   save?: boolean;
+
+  /**
+   * The upload file url instead of direct file upload
+   */
+  url?: string;
+
+  /**
+   * The suffix for the upload url
+   */
+  suffix?: string;
 
   /**
    * Whether to omit helper fields in the template

@@ -1231,8 +1231,9 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   }
 
   async uploadDataFile(
-    file: File,
+    file: File | string,
     autoCommit: boolean = false,
+    suffix?: string,
   ): Promise<ITemplateUploadResponse | undefined> {
     const templateProvider = getTemplateProvider();
 
@@ -1247,6 +1248,8 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       field: this.name,
       target: appNode.target,
       save: autoCommit,
+      suffix: suffix,
+      url: typeof file === "string" ? file : undefined,
     };
 
     if (this._eschema.type === SchemaType.Struct) {
@@ -1277,7 +1280,10 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       }
     }
 
-    return await templateProvider.uploadData(request, file);
+    return await templateProvider!.uploadData(
+      request,
+      typeof file === "string" ? undefined : file,
+    );
   }
 
   //#endregion
@@ -1445,6 +1451,8 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
               if (!node) return;
 
               node.config.require = false;
+              node.config.readonly = false;
+              node.config.immutable = false;
 
               this._appFieldFilter!.push({
                 mode: f.mode,

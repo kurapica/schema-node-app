@@ -84,6 +84,11 @@ export interface IAppFieldSchema {
   template?: boolean;
 
   /**
+   * Enable the clear value option
+   */
+  allowClear?: boolean;
+
+  /**
    * The combine rule if field type is scalar or enum
    */
   combine?: DataCombineTypeValue;
