@@ -712,7 +712,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     row: StructNode,
     forceSave: boolean = false,
   ): Promise<boolean> {
-    if (!this.incrUpdate || !row.valid) return false;
+    if (!this.incrUpdate) return false;
     const primarys = this._schema.array?.primary;
     if (!primarys?.length) return false;
 
@@ -720,7 +720,17 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     let isnew = false;
     for (let i = 0; i < primarys.length; i++) {
       const node = row.getField(primarys[i]);
-      if (!node || isNull(node?.rawData) || !node.valid) return false;
+      if (
+        (!node || isNull(node?.rawData) || !node.valid) &&
+        !this._eschema.struct?.relations?.find(
+          (r) =>
+            r.field === primarys[i] &&
+            (r.type === RelationType.InitOnly ||
+              r.type === RelationType.Assign ||
+              r.type === RelationType.Default),
+        )
+      )
+        return false;
       if (node.changed) isnew = true;
     }
 
@@ -997,6 +1007,16 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       // record query
       this.notify(); // @deprecated, use layoutChangeWatcher instead
       this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
+
+      // re-fill query
+      if (this._appFieldFilter?.length) {
+        const filter = this._fieldInfo?.filter;
+        this._appFieldFilter.forEach((f) => {
+          if (f.mode == FieldFilterMode.Filter || !f.nodes?.length) return;
+          const data = filter ? filter[f.filter] : undefined;
+          if (!isEqual(data, f.nodes[0].data)) f.nodes[0].data = data;
+        });
+      }
     } catch (ex) {
       throw ex;
     }
@@ -1090,7 +1110,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     this._appFieldFilter?.forEach((f) => {
       if (f.mode === FieldFilterMode.Filter) {
         const funcSchema = getCachedSchema(f.filter);
-        if (funcSchema && funcSchema.type === SchemaType.Func) {
+        if (funcSchema && funcSchema.type === SchemaType.Func && f.nodes) {
           const args: any[] = [];
           for (let i = 0; i < f.nodes.length; i++) {
             const data = f.nodes[i].data;

@@ -1,5 +1,4 @@
-export enum RelationType
-{
+export enum RelationType {
   /**
    * The node type, only works for struct field
    */
@@ -44,7 +43,7 @@ export enum RelationType
    * up limit
    */
   UpLimit = "upLimit",
-  
+
   /**
    * root, for enum or scalar values with tree structure
    */
@@ -75,6 +74,11 @@ export enum RelationType
    */
   SingleFlag = "singleFlag",
 
+  /**
+   * The display of the node
+   */
+  Display = "display",
+
   /**s
    * Validate the value
    */
@@ -86,4 +90,4 @@ export enum RelationType
   Reference = "reference",
 }
 
-export type RelationTypeValue = `${RelationType}`
+export type RelationTypeValue = `${RelationType}`;

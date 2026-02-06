@@ -1,36 +1,41 @@
 export abstract class Rule {
-    /**
-     * The node type
-     */
-    type: string = ""
-    
-    /**
-     * The default value
-     */
-    default?: any
+  /**
+   * The node type
+   */
+  type: string = "";
 
-    /**
-     * Invisible
-     */
-    invisible?: boolean
+  /**
+   * The default value
+   */
+  default?: any;
 
-    /**
-     * Disable the node
-     */
-    disable?: boolean
+  /**
+   * Invisible
+   */
+  invisible?: boolean;
 
-    /**
-     * Validation failed
-     */
-    error?: boolean
+  /**
+   * Disable the node
+   */
+  disable?: boolean;
 
-    /**
-     * Already actived
-     */
-    _actived?: boolean
+  /**
+   * Validation failed
+   */
+  error?: boolean;
 
-    /**
-     * The active pushes
-     */
-    _activePushes?: (() => void)[]
+  /**
+   * The display text
+   */
+  display?: string;
+
+  /**
+   * Already actived
+   */
+  _actived?: boolean;
+
+  /**
+   * The active pushes
+   */
+  _activePushes?: (() => void)[];
 }

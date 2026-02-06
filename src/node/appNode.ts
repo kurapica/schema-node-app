@@ -440,7 +440,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
      * @param nodes the reload nodes
      * @param onlyNotLoaded whether only reload unloaded fields
      */
-    async reload(nodes?: AnySchemaNode[] | string[], onlyNotLoaded: boolean = false): Promise<void> {
+    async reload(nodes?: AnySchemaNode[] | string[], onlyNotLoaded: boolean = false, noPageSet: boolean = false): Promise<void> {
         if (!this.target) return
 
         let queryNodes: {node: AnySchemaNode, state: AppFieldNodeState}[] = []
@@ -511,11 +511,13 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
         }
 
         // incr update use set page
+        if (noPageSet) return;
         for (let i = 0; i < incrUpdateArrayNodes.length; i++)
         {
             const n = incrUpdateArrayNodes[i];
             n.state |= AppFieldNodeState.Loaded;
-            (n.node as ArrayNode).setPage(0)
+            const arrayNode = n.node as ArrayNode;
+            arrayNode.setPage(arrayNode.page)
         }
     }
 
@@ -645,7 +647,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
      * Submit all changes
      * @param nodes the submit node fields, default all
      */
-    async submit(nodes?: AnySchemaNode[] | string[]): Promise<IAppDataPushResult | undefined> {
+    async submit(nodes?: AnySchemaNode[] | string[], noPageSet: boolean = false): Promise<IAppDataPushResult | undefined> {
         if (!this.target) return undefined
         const datas: any = {}
 
@@ -679,7 +681,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
 
         // clear changes
         pushNodes.forEach(n => n.resetChanges())
-        await this.reload(this.loadedPushFields)
+        await this.reload(this.loadedPushFields, noPageSet)
 
         return result
     }
