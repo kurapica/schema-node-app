@@ -68,8 +68,7 @@ export class StructNode extends SchemaNode<ISchemaConfig, StructRule> {
 
       if (fconf?.unpack && typeof f.data === "object" && f.data !== null) {
         for (let k in f.data) {
-          if (!isNull(f.data[k]))
-            result[k] = f.data[k];
+          if (!isNull(f.data[k])) result[k] = f.data[k];
         }
       } else result[f.name] = f.data;
     });

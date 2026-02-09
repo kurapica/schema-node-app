@@ -387,6 +387,7 @@ function activePushSchema(
       type = NS_SYSTEM_NUMBER;
       if (node instanceof ScalarNode) {
         handler = (res: any) => {
+          res ||= 0;
           if (node.isNumber && node.rule.useOriginForUpLimit) {
             const origin = node.original;
             if (isFinite(res) && isFinite(origin)) {

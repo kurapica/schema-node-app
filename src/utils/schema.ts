@@ -232,6 +232,8 @@ registerSchema([
                     }
                 }).filter(e => { if (temp.has(e.value)) return false; temp.add(e.value); return true; })
             }),
+            
+            newSystemFunc("system.str.trim", NS_SYSTEM_STRING, [{ name: "str", type: NS_SYSTEM_STRING, nullable: true }], (a?: string) => (a || "").trim()),
 
             // Require backend, no data guid generation in frontend
             newSystemFunc("system.str.newguid", NS_SYSTEM_GUID, [], generateGuid),

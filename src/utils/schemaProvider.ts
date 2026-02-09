@@ -1488,7 +1488,7 @@ export async function callSchemaFunction(
 
   // Pre-check the function arguments
   for (let i = 0; i < funcInfo.args.length; i++) {
-    if (isNull(args[i]) && !funcInfo.args[i].nullable) return null;
+    if (isNull(args[i]) && !(funcInfo.args[i].nullable || funcInfo.args[i].params)) return null;
   }
 
   // Try build the function

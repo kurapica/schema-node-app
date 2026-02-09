@@ -447,9 +447,11 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
         if (!nodes?.length) nodes = this.inputFields
 
         // reload check
+        const checked = new Set<string>()
         const checkToQuery = (n: string) => {
             n = n.toLowerCase()
-            if (isNull(n)) return
+            if (isNull(n) || checked.has(n)) return
+            checked.add(n)
             const info = this._fields.find(f => f.node.name.toLowerCase() === n)
             if (!info) return
             if (queryNodes.findIndex(qn => qn.node === info.node) >= 0) return
@@ -533,9 +535,11 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
         let queryNodes: {node: AnySchemaNode, state: AppFieldNodeState}[] = []
 
         // reload check
+        const checked = new Set<string>()
         const checkToQuery = (n: string) => {
             n = n.toLowerCase()
-            if (isNull(n)) return
+            if (isNull(n) || checked.has(n)) return
+            checked.add(n)
             const info = this._fields.find(f => f.node.name.toLowerCase() === n)
             if (!info) return
             if (queryNodes.findIndex(qn => qn.node === info.node) >= 0) return
