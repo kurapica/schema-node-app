@@ -102,6 +102,7 @@ export default {
 
     SAVE: "Sav",
     CANCEL: "Cancel",
+    CLOSE: "Close",
     EDIT: "Edit",
     VIEW: "View",
     RESUME: "Resume",

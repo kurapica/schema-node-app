@@ -664,7 +664,10 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
             const state = this._fields.find(f => f.node === n)?.state || AppFieldNodeState.None
             if (!(state & (AppFieldNodeState.FrontEnd | AppFieldNodeState.Push | AppFieldNodeState.Ref | AppFieldNodeState.Readonly)) && n.changed)
             {
-                if (!n.valid) return { result: false, error: `field ${n.name} is invalid` }
+                if (!n.valid) {
+                    console.log(n)
+                    return { result: false, error: `field ${n.name} is invalid` }
+                }
                 const submitData = n.submitData
                 const deletes = (n instanceof ArrayNode) ? n.deletes : null
 

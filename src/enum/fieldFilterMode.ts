@@ -11,3 +11,10 @@ export enum FieldFilterMode
 }
 
 export type FieldFilterModeValue = `${FieldFilterMode}`
+
+export enum FieldFilterResolve
+{
+    CascadeParent = "cascadeParent",
+}
+
+export type FieldFilterResolveValue = `${FieldFilterResolve}`

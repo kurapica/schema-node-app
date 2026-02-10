@@ -1,5 +1,5 @@
 import { type DataCombineTypeValue } from "../enum/dataCombineType";
-import { type FieldFilterModeValue } from "../enum/fieldFilterMode";
+import { FieldFilterResolveValue, type FieldFilterModeValue } from "../enum/fieldFilterMode";
 import { type ILocaleString } from "../utils/locale";
 import { type IDataCombine } from "./arraySchema";
 import { type IPolicyItem } from "./policySchema";
@@ -162,4 +162,9 @@ export interface IFieldFilter {
    * The filter mode
    */
   mode: FieldFilterModeValue;
+
+  /**
+   * The filter resolve strategy
+   */
+  resolve?: FieldFilterResolveValue;
 }

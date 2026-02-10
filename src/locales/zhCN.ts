@@ -103,6 +103,7 @@ export default {
 
     SAVE: "保存",
     CANCEL: "取消",
+    CLOSE: "关闭",
     EDIT: "编辑",
     VIEW: "查看",
     RESUME: "恢复",
