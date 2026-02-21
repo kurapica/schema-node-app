@@ -44,25 +44,6 @@ export interface IAppSchemaDataProvider extends ISchemaProvider {
   ): Promise<IAppDataPushResult>;
 
   /**
-   * Set the source app and target for an app target
-   */
-  setSourceTarget(
-    app: string,
-    target: string,
-    sourceApp: string,
-    sourceTarget?: string,
-  ): Promise<boolean>;
-
-  /**
-   * Get the source app and target for an app target
-   */
-  getSourceTarget(
-    app: string,
-    target: string,
-    sourceApp: string,
-  ): Promise<string | undefined>;
-
-  /**
    * Process the interaction workflow request
    * @param app The application name
    * @param target The application target
@@ -118,36 +99,6 @@ export const defaultAppSchemaProvider: IAppSchemaDataProvider = {
       target,
       datas,
     });
-  },
-
-  setSourceTarget: async function (
-    app: string,
-    target: string,
-    sourceApp: string,
-    sourceTarget?: string,
-  ): Promise<boolean> {
-    return (
-      await postSchemaApi("/set-source-target", {
-        app,
-        target,
-        sourceApp,
-        sourceTarget,
-      })
-    )?.result;
-  },
-
-  getSourceTarget: async function (
-    app: string,
-    target: string,
-    sourceApp: string,
-  ): Promise<string | undefined> {
-    return (
-      await postSchemaApi("/get-source-target", {
-        app,
-        target,
-        sourceApp,
-      })
-    )?.target;
   },
 
   interaction: async function (

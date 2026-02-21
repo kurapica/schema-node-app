@@ -35,16 +35,6 @@ export interface IAppFieldSchema {
   desc?: ILocaleString;
 
   /**
-   * The source application
-   */
-  sourceApp?: string;
-
-  /**
-   * The source field
-   */
-  sourceField?: string;
-
-  /**
    * The field storage topology, default is co-located
    */
   topology?: FieldStorageTopologyValue;

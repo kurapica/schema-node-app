@@ -135,18 +135,6 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
 
     get loadedPushFields(): AnySchemaNode[] { return this.getFields(AppFieldNodeState.Push | AppFieldNodeState.Loaded, AppFieldNodeState.Ref) }
 
-    /**
-     * Gets all source apps
-     */
-    get sourceApps(): string[] {
-        const sourceApps: string[] = []
-        this._appSchema.fields!.forEach(f => {
-            if (f.sourceApp && !sourceApps.includes(f.sourceApp))
-                sourceApps.push(f.sourceApp)
-        })
-        return sourceApps
-    }
-
     //#endregion
 
     //#region Methods
@@ -588,7 +576,6 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
                     let state = AppFieldNodeState.None
                     if (!isNull(d) || result?.infos[fconf.name]) state |= AppFieldNodeState.Loaded
                     if (fconf.func) state |= AppFieldNodeState.Push
-                    if (fconf.sourceApp) state |= AppFieldNodeState.Ref
                     if (fconf.readonly) state |= AppFieldNodeState.Readonly | AppFieldNodeState.Push
                     if (fconf.frontend) {
                         // front-end field always consider loaded
@@ -629,7 +616,6 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
             {
                 let state = AppFieldNodeState.None
                 if (fconf.func) state |= AppFieldNodeState.Push
-                if (fconf.sourceApp) state |= AppFieldNodeState.Ref
                 if (fconf.readonly) state |= AppFieldNodeState.Readonly | AppFieldNodeState.Push
                 const readonlyField = (this.readonly || config.readonly || (state & (AppFieldNodeState.Ref | AppFieldNodeState.Push | AppFieldNodeState.Readonly))) ? true : false
 
@@ -799,7 +785,6 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
             let state = AppFieldNodeState.None
             if (!isNull(d) || data?.infos[fconf.name]) state |= AppFieldNodeState.Loaded
             if (fconf.func) state |= AppFieldNodeState.Push
-            if (fconf.sourceApp) state |= AppFieldNodeState.Ref
             if (fconf.readonly) state |= AppFieldNodeState.Readonly | AppFieldNodeState.Push
             if (fconf.frontend) {
                 // front-end field always consider loaded
