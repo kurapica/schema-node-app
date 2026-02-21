@@ -17,6 +17,7 @@ import { SchemaNodeStatus } from "../enum/schemaNodeStatus"
 import { WorkflowStatus } from "../enum/workflowStatus"
 import { FieldFilterMode } from "../enum/fieldFilterMode"
 import { FieldStorageTopology } from "../enum/fieldStorageTopology"
+import { AppScopeType } from "../enum/appScopeType"
 
 //#region Utility
 
@@ -806,6 +807,7 @@ registerSchema([
             newSystemEnum("system.schema.fieldfiltermode", FieldFilterMode),
             newSystemEnum(NS_SYSTEM_SCHEMA_STATUS, SchemaNodeStatus),
             newSystemEnum("system.schema.fieldstoragetopology", FieldStorageTopology),
+            newSystemEnum("system.schema.appscopetype", AppScopeType),
 
             // array
             newSystemArray("system.schema.policyscopes", "system.schema.policyscope"),

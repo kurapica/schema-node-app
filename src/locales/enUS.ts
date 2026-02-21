@@ -37,6 +37,8 @@ export default {
     "system.rangedate.start": "Start Time",
     "system.rangedate.stop": "End Time",
     "system.rangefulldate": "Full Date Time Range",
+    "system.rangefulldate.start": "Start Time",
+    "system.rangefulldate.stop": "End Time",
     "system.rangemonth": "Month Range",
     "system.rangemonth.start": "Start Month",
     "system.rangemonth.stop": "End Month",

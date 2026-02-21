@@ -38,6 +38,8 @@ export default {
     "system.rangedate.start": "起始时间",
     "system.rangedate.stop": "结束时间",
     "system.rangefulldate": "年月日时分秒时间范围",
+    "system.rangefulldate.start": "起始时间",
+    "system.rangefulldate.stop": "结束时间",
     "system.rangemonth": "年月时间范围",
     "system.rangemonth.start": "起始月份",
     "system.rangemonth.stop": "结束月份",

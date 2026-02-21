@@ -1,5 +1,6 @@
 import { type DataCombineTypeValue } from "../enum/dataCombineType";
 import { FieldFilterResolveValue, type FieldFilterModeValue } from "../enum/fieldFilterMode";
+import { FieldStorageTopologyValue } from "../enum/fieldStorageTopology";
 import { type ILocaleString } from "../utils/locale";
 import { type IDataCombine } from "./arraySchema";
 import { type IPolicyItem } from "./policySchema";
@@ -42,6 +43,21 @@ export interface IAppFieldSchema {
    * The source field
    */
   sourceField?: string;
+
+  /**
+   * The field storage topology, default is co-located
+   */
+  topology?: FieldStorageTopologyValue;
+
+  /**
+   * The dynamic table name
+   */
+  tableName?: string;
+
+  /**
+   * The attribute table name when topology is attribute-based
+   */
+  attrTableName?: string;
 
   /**
    * Track the push data to source field

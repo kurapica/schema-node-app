@@ -1,3 +1,4 @@
+import { AppTargetTypeValue } from "../enum/appScopeType"
 import { type ILocaleString } from "../utils/locale"
 import { type IAppFieldSchema } from "./appFieldSchema"
 import { type IAppWorkflowSchema } from "./appWorkflowSchema"
@@ -24,6 +25,11 @@ export interface IAppSchema
      * The description
      */
     desc?: ILocaleString
+
+    /**
+     * The target policies  
+     */
+    scopePolicies?: IAppScopePolicy[]
 
     /**
      * The authorization policy type
@@ -84,6 +90,35 @@ export interface IAppSchema
      * Already loaded from the server
      */
     loaded?: boolean
+}
+
+export interface IAppScopePolicy {
+    /**
+     * The app target policy
+     */
+    type: AppTargetTypeValue
+
+    /**
+     * The app target value, like the node type or the app name
+     */
+    contextMaps?: IAppScopeContextMap[]
+
+    /**
+     * The business key for the business target, default `_target`
+     */
+    businessKey?: string
+}
+
+export interface IAppScopeContextMap {
+    /**
+     * The context item
+     */
+    contextItem?: string
+
+    /**
+     * The context item map key
+     */
+    mapKey?: string
 }
 
 /**
