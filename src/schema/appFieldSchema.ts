@@ -50,11 +50,6 @@ export interface IAppFieldSchema {
   attrTableName?: string;
 
   /**
-   * Track the push data to source field
-   */
-  trackPush?: boolean;
-
-  /**
    * The function used to generate data
    */
   func?: string;
