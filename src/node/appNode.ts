@@ -650,10 +650,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
             const state = this._fields.find(f => f.node === n)?.state || AppFieldNodeState.None
             if (!(state & (AppFieldNodeState.FrontEnd | AppFieldNodeState.Push | AppFieldNodeState.Ref | AppFieldNodeState.Readonly)) && n.changed)
             {
-                if (!n.valid) {
-                    console.log(n)
-                    return { result: false, error: `field ${n.name} is invalid` }
-                }
+                if (!n.valid) return { result: false, error: `field ${n.name} is invalid` }
                 const submitData = n.submitData
                 const deletes = (n instanceof ArrayNode) ? n.deletes : null
 
@@ -674,7 +671,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
 
         // clear changes
         pushNodes.forEach(n => n.resetChanges())
-        await this.reload(this.loadedPushFields, noPageSet)
+        await this.reload(this.loadedPushFields, true, noPageSet)
 
         return result
     }
@@ -723,7 +720,28 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule>
                 if (status === WorkflowStatus.Waiting || status === WorkflowStatus.Running)
                     continue
 
-                await this.reload(this.loadedInputFields)
+                const loadedInputFields = this.loadedInputFields
+                if (loadedInputFields.length > 2)
+                {
+                    // Too many loaded input fields: unload them all and clear data so that
+                    // schemaView lazy-load logic re-triggers them as they re-enter the viewport.
+                    const effected = []
+                    for (const finfo of this._fields)
+                    {
+                        if (!loadedInputFields.includes(finfo.node)) continue
+                        finfo.node.data = undefined
+                        finfo.node.resetChanges()
+                        effected.push(finfo)
+                    }
+                    effected.forEach(finfo => {
+                        finfo.state &= ~AppFieldNodeState.Loaded
+                        finfo.node.notifyState()
+                    })
+                }
+                else
+                {
+                    await this.reload(loadedInputFields)
+                }
                 break
             }
         }

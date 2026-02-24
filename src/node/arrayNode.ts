@@ -255,6 +255,15 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       else this._data = deepClone(data);
       this.validation().then(this.notify);
     } else if (this.incrUpdate) {
+      if (!data.length) {
+        const stale = this._elements;
+        this._elements = [];
+        this._data = [];
+        this._tracker = {};
+        this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
+        setTimeout(() => stale.forEach((e) => e.dispose()), 0);
+        return;
+      }
       throw `Can't set data to ${_L(this.display || this.name)}`;
     } else {
       // assign

@@ -1,6 +1,6 @@
 import { type DataCombineTypeValue } from "../enum/dataCombineType";
-import { FieldFilterResolveValue, type FieldFilterModeValue } from "../enum/fieldFilterMode";
-import { FieldStorageTopologyValue } from "../enum/fieldStorageTopology";
+import { type FieldFilterResolveValue, type FieldFilterModeValue } from "../enum/fieldFilterMode";
+import { type FieldStorageTopologyValue } from "../enum/fieldStorageTopology";
 import { type ILocaleString } from "../utils/locale";
 import { type IDataCombine } from "./arraySchema";
 import { type IPolicyItem } from "./policySchema";
