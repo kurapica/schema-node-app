@@ -37,6 +37,14 @@ export const ARRAY_ITSELF = "$array";
 export const ARRAY_ELEMENT = "$ele";
 export const NODE_SELF = "$self";
 
+const getAppFieldDataFuncs: string[] = [
+  "system.data.getappfdata",
+  "system.data.getappfdatabyonekey",
+  "system.data.getappfdatabytwokey",
+  "system.data.getappfdatabythreekey",
+  "system.data.getappfdatabyfourkey",
+];
+
 /**
  * The rule schema for schema node
  */
@@ -360,7 +368,12 @@ function activePushSchema(
         };
 
         // check display only, they should be handled when batch query, don't work for complex relation now
-        if (node.config.displayOnly && !isNull(node.data)) inited = true;
+        if (
+          node.config.displayOnly &&
+          (!isNull(node.data) ||
+            getAppFieldDataFuncs.includes(pushSchema.func.toLowerCase()))
+        )
+          inited = true;
       }
       break;
 

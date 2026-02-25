@@ -218,7 +218,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
    * Gets the page count
    */
   get pageCount() {
-    return this._fieldInfo?.take;
+    return this._fieldInfo?.take || this.total;
   }
 
   /**
