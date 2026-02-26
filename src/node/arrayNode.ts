@@ -82,12 +82,10 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   get changed(): boolean {
     if (this._enode) return this._enode.changed;
     if (this.asSingle) return !isEqual(this._data, this._original);
-    if (
-      this._elements.find((e) => e.changed) ||
-      (this._original?.length || 0) !== (this._elements.length || 0)
-    )
-      return true;
-    if (!this.incrUpdate) return false;
+
+    if (this._elements.find((e) => e.changed)) return true;
+    if (!this.incrUpdate)
+      return (this._original?.length || 0) !== (this._elements.length || 0);
     for (let key in this._tracker) {
       const track = this._tracker[key];
       if (track.delete || track.update) return true;
@@ -424,6 +422,40 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   }
 
   /**
+   * Clear the deleted for origin
+   */
+  clearDeletes() {
+    if (
+      this.asSingle ||
+      this._enode ||
+      this._eschema.type !== SchemaType.Struct ||
+      !this._schema.array?.primary?.length
+    )
+      return;
+
+    if (this.incrUpdate) {
+      // only clean delete-flagged tracker entries; physical removal and page
+      // refresh are handled by AppNode calling setPage() after clearDeletes()
+      for (const key in this._tracker) {
+        if (this._tracker[key].delete) delete this._tracker[key];
+      }
+    } else {
+      // for non-incrUpdate, update _original so the deleted items no longer appear
+      // in the deletes getter (prevents re-submission on the next save)
+      if (!this._original || !Array.isArray(this._original)) return;
+      const keys = new Set<string>();
+      this._elements.forEach((e) => {
+        const key = this.getPrimaryKey(e);
+        if (key) keys.add(key);
+      });
+      this._original = this._original.filter((e: any) => {
+        const key = this.getPrimaryKey(e);
+        return !key || keys.has(key);
+      });
+    }
+  }
+
+  /**
    * Gets the array field filters
    */
   get filters() {
@@ -599,7 +631,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
           let changable = false;
           row.fields.forEach((e) => {
             if (e instanceof ArrayNode)
-              e.subscribeLayoutChanged((type) => {
+              e.subscribeLayoutChanged((type: any) => {
                 if (type == ArrayNodeLayoutChange.Row)
                   this._layoutChangeWatcher.notify(type);
               });
@@ -740,7 +772,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
         )
       )
         return false;
-      if (node.changed) isnew = true;
+      if (node?.changed) isnew = true;
     }
 
     // save to server
@@ -819,8 +851,9 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
    * Delete rows
    * @param start the start index
    * @param count the delete row count, default 1
+   * @param autoDel whether to automatically delete, default false
    */
-  delRows(start: number, count = 1) {
+  async delRows(start: number, count = 1, autoDel = false) {
     if (
       this._enode ||
       this.asSingle ||
@@ -844,6 +877,12 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       remove.forEach((r) => r.dispose());
       this.notify("del", this.elements.length); // @deprecated, use layoutChangeWatcher instead
       this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
+    }
+    if (autoDel) {
+      const parent = this.parent;
+      if (parent instanceof AppNode) {
+        await parent.submit([this], false, true);
+      }
     }
   }
 
@@ -886,6 +925,40 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   }
 
   /**
+   * Whether a row is new
+   */
+  isNewRow(row: AnySchemaNode | number) {
+    if (
+      this.incrUpdate ||
+      this.asSingle ||
+      this._enode ||
+      this._eschema.type !== SchemaType.Struct ||
+      !this._schema.array?.primary?.length
+    )
+      return false;
+
+    if (typeof row === "number") row = this._elements[row];
+    if (!row) return false;
+
+    if (!this._original || !Array.isArray(this._original)) return true;
+    const key = this.getPrimaryKey(row);
+    if (isNull(key)) return true;
+
+    // check if the key exist in previous data, if not exist, it's a new row
+    for (let i = 0; i < this._elements.length; i++) {
+      const ele = this._elements[i];
+      if (ele === row) break;
+      const k = this.getPrimaryKey(ele);
+      if (k === key) return true;
+    }
+
+    return !this._original.find((e: any) => {
+      const k = this.getPrimaryKey(e);
+      return k === key;
+    });
+  }
+
+  /**
    * Change the current page
    * @todo support more orderby options in the next version
    * @param page The page no
@@ -901,6 +974,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     filter?: { [key: string]: any },
     orderBy?: IAppDataQueryOrder[],
   ) {
+    console.log("set page: ", page, count, descend, filter, orderBy);
     //if (!this.incrUpdate) return
     count ||= this._fieldInfo?.take || 10; // default should be provided by server
     if (isNull(descend)) descend = this._fieldInfo?.descend;
@@ -1055,7 +1129,11 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   /**
    * Query the reference node for a field within a row
    */
-  async getReferenceNode(row: AnySchemaNode, field: string) {
+  async getReferenceNode(
+    row: AnySchemaNode,
+    field: string,
+    disableRefIncr: boolean = false,
+  ): Promise<AnySchemaNode | undefined> {
     const refInfo = this._reffields ? this._reffields[field] : undefined;
     if (!refInfo) return undefined;
     const refApp = refInfo.app;
@@ -1102,6 +1180,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
         refField,
         refInfo.func,
         args,
+        disableRefIncr,
       );
     } else {
       // @TODO: create a temp app node
@@ -1155,7 +1234,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     if (!this._appFieldFilter?.length) return;
 
     this._appFieldFilter?.forEach((f) => {
-      f.nodes.forEach((n) => (n.data = null));
+      f.nodes?.forEach((n) => (n.data = null));
     });
 
     if (load) await this.processFilter().catch(console.log);
@@ -1178,7 +1257,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
 
       this._appFieldFilter?.forEach((f) => {
         f.handlers = [];
-        f.nodes.forEach((n) => f.handlers!.push(n.subscribe(loadFilter)));
+        f.nodes?.forEach((n) => f.handlers!.push(n.subscribe(loadFilter)));
       });
     }
   }
@@ -1234,13 +1313,13 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
 
         // dynamic fields
         if (field.type === NS_SYSTEM_JSON) {
-          const dynamicType = fldNode.rule.type;
+          const dynamicType = fldNode?.rule.type;
           if (dynamicType) {
             const schema = getCachedSchema(dynamicType);
             if (schema && schema.type === SchemaType.Struct) {
               request.dynamicTypes ??= {};
               request.dynamicTypes[field.name] = deepClone(
-                schema.struct.fields,
+                schema.struct?.fields || [],
               );
             }
           }
@@ -1255,7 +1334,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       }
     }
 
-    await templateProvider.downloadTemplate(request);
+    if (templateProvider) await templateProvider.downloadTemplate(request);
     return true;
   }
 
@@ -1288,13 +1367,13 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
 
         // dynamic fields
         if (field.type === NS_SYSTEM_JSON) {
-          const dynamicType = fldNode.rule.type;
+          const dynamicType = fldNode?.rule.type;
           if (dynamicType) {
             const schema = getCachedSchema(dynamicType);
             if (schema && schema.type === SchemaType.Struct) {
               request.dynamicTypes ??= {};
               request.dynamicTypes[field.name] = deepClone(
-                schema.struct.fields,
+                schema.struct?.fields || [],
               );
             }
           }
@@ -1403,7 +1482,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     if (!(appNode && appNode instanceof AppNode && appNode.target)) return;
 
     const appSchema = getAppCachedSchema(appNode.name);
-    const appField = appSchema?.fields.find((f) => f.name === this.name);
+    const appField = appSchema?.fields?.find((f) => f.name === this.name);
     this._template =
       appField?.template === true && isSchemaPluginEnabled("*_TEMPLATE");
 
@@ -1418,12 +1497,12 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
           if (
             filterFunc &&
             filterFunc.type === SchemaType.Func &&
-            filterFunc.func?.args?.length > 1
+            (filterFunc.func?.args?.length || 0) > 1
           ) {
             const nodes: AnySchemaNode[] = [];
             let allValid = true;
-            for (let i = 1; i < filterFunc.func.args.length; i++) {
-              const arg = filterFunc.func.args[i];
+            for (let i = 1; i < filterFunc.func!.args.length; i++) {
+              const arg = filterFunc.func!.args[i];
               const argType = arg.type ? getCachedSchema(arg.type!) : undefined;
               if (!argType) {
                 allValid = false;

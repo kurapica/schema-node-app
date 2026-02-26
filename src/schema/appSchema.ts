@@ -1,4 +1,4 @@
-import { type AppTargetTypeValue } from "../enum/appScopeType";
+import { type AppScopeTypeValue } from "../enum/appScopeType";
 import { type ILocaleString } from "../utils/locale";
 import { type IAppFieldSchema } from "./appFieldSchema";
 import { type IAppWorkflowSchema } from "./appWorkflowSchema";
@@ -95,7 +95,7 @@ export interface IAppScopePolicy {
   /**
    * The app target policy
    */
-  type: AppTargetTypeValue;
+  type: AppScopeTypeValue;
 
   /**
    * The app target value, like the node type or the app name
@@ -221,6 +221,11 @@ export interface IAppDataFieldQuery {
    * The filter function arguments
    */
   filterArgs?: any[];
+
+  /**
+   * Query all filter data, ignore pagination and order, only used for filtering
+   */
+  filterAll?: boolean;
 }
 
 export interface IBatchQueryAppDataResult {

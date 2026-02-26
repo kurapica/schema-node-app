@@ -30,6 +30,11 @@ export abstract class Rule {
   display?: string;
 
   /**
+   * The description of the node
+   */
+  desc?: string;
+
+  /**
    * Already actived
    */
   _actived?: boolean;

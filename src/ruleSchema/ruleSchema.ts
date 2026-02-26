@@ -368,12 +368,7 @@ function activePushSchema(
         };
 
         // check display only, they should be handled when batch query, don't work for complex relation now
-        if (
-          node.config.displayOnly &&
-          (!isNull(node.data) ||
-            getAppFieldDataFuncs.includes(pushSchema.func.toLowerCase()))
-        )
-          inited = true;
+        if (node.config.displayOnly && !isNull(node.data)) inited = true;
       }
       break;
 
