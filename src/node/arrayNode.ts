@@ -882,6 +882,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       const parent = this.parent;
       if (parent instanceof AppNode) {
         await parent.submit([this], false, true);
+        this.notify();
       }
     }
   }
