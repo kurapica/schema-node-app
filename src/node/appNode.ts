@@ -886,6 +886,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
       for (const n of pushNodes) {
         if (n instanceof ArrayNode) {
           n.clearDeletes();
+          n.notify();
           if (n.incrUpdate) incrUpdateNodes.push(n);
         }
       }
@@ -896,9 +897,14 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
         }
       }
     } else {
-      pushNodes.forEach((n) => n.resetChanges());
+      pushNodes.forEach((n) => {
+        n.resetChanges();
+        n.notify();
+      });
       await this.reload(this.loadedPushFields, true, noPageSet);
     }
+
+    //
 
     return result;
   }

@@ -116,6 +116,7 @@ export default {
   QUERY: "查询",
   RESET: "重置",
   DEL_CONFIRM: "是否确认删除当前{0}？删除后不可恢复。",
+  NOTIFY: "提示",
 
   "Download Template": "下载模板",
   "Upload Data": "上传数据",

@@ -116,6 +116,8 @@ export default {
   RESET: "Reset",
   DEL_CONFIRM:
     "Are you sure you want to delete the current {0}? This action cannot be undone.",
+  NOTIFY: "Notify",
+
   //#endregion
 
   "Download Template": "Download Template",

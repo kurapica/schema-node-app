@@ -223,7 +223,9 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
    * Gets the total count
    */
   get total() {
-    return this._fieldInfo?.total ?? this._elements.length;
+    return this.incrUpdate
+      ? this._fieldInfo?.total ?? this._elements.length
+      : this._elements.length;
   }
 
   /**
@@ -646,6 +648,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
         break;
     }
     if (!this.incrUpdate) eleNode?.subscribe(this.refreshRawData);
+    else eleNode?.subscribe(this.notify);
     return eleNode;
   }
 
@@ -879,10 +882,11 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
     }
     if (autoDel) {
-      const parent = this.parent;
+      let parent = this.parent;
+      while (parent && !(parent instanceof AppNode)) parent = parent.parent;
       if (parent instanceof AppNode) {
         await parent.submit([this], false, true);
-        this.notify();
+        this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
       }
     }
   }

@@ -357,6 +357,11 @@ function activePushSchema(
           node.notifyState();
         };
       } else {
+        // check display only, they should be handled when batch query, don't work for complex relation now
+        if (node.config.displayOnly && !isNull(node.data)) {
+          inited = true;
+          node.rule.default = node.data;
+        }
         let dftval: any = node.ruleSchema.default;
         handler = (res: any) => {
           if (isNull(res)) res = dftval;
@@ -366,9 +371,6 @@ function activePushSchema(
             node.data = res;
           node.notifyState();
         };
-
-        // check display only, they should be handled when batch query, don't work for complex relation now
-        if (node.config.displayOnly && !isNull(node.data)) inited = true;
       }
       break;
 
