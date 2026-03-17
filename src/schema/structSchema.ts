@@ -18,18 +18,18 @@ export interface IStructSchema
     /**
      * The struct fields.
     */
-    fields: IStructFieldConfig[]
+    fields: IStructFieldSchema[]
 
     /**
      * The realtions between the fields
      */
-    relations?: IStructFieldRelation[]
+    relations?: IStructRelationSchema[]
 }
 
 /**
  * The struct field config
  */
-export interface IStructFieldConfig extends ISchemaConfig
+export interface IStructFieldSchema extends ISchemaConfig
 {
     /**
      * The field name
@@ -37,14 +37,14 @@ export interface IStructFieldConfig extends ISchemaConfig
     name: string
 }
 
-export interface IStructScalarFieldConfig extends IStructFieldConfig, IScalarConfig {}
-export interface IStructEnumFieldConfig extends IStructFieldConfig, IEnumConfig {}
-export interface IStructArrayFieldConfig extends IStructFieldConfig, IArrayConfig {}
+export interface IStructScalarFieldConfig extends IStructFieldSchema, IScalarConfig {}
+export interface IStructEnumFieldConfig extends IStructFieldSchema, IEnumConfig {}
+export interface IStructArrayFieldConfig extends IStructFieldSchema, IArrayConfig {}
 
 /**
  * The realtion between fields
 */
-export interface IStructFieldRelation
+export interface IStructRelationSchema
 {
     /**
      * The target field, can use . for deep fields

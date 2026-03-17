@@ -9,6 +9,7 @@ export * from './enum/policyCombine'
 export * from './enum/schemaNodeStatus'
 export * from './enum/fieldFilterMode'
 export * from './enum/appScopeType'
+export * from './enum/fieldStorageTopology'
 
 export * from './schema/nodeSchema'
 export * from './schema/scalarSchema'
@@ -46,5 +47,3 @@ export * from './node/enumNode'
 export * from './node/structNode'
 export * from './node/arrayNode'
 export * from './node/appNode'
-
-export * from './plugin/templateProvider'

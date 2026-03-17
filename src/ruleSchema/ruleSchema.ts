@@ -37,14 +37,6 @@ export const ARRAY_ITSELF = "$array";
 export const ARRAY_ELEMENT = "$ele";
 export const NODE_SELF = "$self";
 
-const getAppFieldDataFuncs: string[] = [
-  "system.data.getappfdata",
-  "system.data.getappfdatabyonekey",
-  "system.data.getappfdatabytwokey",
-  "system.data.getappfdatabythreekey",
-  "system.data.getappfdatabyfourkey",
-];
-
 /**
  * The rule schema for schema node
  */

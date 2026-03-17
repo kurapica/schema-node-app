@@ -25,7 +25,7 @@ import {
   SchemaLoadState,
 } from "../schema/nodeSchema";
 import {
-  type IStructFieldConfig,
+  type IStructFieldSchema,
   type IStructScalarFieldConfig,
 } from "../schema/structSchema";
 import { DataChangeWatcher } from "./dataChangeWatcher";
@@ -67,6 +67,7 @@ export const NS_SYSTEM_NUMBERS = "system.numbers";
 export const NS_SYSTEM_INTS = "system.ints";
 
 export const NS_SYSTEM_LANGUAGE = "system.language";
+export const NS_SYSTEM_IDENTIFIER = "system.identifier";
 export const NS_SYSTEM_LOCALE_STRING = "system.localestring";
 export const NS_SYSTEM_LOCALE_TRAN = "system.localetran";
 export const NS_SYSTEM_LOCALE_STRINGS = "system.localestrings";
@@ -76,7 +77,7 @@ export const NS_SYSTEM_ENTRIES = "system.entrys";
 export const NS_SYSTEM_CONTEXT = "system.context";
 
 export const NS_SYSTEM_SCHEMA = "system.schema";
-export const NS_SYSTEM_SCHEMA_NS = "system.schema.namespace";
+export const NS_SYSTEM_SCHEMA_NS = "system.schema.type.namespace";
 
 export const NS_SYSTEM_WORKFLOW = "system.workflow";
 export const NS_SYSTEM_WORKFLOW_ID = "system.workflow.id";
@@ -85,10 +86,10 @@ export const NS_SYSTEM_WORKFLOW_NODE = "system.workflow.node";
 
 export const NS_SYSTEM_SCHEMA_STATUS = "system.schema.status";
 
-export const NS_SYSTEM_LOGIC_IFRET = "system.logic.ifret";
-export const NS_SYSTEM_LOGIC_IFNOT = "system.logic.ifnot";
-export const NS_SYSTEM_LOGIC_IFNULL = "system.logic.ifnull";
-export const NS_SYSTEM_LOGIC_IFEMPTY = "system.logic.ifempty";
+export const NS_SYSTEM_INTRINSIC_IFRET = "system.intrinsic.ifret";
+export const NS_SYSTEM_INTRINSIC_IFNOT = "system.intrinsic.ifnot";
+export const NS_SYSTEM_INTRINSIC_IFNULL = "system.intrinsic.ifnull";
+export const NS_SYSTEM_INTRINSIC_IFEMPTY = "system.intrinsic.ifempty";
 //#endregion
 
 //#region Schema Provider
@@ -129,6 +130,7 @@ export interface ISchemaProvider {
   loadAppSchema(
     app: string,
     includeTypes?: boolean,
+    format?: string,
   ): Promise<IAppSchema | undefined>;
 
   /**
@@ -213,11 +215,13 @@ export const defaultSchemaProvider: ISchemaProvider = {
   loadAppSchema: async (
     app: string,
     includeTypes?: boolean,
+    format?: string
   ): Promise<IAppSchema | undefined> => {
     return (
       await postSchemaApi("/load-app-schema", {
         name: app,
         includeTypes,
+        format,
       })
     )?.schema;
   },
@@ -1052,7 +1056,7 @@ export async function validateSchemaValue(
  * Whether the struct field can be used as index
  * @param config The struct field config
  */
-export async function isStructFieldIndexable(config: IStructFieldConfig) {
+export async function isStructFieldIndexable(config: IStructFieldSchema) {
   let schema: INodeSchema | null | undefined = await getSchema(config.type);
   if (!schema) return false;
   switch (schema.type) {
@@ -1821,16 +1825,16 @@ async function buildFunction(info: INodeSchema): Promise<boolean> {
 
       // special case for ifret
       switch (exp.func.name) {
-        case NS_SYSTEM_LOGIC_IFRET:
+        case NS_SYSTEM_INTRINSIC_IFRET:
           if (val[0]) return val[1];
           break;
-        case NS_SYSTEM_LOGIC_IFNOT:
+        case NS_SYSTEM_INTRINSIC_IFNOT:
           if (!val[0]) return val[1];
           break;
-        case NS_SYSTEM_LOGIC_IFNULL:
+        case NS_SYSTEM_INTRINSIC_IFNULL:
           if (isNull(val[0])) return val[1];
           break;
-        case NS_SYSTEM_LOGIC_IFEMPTY:
+        case NS_SYSTEM_INTRINSIC_IFEMPTY:
           if (isEmpty(val[0])) return val[1];
           break;
       }
@@ -2214,8 +2218,8 @@ export interface ISchemaApiProtocolMeta {
   name?: string;
   request?: ISchemaApiProtocolRequestMeta;
   response?: ISchemaApiProtocolResponseMeta;
+  schemaFormat?: string[];
   error?: string[];
-  plugins: string[];
 }
 
 let schemaApiHeaders = [] as { key: string; value: string }[];
@@ -2276,6 +2280,7 @@ function scanErrorPaths(fields?: Record<string, any>): string[] {
 
 function generateField(url: string, fmt: any): any | undefined {
   if (typeof fmt !== "string") return undefined;
+  fmt = fmt.trim().toLowerCase();
   const match = fmt.match(/^(\w+)\[?(\w*)\]?:?(.*)?$/);
   if (!match) return undefined;
   if (match.length >= 2) {
@@ -2310,27 +2315,12 @@ function setSchemaApiProtocol(protocol: any): boolean {
       name: protocol.name,
       request: protocol.request,
       response: protocol.response,
+      schemaFormat: protocol.schemaFormat,
       error: scanErrorPaths(protocol.response?.fields),
-      plugins: protocol.plugins || [],
     };
     return true;
   }
   return false;
-}
-
-/**
- * Checks whether the schema plugin is enabled
- * @param identity The plugin identity
- * @returns Whether the plugin is enabled
- */
-export function isSchemaPluginEnabled(identity: string): boolean {
-  return apiProtocol?.plugins
-    ? (
-      apiProtocol.plugins.indexOf(identity) >= 0 ||
-      identity.indexOf("*") >= 0 &&
-      apiProtocol.plugins.find(p => new RegExp(identity.replace("*", ".*") + "$").test(p)) && true
-    )
-    : false;
 }
 
 // Read protocol meta if defined
@@ -2360,6 +2350,14 @@ export function setSchemaApiBaseUrl(url: string | undefined): void {
  */
 export function getSchemaApiBaseUrl(): string | undefined {
   return schemaApiBaseUrl;
+}
+
+/**
+ * Gets the app schema format for downloading
+ * @returns The app schema format for downloading
+ */
+export function getSchemaFormats(): string[] {
+  return apiProtocol?.schemaFormat || [];
 }
 
 /**

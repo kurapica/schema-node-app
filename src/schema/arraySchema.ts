@@ -1,5 +1,5 @@
 import { type DataCombineTypeValue } from "../enum/dataCombineType"
-import { type IStructFieldRelation } from "./structSchema"
+import { type IStructRelationSchema } from "./structSchema"
 
 /**
  * The array schema.
@@ -34,7 +34,7 @@ export interface IArraySchema {
     /**
      * The realtions between the fields
      */
-    relations?: IStructFieldRelation[]
+    relations?: IStructRelationSchema[]
 }
 
 export interface IDataCombine {

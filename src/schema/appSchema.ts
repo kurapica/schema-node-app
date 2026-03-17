@@ -4,7 +4,7 @@ import { type IAppFieldSchema } from "./appFieldSchema";
 import { type IAppWorkflowSchema } from "./appWorkflowSchema";
 import { type INodeSchema, SchemaLoadState } from "./nodeSchema";
 import { type IPolicyItem } from "./policySchema";
-import { type IStructFieldRelation } from "./structSchema";
+import { type IStructRelationSchema } from "./structSchema";
 
 /**
  * The application schema
@@ -26,9 +26,9 @@ export interface IAppSchema {
   desc?: ILocaleString;
 
   /**
-   * The target policies
+   * The scope policy
    */
-  scopePolicies?: IAppScopePolicy[];
+  scopePolicy?: IAppScopePolicy;
 
   /**
    * The authorization policy type
@@ -63,7 +63,7 @@ export interface IAppSchema {
   /**
    * The realtions between the fields
    */
-  relations?: IStructFieldRelation[];
+  relations?: IStructRelationSchema[];
 
   /**
    * The application workflows
@@ -101,11 +101,6 @@ export interface IAppScopePolicy {
    * The app target value, like the node type or the app name
    */
   contextMaps?: IAppScopeContextMap[];
-
-  /**
-   * The business key for the business target, default `_target`
-   */
-  businessKey?: string;
 }
 
 export interface IAppScopeContextMap {
@@ -211,21 +206,6 @@ export interface IAppDataFieldQuery {
    * Use descend order
    */
   descend?: boolean;
-
-  /**
-   * The filter function
-   */
-  filterFunc?: string;
-
-  /**
-   * The filter function arguments
-   */
-  filterArgs?: any[];
-
-  /**
-   * Query all filter data, ignore pagination and order, only used for filtering
-   */
-  filterAll?: boolean;
 }
 
 export interface IBatchQueryAppDataResult {
@@ -308,16 +288,6 @@ export interface IAppDataFieldInfo {
    * Use descend order
    */
   descend?: boolean;
-
-  /**
-   * The filter function
-   */
-  filterFunc?: string;
-
-  /**
-   * The filter function arguments
-   */
-  filterArgs?: any[];
 
   /**
    * Allow create the field data

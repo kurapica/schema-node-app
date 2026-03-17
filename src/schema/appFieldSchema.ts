@@ -80,11 +80,6 @@ export interface IAppFieldSchema {
   readonly?: boolean;
 
   /**
-   * Enable the template download
-   */
-  template?: boolean;
-
-  /**
    * Enable the clear value option
    */
   allowClear?: boolean;
@@ -107,23 +102,33 @@ export interface IAppFieldSchema {
   /**
    * Row filter policies
    */
-  rowAuths?: IRowPolicyItem[];
+  rowAuths?: IRowPolicy[];
 
   /**
    * Column access policies
    */
-  colAuths?: IColPolicyItem[];
+  colAuths?: IColPolicy[];
 
   /**
    * The field filters
    */
   filters?: IFieldFilter[];
+
+  /**
+   * The foreign field references
+   */
+  foreigns?: IForeign[];
+
+  /**
+   * The field view from other app
+   */
+  view?: IFieldView;
 }
 
 /**
  * The row policy item
  */
-export interface IRowPolicyItem {
+export interface IRowPolicy {
   /**
    * The policy evaluatorm, if true will use the filter
    */
@@ -138,7 +143,7 @@ export interface IRowPolicyItem {
 /**
  * The column policy item
  */
-export interface IColPolicyItem {
+export interface IColPolicy {
   /**
    * The struct field name
    */
@@ -168,4 +173,40 @@ export interface IFieldFilter {
    * The filter resolve strategy
    */
   resolve?: FieldFilterResolveValue;
+}
+
+/**
+ * The foreign field reference
+ */
+export interface IForeign{
+  /**
+   * The key field
+   */
+  field: string;
+
+  /**
+   * The reference app
+   */
+  app: string;
+}
+
+/**
+ * The field view
+ */
+export interface IFieldView{
+
+  /**
+   * The source app
+   */
+  app: string;
+
+  /**
+   * The source field
+   */
+  field: string;
+
+  /**
+   * The source app target map field
+   */
+  map: string;
 }

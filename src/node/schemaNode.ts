@@ -174,7 +174,7 @@ export abstract class SchemaNode<TC extends ISchemaConfig, TR extends Rule> {
    * Gets the display of the node
    */
   get display() {
-    return this._rule.display || this._config.display;
+    return this._rule.display ? { key: this._rule.display } : this._config.display;
   }
 
   /**

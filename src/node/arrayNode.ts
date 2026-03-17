@@ -6,7 +6,6 @@ import { type INodeSchema } from "../schema/nodeSchema";
 import {
   getAppCachedSchema,
   getCachedSchema,
-  isSchemaPluginEnabled,
   NS_SYSTEM_JSON,
   NS_SYSTEM_LOCALE_STRING,
   NS_SYSTEM_STRING,
@@ -40,7 +39,7 @@ import type {
 import { RelationType } from "../enum/relationType";
 import type {
   IStructArrayFieldConfig,
-  IStructFieldRelation,
+  IStructRelationSchema,
 } from "../schema/structSchema";
 import type { IFunctionCallArgument } from "../schema/functionSchema";
 import {
@@ -48,11 +47,6 @@ import {
   type FieldFilterModeValue,
 } from "../enum/fieldFilterMode";
 import { DataChangeWatcher } from "../utils/dataChangeWatcher";
-import {
-  getTemplateProvider,
-  type ITemplateRequest,
-  type ITemplateUploadResponse,
-} from "../plugin/templateProvider";
 
 /**
  * The array schema data node
@@ -197,13 +191,6 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   }
 
   /**
-   * Whether enable template download
-   */
-  get enableTemplate(): boolean {
-    return this._template === true;
-  }
-
-  /**
    * Gets the current page
    */
   get page() {
@@ -216,7 +203,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
    * Gets the page count
    */
   get pageCount() {
-    return this._fieldInfo?.take || this.total;
+    return this._fieldInfo?.take;
   }
 
   /**
@@ -911,12 +898,25 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   /**
    * Swap two row
    */
-  swapRow(x: number, y: number) {
-    if (this._enode || this.asSingle || this.incrUpdate) return;
-    const temp = this._elements[x];
-    this._elements[x] = this._elements[y];
-    this._elements[y] = temp;
-    this.notify("swap", x, y); // @deprecated, use layoutChangeWatcher instead
+  moveRow(from: number, to: number) {
+    if (this._enode || this.asSingle || this.incrUpdate || from == to || from < 0 || to < 0 || from >= this._elements.length || to >= this._elements.length) return;
+    
+    const temp = this._elements[from]
+    if (from < to)
+    {
+      for(let i = from; i < to; i++)
+      {
+        this._elements[i] = this._elements[i + 1]
+      }
+    }
+    else
+    {
+      for(let i = from; i > to; i--)
+      {
+        this._elements[i] = this._elements[i - 1]
+      }
+    }
+    this._elements[to] = temp   
     this._layoutChangeWatcher.notify(ArrayNodeLayoutChange.Row);
   }
 
@@ -979,9 +979,7 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     filter?: { [key: string]: any },
     orderBy?: IAppDataQueryOrder[],
   ) {
-    console.log("set page: ", page, count, descend, filter, orderBy);
-    //if (!this.incrUpdate) return
-    count ||= this._fieldInfo?.take || 10; // default should be provided by server
+    count ||= this._fieldInfo?.take; // default should be provided by server
     if (isNull(descend)) descend = this._fieldInfo?.descend;
     let appNode = this.parent;
     while (appNode && !(appNode instanceof AppNode)) appNode = appNode.parent;
@@ -1034,8 +1032,6 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
             descend,
             filter,
             orderBy,
-            filterFunc: this._fieldInfo?.filterFunc,
-            filterArgs: this._fieldInfo?.filterArgs,
           },
         },
       });
@@ -1121,71 +1117,28 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   }
 
   /**
-   * Gets the reference fields
-   */
-  getReferenceFields(app: string): string[] {
-    return this._reffields
-      ? Object.values(this._reffields)
-          .filter((r) => r.app === app)
-          .map((r) => r.field)
-      : [];
-  }
-
-  /**
    * Query the reference node for a field within a row
    */
   async getReferenceNode(
     row: AnySchemaNode,
-    field: string,
-    disableRefIncr: boolean = false,
+    field: string
   ): Promise<AnySchemaNode | undefined> {
     const refInfo = this._reffields ? this._reffields[field] : undefined;
     if (!refInfo) return undefined;
-    const refApp = refInfo.app;
-    const refField = refInfo.field;
-    const args = [];
-    let fullMatch = true;
-
-    for (let i = 0; i < refInfo.args.length; i++) {
-      if (!isNull(refInfo.args[i].name)) {
-        const paths = refInfo.args[i]
-          .name!.split(".")
-          .filter((f) => !isNull(f));
-        let node: AnySchemaNode | undefined = row;
-        for (let i = 0; i < paths.length; i++) {
-          if (node instanceof StructNode) {
-            node = node.getField(paths[i])!;
-          } else {
-            node = undefined;
-            break;
-          }
-        }
-        if (node == null || !node.valid || isNull(node.data)) {
-          fullMatch = false;
-          break;
-        }
-        args.push(node.data);
-      } else {
-        args.push(refInfo.args[i].value);
-      }
-    }
-    if (!fullMatch) return undefined;
-
+    
     // query & build the reference node
     let appNode = this.parent;
     while (appNode && !(appNode instanceof AppNode)) appNode = appNode.parent;
     if (!(appNode && appNode instanceof AppNode && appNode.target))
       return undefined;
-    if (appNode instanceof AppNode && appNode.name === refApp) {
+    if (appNode instanceof AppNode && appNode.getField(refInfo.field)) {
       return await appNode.loadRefField(
         row,
         this._eschema.struct!.fields.find(
-          (f) => f.name === refField,
+          (f) => f.name === field,
         ) as IStructArrayFieldConfig,
-        refField,
-        refInfo.func,
-        args,
-        disableRefIncr,
+        refInfo.field,
+        refInfo.func
       );
     } else {
       // @TODO: create a temp app node
@@ -1295,116 +1248,6 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
 
   //#endregion
 
-  //#region Template
-
-  async downloadTemplate(): Promise<boolean> {
-    const templateProvider = getTemplateProvider();
-    if (!this._template) return false;
-
-    // reference check
-    let appNode = this.parent;
-    while (appNode && !(appNode instanceof AppNode)) appNode = appNode.parent;
-    if (!(appNode && appNode instanceof AppNode)) return false;
-
-    const request: ITemplateRequest = {
-      app: appNode.name,
-      field: this.name,
-    };
-
-    if (this._eschema.type === SchemaType.Struct) {
-      for (const field of this._eschema.struct?.fields || []) {
-        if (field.displayOnly || field.invisible) continue;
-        const fldNode = this.getTemplateNode(field.name);
-
-        // dynamic fields
-        if (field.type === NS_SYSTEM_JSON) {
-          const dynamicType = fldNode?.rule.type;
-          if (dynamicType) {
-            const schema = getCachedSchema(dynamicType);
-            if (schema && schema.type === SchemaType.Struct) {
-              request.dynamicTypes ??= {};
-              request.dynamicTypes[field.name] = deepClone(
-                schema.struct?.fields || [],
-              );
-            }
-          }
-        }
-        // entries
-        else if (fldNode instanceof ScalarNode) {
-          if (fldNode.whiteList?.length) {
-            request.entries ??= {};
-            request.entries[field.name] = deepClone(fldNode.whiteList);
-          }
-        }
-      }
-    }
-
-    if (templateProvider) await templateProvider.downloadTemplate(request);
-    return true;
-  }
-
-  async uploadDataFile(
-    file: File | string,
-    autoCommit: boolean = false,
-    suffix?: string,
-  ): Promise<ITemplateUploadResponse | undefined> {
-    const templateProvider = getTemplateProvider();
-
-    // reference check
-    let appNode = this.parent;
-    while (appNode && !(appNode instanceof AppNode)) appNode = appNode.parent;
-    if (!(appNode && appNode instanceof AppNode && appNode.target))
-      return undefined;
-
-    const request: ITemplateRequest = {
-      app: appNode.name,
-      field: this.name,
-      target: appNode.target,
-      save: autoCommit,
-      suffix: suffix,
-      url: typeof file === "string" ? file : undefined,
-    };
-
-    if (this._eschema.type === SchemaType.Struct) {
-      for (const field of this._eschema.struct?.fields || []) {
-        if (field.displayOnly || field.invisible) continue;
-        const fldNode = this.getTemplateNode(field.name);
-
-        // dynamic fields
-        if (field.type === NS_SYSTEM_JSON) {
-          const dynamicType = fldNode?.rule.type;
-          if (dynamicType) {
-            const schema = getCachedSchema(dynamicType);
-            if (schema && schema.type === SchemaType.Struct) {
-              request.dynamicTypes ??= {};
-              request.dynamicTypes[field.name] = deepClone(
-                schema.struct?.fields || [],
-              );
-            }
-          }
-        }
-        // entries
-        else if (fldNode instanceof ScalarNode) {
-          if (fldNode.whiteList?.length) {
-            request.entries ??= {};
-            request.entries[field.name] = deepClone(fldNode.whiteList);
-          }
-        }
-      }
-    }
-
-    return await templateProvider!.uploadData(
-      request,
-      typeof file === "string" ? undefined : file,
-    );
-  }
-
-  //#endregion
-
-  //#region Properties
-
-  //#endregion
-
   //#region Fields
 
   private _eschema: INodeSchema = { name: "", type: SchemaType.Namespace };
@@ -1418,17 +1261,14 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
   private _reffields:
     | {
         [key: string]: {
-          app: string;
           field: string;
           func: string;
-          args: IFunctionCallArgument[];
         };
       }
     | undefined;
   private _appFieldFilter: IArrayFieldFilter[] | undefined;
   private _templateRow: StructNode | undefined;
   private _layoutChangeWatcher: DataChangeWatcher = new DataChangeWatcher();
-  private _template?: boolean;
 
   //#endregion
 
@@ -1488,8 +1328,6 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
 
     const appSchema = getAppCachedSchema(appNode.name);
     const appField = appSchema?.fields?.find((f) => f.name === this.name);
-    this._template =
-      appField?.template === true && isSchemaPluginEnabled("*_TEMPLATE");
 
     // field filters
     if (appField?.filters?.length && this._eschema.type === SchemaType.Struct) {
@@ -1579,22 +1417,30 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
     }
 
     // reference fields
-    if (
-      appNode &&
-      this._eschema.type === SchemaType.Struct &&
-      this._eschema.struct?.relations?.length &&
-      this._eschema.struct.relations.some(
-        (r) => r.type === RelationType.Reference,
-      )
-    ) {
-      this._reffields = {};
-      for (let i = 0; i < this._eschema.struct.relations.length; i++) {
-        const rel = this._eschema.struct.relations[i];
-        if (rel.type !== RelationType.Reference) continue;
-        this._reffields[rel.field] = resolveAppReference(
-          this._eschema.name,
-          rel,
-        ) as any;
+    if (appField && this._eschema.type === SchemaType.Struct) {
+      for (let i = 0; i < this._eschema.struct.fields.length; i++) {
+        const fld = this._eschema.struct.fields[i];
+        // Check displayOnly field without assignment, could be used as query field for other app fields who are reference fields
+        if (fld.displayOnly && 
+          !this._eschema.struct.relations?.find((r) => r.field.toLowerCase() === fld.name.toLowerCase() && [RelationType.InitOnly, RelationType.Assign, RelationType.Default].includes(r.type as RelationType)) &&
+          !appSchema.relations?.find((r) => r.field.toLowerCase() === `${appField.name}.${fld.name}`.toLowerCase() && [RelationType.InitOnly, RelationType.Assign, RelationType.Default].includes(r.type as RelationType))){
+          
+          const refField = appSchema.fields?.find(f => 
+            f.type.toLowerCase() === fld.type.toLowerCase() 
+            && f.filters?.find(fi => 
+              fi.mode == FieldFilterMode.Filter && 
+              getCachedSchema(fi.filter)?.func?.args?.[1]?.type?.toLowerCase() === this._eschema.name.toLowerCase() &&
+              getCachedSchema(fi.filter)?.func?.args.length === 2));
+          if(refField){
+            this._reffields ??= {};
+            this._reffields[fld.name] = {
+              field: refField.name,
+              func: refField.filters!.find(fi => 
+                fi.mode == FieldFilterMode.Filter && 
+                getCachedSchema(fi.filter)?.func?.args?.[1]?.type?.toLowerCase() === this._eschema.name.toLowerCase())?.filter as string
+            }
+          }
+        }
       }
     }
 
@@ -1615,60 +1461,6 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
       );
     }
   }
-}
-
-/**
- * Resolve the app reference field
- * @param name The struct array type
- * @param field The ref field
- * @param refFunc The reference func used to resolve
- */
-function resolveAppReference(name: string, relation: IStructFieldRelation) {
-  if (relation?.type !== RelationType.Reference) return undefined;
-
-  // check schema
-  let schema = getCachedSchema(name);
-  if (schema?.type === SchemaType.Array && schema.array?.element)
-    schema = getCachedSchema(schema.array.element);
-  if (schema?.type !== SchemaType.Struct) return undefined;
-
-  // check field
-  const field = relation.field.toLowerCase();
-  const f = schema.struct?.fields?.find((f) => f.name.toLowerCase() === field);
-  if (!(f && f.displayOnly)) return undefined;
-
-  // check func
-  const funcSchema = getCachedSchema(relation.func);
-  if (
-    funcSchema?.type !== SchemaType.Func ||
-    funcSchema.func?.return !== f.type ||
-    !funcSchema.func?.args?.length
-  )
-    return undefined;
-
-  // analyze app & field
-  let app: string | undefined = undefined;
-  let appField: string | undefined = undefined;
-
-  for (let exp of funcSchema.func.exps) {
-    // get app and app field
-    if (exp.func === "system.data.getdatasource") {
-      app = exp.args[0]?.value;
-      appField = exp.args[1]?.value;
-      break;
-    }
-  }
-
-  if (app && appField) {
-    return {
-      app: app,
-      field: appField,
-      func: relation.func,
-      args: relation.args,
-    };
-  }
-
-  return undefined;
 }
 
 /**

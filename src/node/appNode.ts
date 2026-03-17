@@ -26,7 +26,7 @@ import { StructRule } from "../rule/structRule";
 import type {
   IStructArrayFieldConfig,
   IStructEnumFieldConfig,
-  IStructFieldConfig,
+  IStructFieldSchema,
   IStructScalarFieldConfig,
 } from "../schema/structSchema";
 import {
@@ -42,6 +42,8 @@ import {
 } from "../enum/dataCombineType";
 import { WorkflowStatus } from "../enum/workflowStatus";
 import { type IAppInteractionWorkflow } from "../schema/appWorkflowSchema";
+import { PolicyScope, PolicyScopeValue } from "../enum/policyScope";
+import { AppScopeType, AppScopeTypeValue } from "../enum/appScopeType";
 
 //#region Inner Type
 
@@ -144,6 +146,13 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
   //#region Properties
 
   /**
+   * The policy scope
+   */
+  get policyScope(): AppScopeTypeValue {
+    return this._appSchema.scopePolicy?.type || AppScopeType.BusinessTarget;
+  }
+
+  /**
    * The app target
    */
   get target(): string {
@@ -242,7 +251,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
    * Whether the given field is loaded
    */
   isFieldLoaded(name: string | AnySchemaNode): boolean {
-    if (!this._target) return true;
+    if (!this._target && this.policyScope !== AppScopeType.SystemLevel) return true;
     if (typeof name !== "string") name = name.name.toLowerCase();
     return (
       ((this._fields.find((f) => f.node.name.toLowerCase() === name)?.state ||
@@ -528,7 +537,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
     onlyNotLoaded: boolean = false,
     noPageSet: boolean = false,
   ): Promise<void> {
-    if (!this.target) return;
+    if (!this.target && this.policyScope !== AppScopeType.SystemLevel) return;
 
     let queryNodes: { node: AnySchemaNode; state: AppFieldNodeState }[] = [];
     if (!nodes?.length) nodes = this.inputFields;
@@ -580,7 +589,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
     if (queryNodes.length) {
       const query: IAppDataQuery = {
         app: this.name,
-        target: this.target,
+        target: this.target || "00000000-0000-0000-0000-000000000000",
         fields: queryNodes.map((n) => n.node.name),
       };
 
@@ -633,9 +642,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
     parent: AnySchemaNode,
     config: IStructArrayFieldConfig,
     field: string,
-    filterFunc: string,
-    filterArgs: any[],
-    disableRefIncr: boolean = false,
+    filterFunc: string
   ): Promise<ArrayNode | undefined> {
     field = field.toLowerCase();
     const fconf = this._appSchema.fields?.find(
@@ -687,8 +694,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
     const incrUpdateArrayNodes = queryNodes.filter(
       (n) =>
         n.node instanceof ArrayNode &&
-        n.node.incrUpdate &&
-        (n.node.name.toLowerCase() !== field || !disableRefIncr),
+        n.node.incrUpdate
     );
     queryNodes = queryNodes.filter((n) => !incrUpdateArrayNodes.includes(n));
 
@@ -700,9 +706,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
         fields: queryNodes.map((n) => n.node.name),
         querys: {
           [field]: {
-            filterFunc,
-            filterArgs,
-            filterAll: disableRefIncr,
+            filter: { [filterFunc]: parent.data },
           },
         },
       };
@@ -744,7 +748,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
               display: config.display,
               desc: config.desc,
               readonly: readonlyField,
-              incrUpdate: disableRefIncr ? false : fconf.incrUpdate,
+              incrUpdate: fconf.incrUpdate,
               fieldInfo: finfo,
             } as IStructArrayFieldConfig,
             d,
@@ -807,7 +811,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
             desc: config.desc,
             readonly: readonlyField,
             incrUpdate: fconf.incrUpdate,
-            fieldInfo: { filterFunc, filterArgs },
+            fieldInfo: { },
           } as IStructArrayFieldConfig,
           [],
           parent,
@@ -1119,7 +1123,7 @@ export class AppNode extends SchemaNode<ISchemaConfig, StructRule> {
               display: fconf.display,
               desc: fconf.desc,
               readonly: readonlyField,
-            } as IStructFieldConfig,
+            } as IStructFieldSchema,
             d,
             this,
           );

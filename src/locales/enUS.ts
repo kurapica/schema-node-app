@@ -56,7 +56,7 @@ export default {
   "system.localetrans": "Translate List",
 
   "system.localestring": "Locale string",
-  "system.localestring.default": "Default",
+  "system.localestring.key": "Default",
   "system.localestring.trans": "Translate",
   "system.localestrings": "Locale strings",
 

@@ -3,7 +3,7 @@ import { AppNode } from "../node/appNode"
 import { type AnySchemaNode } from "../node/schemaNode"
 import { StructNode } from "../node/structNode"
 import { type INodeSchema } from "../schema/nodeSchema"
-import { type IStructFieldRelation, type IStructSchema } from "../schema/structSchema"
+import { type IStructRelationSchema, type IStructSchema } from "../schema/structSchema"
 import { getCachedSchema } from "../utils/schemaProvider"
 import { isNull } from "../utils/toolset"
 import { ArrayRuleSchema } from "./arrayRuleSchema"
@@ -96,7 +96,7 @@ export class StructRuleSchema extends RuleSchema
      * @param relation The realtion to be registered
      * @param info the struct info of the root schema
      */
-    regRelation(relation: IStructFieldRelation) {
+    regRelation(relation: IStructRelationSchema) {
         const rootTypeInfo = this._schema.struct
 
         // locate the target

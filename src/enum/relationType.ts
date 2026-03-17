@@ -83,11 +83,6 @@ export enum RelationType {
    * Validate the value
    */
   Validation = "validation",
-
-  /**
-   * App field reference
-   */
-  Reference = "reference",
 }
 
 export type RelationTypeValue = `${RelationType}`;

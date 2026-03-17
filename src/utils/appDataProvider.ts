@@ -1,3 +1,4 @@
+import { AppScopeType } from "../enum/appScopeType";
 import { WorkflowStatus } from "../enum/workflowStatus";
 import type {
   IAppDataFieldPushQuery,
@@ -290,7 +291,16 @@ const processAppDataQueryQueue = debounce(() => {
 
       // resolve
       queue.forEach((q) => {
-        if (!isNull(q.query.target)) {
+        if (getAppCachedSchema(q.query.app).scopePolicy?.type === AppScopeType.SystemLevel)
+        {
+          const result = res.results.find((r) => r.app === q.query.app);
+          if (result) {
+            q.resolve(result);
+          } else {
+            q.reject(`Unable to load app data ${q.query.app}`);
+          }
+        }
+        else if (!isNull(q.query.target)) {
           const result = res.results.find(
             (r) => r.app === q.query.app && r.target === q.query.target,
           );
