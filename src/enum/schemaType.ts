@@ -24,6 +24,11 @@ export enum SchemaType
     Struct = "struct",
 
     /**
+     * The struct field node, sub-schema of the struct node
+     */
+    StructField = "structField",
+
+    /**
      * The array node
      */
     Array = "array",
@@ -52,6 +57,36 @@ export enum SchemaType
      * The function node
      */
     Func = "func",
+
+    /**
+     * The recognizer node
+     */
+    Recognizer = "recognizer",
+
+    /**
+     * The recognizer part node, sub-schema of the recognizer node
+     */
+    RecognizerPart = "recognizerPart",
+
+    /**
+     * The property node
+     */
+    Property = "property",
+
+    /**
+     * The application node
+     */
+    App = "app",
+
+    /**
+     * The application field node
+     */
+    AppField = "appField",
+
+    /**
+     * The application workflow node
+     */
+    AppWorkflow = "appWorkflow",
 }
 
 export type SchemaTypeValue = `${SchemaType}`

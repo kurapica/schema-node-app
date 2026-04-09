@@ -756,9 +756,9 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
         !this._eschema.struct?.relations?.find(
           (r) =>
             r.field === primarys[i] &&
-            (r.type === RelationType.InitOnly ||
-              r.type === RelationType.Assign ||
-              r.type === RelationType.Default),
+            (r.prop === RelationType.InitOnly ||
+              r.prop === RelationType.Assign ||
+              r.prop === RelationType.Default),
         )
       )
         return false;
@@ -1422,8 +1422,8 @@ export class ArrayNode extends SchemaNode<IArrayConfig, ArrayRule> {
         const fld = this._eschema.struct.fields[i];
         // Check displayOnly field without assignment, could be used as query field for other app fields who are reference fields
         if (fld.displayOnly && 
-          !this._eschema.struct.relations?.find((r) => r.field.toLowerCase() === fld.name.toLowerCase() && [RelationType.InitOnly, RelationType.Assign, RelationType.Default].includes(r.type as RelationType)) &&
-          !appSchema.relations?.find((r) => r.field.toLowerCase() === `${appField.name}.${fld.name}`.toLowerCase() && [RelationType.InitOnly, RelationType.Assign, RelationType.Default].includes(r.type as RelationType))){
+          !this._eschema.struct.relations?.find((r) => r.field.toLowerCase() === fld.name.toLowerCase() && [RelationType.InitOnly, RelationType.Assign, RelationType.Default].includes(r.prop as RelationType)) &&
+          !appSchema.relations?.find((r) => r.field.toLowerCase() === `${appField.name}.${fld.name}`.toLowerCase() && [RelationType.InitOnly, RelationType.Assign, RelationType.Default].includes(r.prop as RelationType))){
           
           const refField = appSchema.fields?.find(f => 
             f.type.toLowerCase() === fld.type.toLowerCase() 

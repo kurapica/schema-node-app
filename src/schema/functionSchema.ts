@@ -27,6 +27,11 @@ export interface IFunctionSchema {
   generic?: string | string[];
 
   /**
+   * As type converter
+   */
+  converter?: boolean;
+
+  /**
    * Call server if server provided
    */
   server?: boolean;
@@ -35,6 +40,16 @@ export interface IFunctionSchema {
    * The client should not cache the result
    */
   nocache?: boolean;
+
+  /**
+   * The function has side effects
+   */
+  sideEffect?: boolean;
+
+  /**
+   * The function can only be used in workflow
+   */
+  workflowOnly?: boolean;
 
   /**
    * The function registered by the frontend
@@ -70,6 +85,11 @@ export interface IFunctionArgumentInfo {
    * The argument is params
    */
   params?: boolean;
+
+  /**
+   * The default value of the argument
+   */
+  default?: any;
 }
 
 /**

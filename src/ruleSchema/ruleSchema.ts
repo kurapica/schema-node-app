@@ -114,7 +114,7 @@ export class RuleSchema {
     rule.default = this.default;
     rule.invisible =
       this.invisible ||
-      this.pushSchemas?.some((p) => p.type === RelationType.Visible) ||
+      this.pushSchemas?.some((p) => p.prop === RelationType.Visible) ||
       undefined;
     rule.disable = this.disable;
     rule.display = this.display;
@@ -254,7 +254,7 @@ function activePushSchema(
   let type: string = "";
   let inited = false;
 
-  switch (pushSchema.type) {
+  switch (pushSchema.prop) {
     case RelationType.Type:
       if (node.parent instanceof StructNode) {
         handler = (res: any) => {
@@ -660,7 +660,7 @@ export interface ISchemaNodePushSchema {
   /**
    * The realtion type
    */
-  type: RelationTypeValue;
+  prop: string;
 
   /**
    * The schema source

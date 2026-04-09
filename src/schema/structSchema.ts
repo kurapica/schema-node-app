@@ -1,4 +1,3 @@
-import { type RelationTypeValue } from "../enum/relationType"
 import { type ISchemaConfig } from "../config/schemaConfig"
 import { type IFunctionCallArgument } from "./functionSchema"
 import { type IScalarConfig } from "../config/scalarConfig"
@@ -24,6 +23,17 @@ export interface IStructSchema
      * The realtions between the fields
      */
     relations?: IStructRelationSchema[]
+
+    /**
+     * The union validations
+     */
+    unionValids?: IStructUnionValidation[]
+
+    /**
+     * The atomic flag indicates whether the struct is atomic, which means that the struct
+     * should be treated as a whole when performing operations such as updates, delete or render.
+     */
+    atomic?: boolean
 }
 
 /**
@@ -52,6 +62,12 @@ export interface IStructRelationSchema
     field: string
 
     /**
+     * The property of the relation, references a system property schema name
+     * (e.g. "visible", "invisible", "assign", "disable", "default", "initOnly", "type", etc.)
+    */
+    prop: string
+
+    /**
      * The relation function
     */
     func: string
@@ -60,9 +76,20 @@ export interface IStructRelationSchema
      * The func arguments
     */
     args: IFunctionCallArgument[]
+}
+
+/**
+ * The union validation of a struct
+ */
+export interface IStructUnionValidation
+{
+    /**
+     * The validation function
+     */
+    func: string
 
     /**
-     * The realtion type
-    */
-    type: RelationTypeValue
+     * The func arguments
+     */
+    args: IFunctionCallArgument[]
 }

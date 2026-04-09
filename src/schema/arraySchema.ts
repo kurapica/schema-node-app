@@ -35,6 +35,12 @@ export interface IArraySchema {
      * The realtions between the fields
      */
     relations?: IStructRelationSchema[]
+
+    /**
+     * The atomic flag indicates whether the array is atomic, which means that the array
+     * should be treated as a whole when performing operations such as updates, delete or render.
+     */
+    atomic?: boolean
 }
 
 export interface IDataCombine {

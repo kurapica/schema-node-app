@@ -79,6 +79,12 @@ export const NS_SYSTEM_CONTEXT = "system.context";
 export const NS_SYSTEM_SCHEMA = "system.schema";
 export const NS_SYSTEM_SCHEMA_NS = "system.schema.type.namespace";
 
+export const NS_SYSTEM_SCHEMA_TYPE_RECOGNIZER = "system.schema.type.recognizer";
+export const NS_SYSTEM_SCHEMA_TYPE_PROPERTY = "system.schema.type.property";
+
+export const NS_SYSTEM_SCHEMA_DEF_RECOGNIZER = "system.schema.def.recognizer";
+export const NS_SYSTEM_SCHEMA_DEF_PROPERTY = "system.schema.def.property";
+
 export const NS_SYSTEM_WORKFLOW = "system.workflow";
 export const NS_SYSTEM_WORKFLOW_ID = "system.workflow.id";
 export const NS_SYSTEM_WORKFLOW_CRON = "system.workflow.cron";

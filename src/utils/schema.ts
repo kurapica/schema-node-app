@@ -1,5 +1,6 @@
 import { BigNumber } from "bignumber.js"
 import { SchemaType } from "../enum/schemaType"
+import { RecognizerPartType } from "../enum/RecognizerPartType"
 import { registerSchema, NS_SYSTEM, NS_SYSTEM_ARRAY, NS_SYSTEM_BOOL, NS_SYSTEM_DATE, NS_SYSTEM_FULLDATE, NS_SYSTEM_INT, NS_SYSTEM_NUMBER, NS_SYSTEM_STRING, NS_SYSTEM_STRUCT, NS_SYSTEM_YEAR, NS_SYSTEM_YEARMONTH, NS_SYSTEM_DOUBLE, NS_SYSTEM_FLOAT, NS_SYSTEM_INTS, NS_SYSTEM_NUMBERS, NS_SYSTEM_RANGEDATE, NS_SYSTEM_RANGEFULLDATE, NS_SYSTEM_RANGEMONTH, NS_SYSTEM_RANGEYEAR, NS_SYSTEM_STRINGS, NS_SYSTEM_PERCENT, NS_SYSTEM_GUID, NS_SYSTEM_ENTRIES, NS_SYSTEM_ENTRY, NS_SYSTEM_LOCALE_STRING, NS_SYSTEM_LANGUAGE, NS_SYSTEM_LOCALE_TRAN, NS_SYSTEM_LOCALE_TRANS, NS_SYSTEM_LOCALE_STRINGS, NS_SYSTEM_JSON, NS_SYSTEM_SCHEMA, NS_SYSTEM_SCHEMA_NS, NS_SYSTEM_WORKFLOW, NS_SYSTEM_WORKFLOW_NODE, NS_SYSTEM_LIST, NS_SYSTEM_SCHEMA_STATUS, NS_SYSTEM_INTRINSIC_IFRET, NS_SYSTEM_INTRINSIC_IFNOT, NS_SYSTEM_INTRINSIC_IFNULL, NS_SYSTEM_INTRINSIC_IFEMPTY, NS_SYSTEM_OBJECT, NS_SYSTEM_WORKFLOW_ID, NS_SYSTEM_WORKFLOW_CRON, getEnumAccessList, NS_SYSTEM_IDENTIFIER } from "./schemaProvider"
 import { _LS, SCHEMA_LANGUAGES, type ILocaleString } from "./locale"
 import { deepClone, generateGuid, isEmpty, isEqual, isNull } from "./toolset"
@@ -636,6 +637,8 @@ registerSchema([
                 newSystemScalar("system.schema.type.event", NS_SYSTEM_SCHEMA_NS),
                 newSystemScalar("system.schema.type.workflow", NS_SYSTEM_SCHEMA_NS),
                 newSystemScalar("system.schema.type.policy", NS_SYSTEM_SCHEMA_NS),
+                newSystemScalar("system.schema.type.recognizer", NS_SYSTEM_SCHEMA_NS),
+                newSystemScalar("system.schema.type.property", NS_SYSTEM_SCHEMA_NS),
 
                 newSystemSchema("system.schema.type.rule", [
                     newSystemScalar("system.schema.type.rule.arrayelement", NS_SYSTEM_SCHEMA_NS),
@@ -680,6 +683,11 @@ registerSchema([
 
                 ]),
                 newSystemSchema("system.schema.def.workflow", [
+                ]),
+                newSystemSchema("system.schema.def.recognizer", [
+                    newSystemEnum("system.schema.def.recognizer.parttype", RecognizerPartType),
+                ]),
+                newSystemSchema("system.schema.def.property", [
                 ]),
                 newSystemSchema("system.schema.def.app", [
                     newSystemEnum("system.schema.def.app.scope", AppScopeType),

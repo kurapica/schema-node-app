@@ -11,6 +11,11 @@ export enum SchemaNodeStatus
     NoDefinition = "noDefinition",
 
     /// <summary>
+    /// Wrong ref type
+    /// </summary>
+    WrongRefType = "wrongRefType",
+
+    /// <summary>
     /// No base scalar
     /// </summary>
     ScalarHasWrongBase = "scalarHasWrongBase",
@@ -136,6 +141,16 @@ export enum SchemaNodeStatus
     FunctionExpWrongFuncArgs = "functionExpWrongFuncArgs",
     
     /// <summary>
+    /// The function expression has wrong collection
+    /// </summary>
+    FunctionExpWrongCollection = "functionExpWrongCollection",
+
+    /// <summary>
+    /// The function expression has wrong return value
+    /// </summary>
+    FunctionExpWrongReturn = "functionExpWrongReturn",
+    
+    /// <summary>
     /// The function has no expressions
     /// </summary>
     FunctionNoExps = "functionNoExps",
@@ -179,6 +194,11 @@ export enum SchemaNodeStatus
     /// The function expression haven't pass the complier
     /// </summary>
     FunctionExpsHasCompileError = "functionExpsHasCompileError",
+
+    /// <summary>
+    /// The function can't be used as policy filter
+    /// </summary>
+    FunctionCantBeUsedAsPolicyFilter = "functionCantBeUsedAsPolicyFilter",
 
     /// <summary>
     /// The workflow has wrong func
@@ -239,6 +259,46 @@ export enum SchemaNodeStatus
     /// The application field data auth wrong func
     /// </summary>
     ApplicationFieldDataAuthWrongFunc = "applicationFieldDataAuthWrongFunc",
+
+    /// <summary>
+    /// The application field data auth wrong field
+    /// </summary>
+    ApplicationFieldDataAuthWrongField = "applicationFieldDataAuthWrongField",
+
+    /// <summary>
+    /// The application push data wrong func
+    /// </summary>
+    ApplicationPushDataWrongFunc = "applicationPushDataWrongFunc",
+
+    /// <summary>
+    /// The application field has wrong filter settings
+    /// </summary>
+    ApplicationFieldDataWrongFilter = "applicationFieldDataWrongFilter",
+
+    /// <summary>
+    /// The data source compile error
+    /// </summary>
+    DataSourceComipleError = "dataSourceComipleError",
+
+    /// <summary>
+    /// The recognizer has wrong source type
+    /// </summary>
+    RecognizerWrongSourceType = "recognizerWrongSourceType",
+
+    /// <summary>
+    /// The recognizer has wrong parts configuration
+    /// </summary>
+    RecognizerWrongParts = "recognizerWrongParts",
+
+    /// <summary>
+    /// The recognizer has wrong validation function
+    /// </summary>
+    RecognizerWrongValidation = "recognizerWrongValidation",
+
+    /// <summary>
+    /// The property has wrong value type
+    /// </summary>
+    PropertyHasWrongValueType = "propertyHasWrongValueType",
 }
 
 export type SchemaNodeStatusValue = `${SchemaNodeStatus}`
