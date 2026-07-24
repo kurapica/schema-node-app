@@ -1,4 +1,3 @@
-import { type RelationTypeValue } from "../enum/relationType"
 import { type ISchemaConfig } from "../config/schemaConfig"
 import { type IFunctionCallArgument } from "./functionSchema"
 import { type IScalarConfig } from "../config/scalarConfig"
@@ -18,18 +17,29 @@ export interface IStructSchema
     /**
      * The struct fields.
     */
-    fields: IStructFieldConfig[]
+    fields: IStructFieldSchema[]
 
     /**
      * The realtions between the fields
      */
-    relations?: IStructFieldRelation[]
+    relations?: IStructRelationSchema[]
+
+    /**
+     * The union validations
+     */
+    unionValids?: IStructUnionValidation[]
+
+    /**
+     * The atomic flag indicates whether the struct is atomic, which means that the struct
+     * should be treated as a whole when performing operations such as updates, delete or render.
+     */
+    atomic?: boolean
 }
 
 /**
  * The struct field config
  */
-export interface IStructFieldConfig extends ISchemaConfig
+export interface IStructFieldSchema extends ISchemaConfig
 {
     /**
      * The field name
@@ -37,19 +47,25 @@ export interface IStructFieldConfig extends ISchemaConfig
     name: string
 }
 
-export interface IStructScalarFieldConfig extends IStructFieldConfig, IScalarConfig {}
-export interface IStructEnumFieldConfig extends IStructFieldConfig, IEnumConfig {}
-export interface IStructArrayFieldConfig extends IStructFieldConfig, IArrayConfig {}
+export interface IStructScalarFieldConfig extends IStructFieldSchema, IScalarConfig {}
+export interface IStructEnumFieldConfig extends IStructFieldSchema, IEnumConfig {}
+export interface IStructArrayFieldConfig extends IStructFieldSchema, IArrayConfig {}
 
 /**
  * The realtion between fields
 */
-export interface IStructFieldRelation
+export interface IStructRelationSchema
 {
     /**
      * The target field, can use . for deep fields
     */
     field: string
+
+    /**
+     * The property of the relation, references a system property schema name
+     * (e.g. "visible", "invisible", "assign", "disable", "default", "initOnly", "type", etc.)
+    */
+    prop: string
 
     /**
      * The relation function
@@ -60,9 +76,20 @@ export interface IStructFieldRelation
      * The func arguments
     */
     args: IFunctionCallArgument[]
+}
+
+/**
+ * The union validation of a struct
+ */
+export interface IStructUnionValidation
+{
+    /**
+     * The validation function
+     */
+    func: string
 
     /**
-     * The realtion type
-    */
-    type: RelationTypeValue
+     * The func arguments
+     */
+    args: IFunctionCallArgument[]
 }

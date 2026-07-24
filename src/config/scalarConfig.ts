@@ -1,39 +1,50 @@
-import { type ISchemaConfig } from "./schemaConfig"
+import { type ILocaleString } from "../utils/locale";
+import { type ISchemaConfig } from "./schemaConfig";
 
-export interface IScalarConfig extends ISchemaConfig
-{
-    /**
-     * The white list
-    */
-    whiteList?: number[] | string[] | { value: any, label: string }[]
+export interface IEntry {
+  value: any;
+  label: ILocaleString;
+  children?: IEntry[];
+}
 
-    /**
-     * The root value.
-     */
-    root?: string
-    
-    /**
-     * The black list
-     */
-    blackList?: string[] | number[]
+export interface IScalarConfig extends ISchemaConfig {
+  /**
+   * The entries for enum-like scalar values.
+   */
+  entries?: IEntry[];
 
-    /**
-     * The low limit of the scalar value.
-     */
-    lowLimit?: any
+  /**
+   * The white list
+   */
+  whiteList?: number[] | string[] | IEntry[];
 
-    /**
-     * The up limit of the scalar value.
-     */
-    upLimit?: any
+  /**
+   * The root value.
+   */
+  root?: string;
 
-    /**
-     * The enum white list only used for suggest.
-     */
-    asSuggest?: boolean
+  /**
+   * The black list
+   */
+  blackList?: string[] | number[];
 
-    /**
-     * When calculating the up limit, use the original value.
-     */
-    useOriginForUpLimit?: boolean
+  /**
+   * The low limit of the scalar value.
+   */
+  lowLimit?: any;
+
+  /**
+   * The up limit of the scalar value.
+   */
+  upLimit?: any;
+
+  /**
+   * The enum white list only used for suggest.
+   */
+  asSuggest?: boolean;
+
+  /**
+   * When calculating the up limit, use the original value.
+   */
+  useOriginForUpLimit?: boolean;
 }

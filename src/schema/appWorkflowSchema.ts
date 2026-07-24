@@ -101,9 +101,9 @@ export interface IAppWorkflowNodeSchema
     fork?: boolean
 
     /**
-     * The fork key
+     * The fork keys
      */
-    forkKey?: string
+    forkKey?: string[]
 
     /**
      * Whether the node is un-cancelable when running
@@ -114,4 +114,17 @@ export interface IAppWorkflowNodeSchema
      * Cancel the previous fork branches
      */
     cancelPre?: boolean
+}
+
+export interface IAppInteractionWorkflow extends IAppWorkflowSchema
+{
+    /**
+     * Whether the workflow can be toggled on/off
+     */
+    togglable: boolean
+
+    /**
+     * The workflow identifier to be turned off
+     */
+    workflowId?: string
 }

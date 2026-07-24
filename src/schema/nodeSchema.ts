@@ -6,6 +6,8 @@ import { type IEnumSchema } from "./enumSchema"
 import { type IEventSchema } from "./eventSchema"
 import { type IFunctionSchema } from "./functionSchema"
 import { type IPolicySchema } from "./policySchema"
+import { type IPropertySchema } from "./propertySchema"
+import { type IRecognizerSchema } from "./recognizerSchema"
 import { type IScalarSchema } from "./scalarSchema"
 import { type IStructSchema } from "./structSchema"
 import { type IWorkflowSchema } from "./workflowSchema"
@@ -72,9 +74,24 @@ export interface INodeSchema
     policy?: IPolicySchema
 
     /**
+     * The recognizer schema if type is recognizer
+     */
+    recognizer?: IRecognizerSchema
+
+    /**
+     * The property schema if type is property
+     */
+    property?: IPropertySchema
+
+    /**
      * The policy type for the schema
      */
     auth?: string
+
+    /**
+     * The compatible schema conversions
+     */
+    compatibles?: { to: string, convert: string }[]
 
     /**
      * The sub schemas of of the namespace
@@ -115,6 +132,8 @@ export interface INodeSchema
      * The schema is used by applications
      */
     usedByApp?: string[]
+
+
 }
 
 /**

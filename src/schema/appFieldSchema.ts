@@ -1,113 +1,212 @@
-import { type DataCombineTypeValue } from "../enum/dataCombineType"
-import { type ILocaleString } from "../utils/locale"
-import { type IDataCombine } from "./arraySchema"
-import { type IPolicyItem } from "./policySchema"
+import { type DataCombineTypeValue } from "../enum/dataCombineType";
+import { type FieldFilterResolveValue, type FieldFilterModeValue } from "../enum/fieldFilterMode";
+import { type FieldStorageTopologyValue } from "../enum/fieldStorageTopology";
+import { type ILocaleString } from "../utils/locale";
+import { type IDataCombine } from "./arraySchema";
+import { type IPolicyItem } from "./policySchema";
 
 /**
  * The application field scehma
  */
-export interface IAppFieldSchema
-{
-    /**
-     * The application name
-     */
-    app: string
+export interface IAppFieldSchema {
+  /**
+   * The application name
+   */
+  app: string;
 
-    /**
-     * The field name
-     */
-    name: string
+  /**
+   * The field name
+   */
+  name: string;
 
-    /**
-     * The field type
-     */
-    type: string
+  /**
+   * The field type
+   */
+  type: string;
 
-    /**
-     * The display name
-     */
-    display?: ILocaleString
+  /**
+   * The display name
+   */
+  display?: ILocaleString;
 
-    /**
-     * The description
-     */
-    desc?: ILocaleString
+  /**
+   * The description
+   */
+  desc?: ILocaleString;
 
-    /**
-     * The source application
-     */
-    sourceApp?: string
+  /**
+   * The field storage topology, default is co-located
+   */
+  topology?: FieldStorageTopologyValue;
 
-    /**
-     * The source field
-     */
-    sourceField?: string
+  /**
+   * The dynamic table name
+   */
+  tableName?: string;
 
-    /**
-     * Track the push data to source field
-     */
-    trackPush?: boolean
+  /**
+   * The attribute table name when topology is attribute-based
+   */
+  attrTableName?: string;
 
-    /**
-     * The function used to generate data
-     */
-    func?: string
+  /**
+   * The function used to generate data
+   */
+  func?: string;
 
-    /**
-     * The argument fields to provide input data
-     */
-    args?: string[]
+  /**
+   * The source field that push data to the field with the func
+   */
+  arg?: string;
 
-    /**
-     * The field is using increase update, not full-data update
-     */
-    incrUpdate?: boolean
+  /**
+   * The field is using increase update, not full-data update
+   */
+  incrUpdate?: boolean;
 
-    /**
-     * The field is front-end only, no need store data
-     */
-    frontend?: boolean
+  /**
+   * The field is front-end only, no need store data
+   */
+  frontend?: boolean;
 
-    /**
-     * The field is disabled
-     */
-    disable?: boolean
+  /**
+   * The field is disabled
+   */
+  disable?: boolean;
 
-    /**
-     * The field is readonly
-     */
-    readonly?: boolean
+  /**
+   * The field is readonly
+   */
+  readonly?: boolean;
 
-    /**
-     * The combine rule if field type is scalar or enum
-     */
-    combine?: DataCombineTypeValue
+  /**
+   * Enable the clear value option
+   */
+  allowClear?: boolean;
 
-    /**
-     * The combine rule if field type is struct or struct-array
-     */
-    combines?: IDataCombine[]
+  /**
+   * The combine rule if field type is scalar or enum
+   */
+  combine?: DataCombineTypeValue;
 
-    /**
-     * The data authorization policies for the field, normally the row access policies
-     */
-    auths: IPolicyItem[]
+  /**
+   * The combine rule if field type is struct or struct-array
+   */
+  combines?: IDataCombine[];
 
-    /**
-     * The data authorization policies for the field, normally the colun access policies
-     */
-    fieldAuths?: IFieldPolicy[]
+  /**
+   * The data authorization policies for the field, normally the row access policies
+   */
+  auths: IPolicyItem[];
+
+  /**
+   * Row filter policies
+   */
+  rowAuths?: IRowPolicy[];
+
+  /**
+   * Column access policies
+   */
+  colAuths?: IColPolicy[];
+
+  /**
+   * The field filters
+   */
+  filters?: IFieldFilter[];
+
+  /**
+   * The foreign field references
+   */
+  foreigns?: IForeign[];
+
+  /**
+   * The field view from other app
+   */
+  view?: IFieldView;
 }
 
-export interface IFieldPolicy
-{
-    /**
-     * The field name in struct
-     */
-    name: string
+/**
+ * The row policy item
+ */
+export interface IRowPolicy {
+  /**
+   * The policy evaluatorm, if true will use the filter
+   */
+  evaluator: string;
 
-    /**
-     * The authorization policies for the field
-     */
-    Auths: IPolicyItem[]
+  /**
+   * The row filter function
+   */
+  filter?: string;
+}
+
+/**
+ * The column policy item
+ */
+export interface IColPolicy {
+  /**
+   * The struct field name
+   */
+  name: string;
+
+  /**
+   * The column access evaluators
+   */
+  evaluators: string[];
+}
+
+/**
+ * The field filter
+ */
+export interface IFieldFilter {
+  /**
+   * The field name or filter function
+   */
+  filter: string;
+
+  /**
+   * The filter mode
+   */
+  mode: FieldFilterModeValue;
+
+  /**
+   * The filter resolve strategy
+   */
+  resolve?: FieldFilterResolveValue;
+}
+
+/**
+ * The foreign field reference
+ */
+export interface IForeign{
+  /**
+   * The key field
+   */
+  field: string;
+
+  /**
+   * The reference app
+   */
+  app: string;
+}
+
+/**
+ * The field view
+ */
+export interface IFieldView{
+
+  /**
+   * The source app
+   */
+  app: string;
+
+  /**
+   * The source field
+   */
+  field: string;
+
+  /**
+   * The source app target map field
+   */
+  map: string;
 }

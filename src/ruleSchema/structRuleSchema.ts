@@ -3,7 +3,7 @@ import { AppNode } from "../node/appNode"
 import { type AnySchemaNode } from "../node/schemaNode"
 import { StructNode } from "../node/structNode"
 import { type INodeSchema } from "../schema/nodeSchema"
-import { type IStructFieldRelation, type IStructSchema } from "../schema/structSchema"
+import { type IStructRelationSchema, type IStructSchema } from "../schema/structSchema"
 import { getCachedSchema } from "../utils/schemaProvider"
 import { isNull } from "../utils/toolset"
 import { ArrayRuleSchema } from "./arrayRuleSchema"
@@ -96,7 +96,7 @@ export class StructRuleSchema extends RuleSchema
      * @param relation The realtion to be registered
      * @param info the struct info of the root schema
      */
-    regRelation(relation: IStructFieldRelation) {
+    regRelation(relation: IStructRelationSchema) {
         const rootTypeInfo = this._schema.struct
 
         // locate the target
@@ -108,7 +108,7 @@ export class StructRuleSchema extends RuleSchema
 
         // locate the refs
         const args: ISchemaNodePushArgSchema[] = []
-        relation.args.forEach(a => {
+        relation.args?.forEach(a => {
             if (a.name) {
                 // access path
                 const accessPaths = getAccessPath(this, a.name, rootTypeInfo!)
@@ -126,12 +126,12 @@ export class StructRuleSchema extends RuleSchema
             }
         })
 
-        if (args.length < relation.args.length)
+        if (args.length < (relation.args?.length || 0))
             return
 
         // register
         const targetSchema = targetAccessPaths[targetAccessPaths.length - 1].schema
-        const pushSchema: ISchemaNodePushSchema = { func: relation.func, args, type: relation.type, source: this._schema.name }
+        const pushSchema: ISchemaNodePushSchema = { func: relation.func, args, prop: relation.prop, source: this._schema.name }
         targetSchema.pushSchemas = targetSchema.pushSchemas || []
         targetSchema.pushSchemas.push(pushSchema)
     }

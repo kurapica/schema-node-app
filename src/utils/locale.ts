@@ -219,7 +219,7 @@ export function combineLocaleString(locale: string | ILocaleString | null | unde
 }
 
 /**
- * parse the locale string to string, the key may complex like '{list.prefix}{@system.schema.structschema.type}{list.suffix}'
+ * parse the locale string to string, the key may complex like '{list.prefix}{@system.schema.def.struct.schema.type}{list.suffix}'
  */
 export function localeStringToString(value: ILocaleString | string | null | undefined): string
 {
