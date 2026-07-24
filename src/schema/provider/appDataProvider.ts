@@ -1,12 +1,12 @@
-import { AppScopeType } from "../enum/appScopeType";
-import { WorkflowStatus } from "../enum/workflowStatus";
+import { AppScopeType } from "../../enum/appScopeType";
+import { WorkflowStatus } from "../../enum/workflowStatus";
 import type {
   IAppDataFieldPushQuery,
   IAppDataPushResult,
   IAppDataQuery,
   IAppDataResult,
   IBatchQueryAppDataResult,
-} from "../schema/appSchema";
+} from "../appSchema";
 import { SchemaLoadState } from "../schema/nodeSchema";
 import {
   defaultSchemaProvider,
@@ -18,7 +18,7 @@ import {
   registerSchema,
   useSchemaProvider,
 } from "./schemaProvider";
-import { debounce, deepClone, isNull } from "./toolset";
+import { debounce, deepClone, isNull } from "../../utils/toolset";
 
 let DEBOUNCE_BATCH_QUERY = 50;
 
