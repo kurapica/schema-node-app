@@ -1,8 +1,8 @@
 //#region Api schema Protocol
 
 import axios from "axios";
-import { generateGuid, isNull } from "schema-node-core";
-import { getLanguage } from "../../utils/locale";
+import { ArrayType, Display, EnumType, generateGuid, getNodeType, isNull, LocaleString, NodeType, NS_SYSTEM_GUID, ScalarType, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_INT, SCHEMA_KIND_STRING, StructType } from "schema-node-core";
+import { _L, getLanguage } from "../../utils/locale";
 import { getAppSchemaProvider } from "./appSchemaProvider";
 
 interface ISchemaApiProtocolRequestMeta {
@@ -248,7 +248,7 @@ export async function postSchemaApi(
     const disposition = headers["content-disposition"] || "";
     if(disposition && disposition.includes("attachment"))
     {
-        let filename = "template.xlsx";
+        let filename = "unknown.obj";
 
         // RFC 5987: filename*=UTF-8''xxx
         const utf8Match = disposition.match(/filename\*\=UTF-8''(.+)/i);
@@ -307,42 +307,45 @@ export async function postSchemaApi(
  * Mocks the schema data
  * @param name The schema name
  */
-export function mockSchemaData(name: string): any {
+export async function mockSchemaData(name: string | NodeType): Promise<any> {
   if (isNull(name)) return null;
-  const schema = getCachedSchema(name);
+  const schema = typeof name === "string" ? await getNodeType(name) : name;
   if (!schema) return null;
 
-  switch (schema.type) {
-    case SchemaType.Scalar:
-      const valueType = getScalarValueType(name);
-      if (!valueType) return null;
-      if (valueType & ScalarValueType.Boolean) return false;
-      if (valueType & ScalarValueType.Date) return new Date();
-      if (valueType & ScalarValueType.Integer) return 0;
-      if (valueType & ScalarValueType.Number) return 0.0;
-      if (valueType & ScalarValueType.String)
+  if (schema instanceof ScalarType)
+  {
+    switch (schema.kind)
+    {
+      case SCHEMA_KIND_INT:
+        return 0;
+      case SCHEMA_KIND_DECIMAL:
+        return 0.0;
+      case SCHEMA_KIND_STRING:
         return schema.name == NS_SYSTEM_GUID ? generateGuid() : "";
-      return null;
-    case SchemaType.Enum:
-      if (schema.enum?.values && schema.enum.values.length)
-        return schema.enum.values[0].value;
-      return null;
-    case SchemaType.Struct:
+      case SCHEMA_KIND_DATE:
+        return new Date();
+      case SCHEMA_KIND_BOOL:
+        return false;
+    }
+  }
+  else if (schema instanceof EnumType)
+  {
+    return (await schema.getEnumEntryAccess())[0]?.children?.[0]?.value;
+   }
+  else if (schema instanceof StructType)
+  {
       const obj: any = {};
-      schema.struct?.fields?.forEach((f) => {
+      schema.getFields().forEach((f) => {
         const data = mockSchemaData(f.type!);
         obj[f.name] = isNull(data)
-          ? f.display?.key
-            ? _L(f.display.key)
-            : f.name
+          ? (f.getProperty(Display)?.getValue<LocaleString>()?.key || f.name)
           : data;
       });
       return obj;
-    case SchemaType.Array:
-      if (schema.array?.element) {
-        return [mockSchemaData(schema.array.element)];
-      }
-      return [];
+  }
+  else if (schema instanceof ArrayType)
+  {
+    return [mockSchemaData(schema.element)].filter(f => !isNull(f));
   }
   return null;
 }
