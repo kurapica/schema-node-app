@@ -284,3 +284,12 @@ export function localeStringToString(value: ILocaleString | string | null | unde
     const tran = value.trans?.find(t => currLang.startsWith(t.lang) || t.lang.startsWith(currLang))
     return tran?.tran || (currLocale[value.key] !== undefined && currLocale[value.key] !== null ? currLocale[value.key] : value.key || "")
 }
+
+/**
+ * format string
+ */
+export function sformat(template: string | ILocaleString, ...args: any[]) {
+  return `${_L(template)}`.replace(/{(\d+)}/g, (match, index) => {
+    return typeof args[index] !== 'undefined' ? _L(args[index]) : match;
+  });
+}

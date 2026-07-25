@@ -34,7 +34,7 @@ import {
   interactionWorkflow,
   pushAppData,
   queryAppData,
-} from "../schema/provider/appDataProvider";
+} from "../schema/provider/appSchemaProvider";
 import { type INodeSchema } from "../schema/nodeSchema";
 import {
   DataCombineType,

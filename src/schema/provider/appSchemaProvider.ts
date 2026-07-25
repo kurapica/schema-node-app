@@ -1,24 +1,4 @@
-import { AppScopeType } from "../../enum/appScopeType";
-import { WorkflowStatus } from "../../enum/workflowStatus";
-import type {
-  IAppDataFieldPushQuery,
-  IAppDataPushResult,
-  IAppDataQuery,
-  IAppDataResult,
-  IBatchQueryAppDataResult,
-} from "../appSchema";
-import { SchemaLoadState } from "../schema/nodeSchema";
-import {
-  defaultSchemaProvider,
-  getAppCachedSchema,
-  getSchemaApiBaseUrl,
-  type ISchemaProvider,
-  postSchemaApi,
-  registerAppSchema,
-  registerSchema,
-  useSchemaProvider,
-} from "./schemaProvider";
-import { debounce, deepClone, isNull } from "../../utils/toolset";
+import { INodeSchemaProvider } from "schema-node-core";
 
 let DEBOUNCE_BATCH_QUERY = 50;
 
@@ -27,7 +7,39 @@ let DEBOUNCE_BATCH_QUERY = 50;
 /**
  * The Application field data schema provider
  */
-export interface IAppSchemaDataProvider extends ISchemaProvider {
+export interface IAppSchemaProvider extends INodeSchemaProvider {
+  /**
+   * Get the schema api protocol information
+   */
+  protocol(): Promise<ISchemaApiProtocolMeta | undefined>;
+
+  /**
+   * Load the application schema information
+   * @param app the name of the application
+   * @return the application schema
+   */
+  getAppSchema(
+    app: string,
+    includeTypes?: boolean,
+    format?: string,
+  ): Promise<IAppSchema | undefined>;
+
+  /**
+   * Authorize the policy for the scope
+   * @param scope The policy scope
+   * @param name The schema type name
+   * @param app The application name
+   * @param field The field name
+   * @param workflow The workflow name
+   */
+  authorize(
+    scope: PolicyScope,
+    name?: string,
+    app?: string,
+    field?: string,
+    workflow?: string,
+  ): Promise<boolean>;
+
   /**
    * Batch query the application data from server
    */
@@ -142,8 +154,8 @@ export const defaultAppSchemaProvider: IAppSchemaDataProvider = {
 /**
  * Sets the data schema provider
  */
-export function useAppDataProvider(
-  provider: IAppSchemaDataProvider,
+export function useAppSchemaProvider(
+  provider: IAppSchemaProvider,
   debounce: number = 50,
 ): void {
   schemaProvider = provider;
@@ -154,7 +166,7 @@ export function useAppDataProvider(
 /**
  * Gets the data schema provider
  */
-export function getAppDataProvider(): IAppSchemaDataProvider | null {
+export function getAppSchemaProvider(): IAppSchemaProvider | null {
   return (
     schemaProvider ?? (getSchemaApiBaseUrl() ? defaultAppSchemaProvider : null)
   );
