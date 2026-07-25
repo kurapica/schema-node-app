@@ -1,98 +1,104 @@
-import { INodeSchemaProvider } from "schema-node-core";
+import { useSchemaProvider } from "schema-node-core";
+import { getSchemaApiBaseUrl } from "./protocol";
+import { WorkflowStatus } from "../../enum/workflowStatus";
+import { IAppSchemaProvider } from "./interface";
 
 let DEBOUNCE_BATCH_QUERY = 50;
+let schemaProvider: IAppSchemaProvider | null = null;
 
-//#region App data provider
+export const defaultAppSchemaProvider: IAppSchemaProvider = {
+  
+  protocol: async (): Promise<ISchemaApiProtocolMeta | undefined> => {
+    return (await postSchemaApi("/protocol", {}, true)) || undefined;
+  },
 
-/**
- * The Application field data schema provider
- */
-export interface IAppSchemaProvider extends INodeSchemaProvider {
-  /**
-   * Get the schema api protocol information
-   */
-  protocol(): Promise<ISchemaApiProtocolMeta | undefined>;
+  loadSchema: async (names: string[]): Promise<INodeSchema[]> => {
+    return (
+      (
+        await postSchemaApi("/load-schema", {
+          names: names,
+        })
+      )?.schemas || []
+    );
+  },
 
-  /**
-   * Load the application schema information
-   * @param app the name of the application
-   * @return the application schema
-   */
-  getAppSchema(
+  loadAppSchema: async (
     app: string,
     includeTypes?: boolean,
-    format?: string,
-  ): Promise<IAppSchema | undefined>;
+    format?: string
+  ): Promise<IAppSchema | undefined> => {
+    return (
+      await postSchemaApi("/load-app-schema", {
+        name: app,
+        includeTypes,
+        format,
+      })
+    )?.schema;
+  },
 
-  /**
-   * Authorize the policy for the scope
-   * @param scope The policy scope
-   * @param name The schema type name
-   * @param app The application name
-   * @param field The field name
-   * @param workflow The workflow name
-   */
-  authorize(
-    scope: PolicyScope,
+  loadEnumSubList: async (
+    name: string,
+    value?: any,
+    fullList?: boolean,
+  ): Promise<IEnumValueInfo[]> => {
+    return (
+      await postSchemaApi("/load-enum-sub-list", {
+        name,
+        value,
+        fullList,
+      })
+    )?.values;
+  },
+
+  loadEnumAccessList: async (
+    name: string,
+    value: any,
+    noSubList?: boolean,
+    withSubList?: boolean,
+  ): Promise<IEnumValueAccess[]> => {
+    return (
+      await postSchemaApi("/load-enum-access-list", {
+        name,
+        value,
+        noSubList,
+        withSubList,
+      })
+    )?.access;
+  },
+
+  callFunction: async (
+    name: string,
+    args: any[],
+    retType?: string,
+    target?: string,
+  ): Promise<any> => {
+    return (
+      await postSchemaApi("/call-function", {
+        name,
+        args,
+        return: retType,
+        target,
+      })
+    )?.result;
+  },
+
+  authorize: async (
+    scope: PolicyScope = PolicyScope.DataRead,
     name?: string,
     app?: string,
     field?: string,
     workflow?: string,
-  ): Promise<boolean>;
-
-  /**
-   * Batch query the application data from server
-   */
-  batchQueryAppData(
-    queries: IAppDataQuery[],
-  ): Promise<IBatchQueryAppDataResult>;
-
-  /**
-   * push the application data to server
-   */
-  pushAppData(
-    app: string,
-    target: string,
-    datas: { [key: string]: IAppDataFieldPushQuery },
-  ): Promise<IAppDataPushResult>;
-
-  /**
-   * Process the interaction workflow request
-   * @param app The application name
-   * @param target The application target
-   * @param workflow The workflow name
-   * @param node The workflow node name
-   * @param workflowId The workflow instance id
-   * @param data The interaction form data
-   * @param terminate Whether to terminate the workflow after interaction
-   */
-  interaction(
-    app: string,
-    target: string,
-    workflow: string,
-    node?: string,
-    workflowId?: string,
-    data?: any,
-    terminate?: boolean,
-  ): Promise<string | undefined>;
-
-  /**
-   * Gets the workflow status info
-   * @param app The application
-   * @param workflow The workflow
-   * @param workflowId The workflow id
-   */
-  workflowInfo(
-    app: string,
-    workflow: string,
-    workflowId: string,
-  ): Promise<WorkflowStatus>;
-}
-
-let schemaProvider: IAppSchemaDataProvider | null = null;
-
-export const defaultAppSchemaProvider: IAppSchemaDataProvider = {
-  ...defaultSchemaProvider,
+  ): Promise<boolean> => {
+    return (
+      await postSchemaApi("/authorize", {
+        name,
+        app,
+        field,
+        workflow,
+        scope,
+      })
+    )?.result;
+  },
 
   batchQueryAppData: async function (
     queries: IAppDataQuery[],
