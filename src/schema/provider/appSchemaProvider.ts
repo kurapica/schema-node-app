@@ -5,7 +5,6 @@ import { IAppDataFieldPushQuery, IAppDataPushResult, IAppDataQuery, IAppDataResu
 import { AppSchema } from "../app/appSchema";
 import { PolicyScope } from "../../enum/policyScope";
 import { AppScopeType } from "../../enum/appScopeType";
-import { getAppCachedSchema, registerSchema, registerAppSchema } from "./schemaProvider";
 
 let DEBOUNCE_BATCH_QUERY = 50;
 let schemaProvider: IAppSchemaProvider | null = null;
@@ -132,6 +131,9 @@ export const defaultAppSchemaProvider: IAppSchemaProvider = {
   },
 };
 
+/** Register the default schema provider */
+useSchemaProvider(defaultAppSchemaProvider);
+
 /**
  * Sets the data schema provider
  */
@@ -185,7 +187,7 @@ export function queryAppData(query: IAppDataQuery): Promise<IAppDataResult> {
     query.noSchema = undefined;
   }
 
-  if (!getAppDataProvider()) throw "No App data provider";
+  if (!getAppSchemaProvider()) throw "No App data provider";
   if (isNull(query.noSchema) && cacheSchema) query.noSchema = true;
 
   // prepare the query
@@ -268,16 +270,16 @@ const processAppDataQueryQueue = debounce(() => {
   //#endregion
 
   // process
-  let provider = getAppDataProvider();
+  let provider = getAppSchemaProvider();
   provider
     ?.batchQueryAppData(combineQueries)
     .then((res) => {
       // reg schema
       if (res.schemas?.length)
-        registerSchema(res.schemas, SchemaLoadState.Server);
+        registerSchema(res.schemas, SchemaLoadState.Service);
       registerAppSchema(
         res.results?.filter((r) => r.schema).map((r) => r.schema!) || [],
-        SchemaLoadState.Server,
+        SchemaLoadState.Service,
       );
 
       // resolve
@@ -335,7 +337,7 @@ export async function pushAppData(
   target: string,
   datas: { [key: string]: IAppDataFieldPushQuery },
 ): Promise<IAppDataPushResult> {
-  let provider = getAppDataProvider();
+  let provider = getAppSchemaProvider();
   if (isNull(target)) throw "Push target must be provided";
   if (!provider) throw "No App data provider";
   return await provider.pushAppData(app, target, datas);
@@ -353,7 +355,7 @@ export async function interactionWorkflow(
   data?: any,
   terminate?: boolean,
 ): Promise<string | undefined> {
-  let provider = getAppDataProvider();
+  let provider = getAppSchemaProvider();
   if (!provider) throw "No App data provider";
   return await provider.interaction(
     app,
@@ -371,7 +373,7 @@ export async function getWorkflowInfo(
   workflow: string,
   workflowId: string,
 ): Promise<WorkflowStatus> {
-  let provider = getAppDataProvider();
+  let provider = getAppSchemaProvider();
   if (!provider) throw "No App data provider";
   return await provider.workflowInfo(app, workflow, workflowId);
 }

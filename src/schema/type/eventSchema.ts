@@ -1,6 +1,6 @@
 import { FuncArg, Meta, NodeSchemaKind, SchemaKind, SchemaType, RuntimeNodeType, Attach, Property, ForSchema, OfSchema, SCHEMA_KIND_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY_CORE, ReadOnly, PropertyValueType, Relation, Visible, Call, buildFuncCall, NS_SYSTEM_LOGIC_EQ, NODE_SELF, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, SCHEMA_KIND_STRING, Valid, Base, NS_SYSTEM_SCHEMA_FUNC } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_EVENT, SCHEMA_KIND_ORDER_EVENT } from "../../utils/constant";
-import { EventType } from "../../runtime/eventType";
+import { EventType } from "../../runtime/type/eventType";
 
 /** The event schema */
 export interface EventSchema {

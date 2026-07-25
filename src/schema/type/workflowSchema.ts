@@ -1,6 +1,6 @@
 import { Attach, Base, buildFuncCall, Call, ForSchema, FuncArg, Meta, NODE_SELF, NodeSchemaKind, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_PROPERTY_CORE, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, OfSchema, Property, PropertyValueType, ReadOnly, Relation, Require, RuntimeNodeType, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING, SchemaKind, SchemaType, Valid, Visible } from "schema-node-core";
 import { SCHEMA_KIND_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../../utils/constant";
-import { WorkflowType } from "../../runtime/workflowType";
+import { WorkflowType } from "../../runtime/type/workflowType";
 
 export interface WorkflowSchema {
     /** The workflow schema kind */
