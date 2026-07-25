@@ -1,32 +1,37 @@
-import { useSchemaProvider } from "schema-node-core";
-import { getSchemaApiBaseUrl } from "./protocol";
+import { debounce, deepClone, isNull, NodeSchema, SchemaLoadState, useSchemaProvider } from "schema-node-core";
+import { getSchemaApiBaseUrl, ISchemaApiProtocolMeta, postSchemaApi } from "./protocol";
 import { WorkflowStatus } from "../../enum/workflowStatus";
-import { IAppSchemaProvider } from "./interface";
+import { IAppDataFieldPushQuery, IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppSchemaProvider, IBatchQueryAppDataResult } from "./interface";
+import { AppSchema } from "../app/appSchema";
+import { PolicyScope } from "../../enum/policyScope";
+import { AppScopeType } from "../../enum/appScopeType";
+import { getAppCachedSchema, registerSchema, registerAppSchema } from "./schemaProvider";
 
 let DEBOUNCE_BATCH_QUERY = 50;
 let schemaProvider: IAppSchemaProvider | null = null;
 
+/** The default app schema provider */
 export const defaultAppSchemaProvider: IAppSchemaProvider = {
   
   protocol: async (): Promise<ISchemaApiProtocolMeta | undefined> => {
     return (await postSchemaApi("/protocol", {}, true)) || undefined;
   },
 
-  loadSchema: async (names: string[]): Promise<INodeSchema[]> => {
+  getSchema: async (names: string[]): Promise<NodeSchema[]> => {
     return (
       (
-        await postSchemaApi("/load-schema", {
+        await postSchemaApi("/get-schema", {
           names: names,
         })
       )?.schemas || []
     );
   },
 
-  loadAppSchema: async (
+  getAppSchema: async (
     app: string,
     includeTypes?: boolean,
     format?: string
-  ): Promise<IAppSchema | undefined> => {
+  ): Promise<AppSchema | undefined> => {
     return (
       await postSchemaApi("/load-app-schema", {
         name: app,
@@ -34,36 +39,6 @@ export const defaultAppSchemaProvider: IAppSchemaProvider = {
         format,
       })
     )?.schema;
-  },
-
-  loadEnumSubList: async (
-    name: string,
-    value?: any,
-    fullList?: boolean,
-  ): Promise<IEnumValueInfo[]> => {
-    return (
-      await postSchemaApi("/load-enum-sub-list", {
-        name,
-        value,
-        fullList,
-      })
-    )?.values;
-  },
-
-  loadEnumAccessList: async (
-    name: string,
-    value: any,
-    noSubList?: boolean,
-    withSubList?: boolean,
-  ): Promise<IEnumValueAccess[]> => {
-    return (
-      await postSchemaApi("/load-enum-access-list", {
-        name,
-        value,
-        noSubList,
-        withSubList,
-      })
-    )?.access;
   },
 
   callFunction: async (
@@ -173,9 +148,7 @@ export function useAppSchemaProvider(
  * Gets the data schema provider
  */
 export function getAppSchemaProvider(): IAppSchemaProvider | null {
-  return (
-    schemaProvider ?? (getSchemaApiBaseUrl() ? defaultAppSchemaProvider : null)
-  );
+  return schemaProvider ?? (getSchemaApiBaseUrl() ? defaultAppSchemaProvider : null);
 }
 
 //#endregion
