@@ -6,7 +6,7 @@ export { ColAuths, type ColPolicy } from './colAuths';
 export { DataCombine } from './dataCombine';
 export { EnableStorage } from './enableStorage';
 export { Filters, type FieldFilter } from './filters';
-export { IncrUpdate } from './incrUpdate';
+export { Pageable } from './pageable';
 export { Push, type PushSource } from './push';
 export { RowAuths, type RowPolicy } from './rowAuths';
 export { ScopePolicy, type AppScopePolicy, type AppScopeContextMap } from './scopePolicy';

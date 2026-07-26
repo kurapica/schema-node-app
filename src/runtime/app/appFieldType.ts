@@ -1,8 +1,11 @@
 import type { AppType } from "./appType";
 import type { AppFieldSchema, Foreign, FieldView, DataCombine } from "../../schema/app/appFieldSchema";
-import { type NodeType, type ValueType, type FunctionType, type IProperty, type IPropertyProvider, joinProperties } from "schema-node-core";
+import { type NodeType, type ValueType, type FunctionType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getMetaPropertiesForSchema, getPropertiesBySchemaKind, isTypeRefProperty, ITypeRefProperty, Disable, IValueAccess } from "schema-node-core";
 import type { DataCombineType } from "../../enum/dataCombineType";
-import { FieldFilter } from "../../property";
+import { FieldFilter, Filters, Pageable } from "../../property";
+import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
+import { AppNode } from "../../node/appNode";
+import { PageNode } from "../../node/pageNode";
 
 export class AppFieldType implements IPropertyProvider {
   private readonly _appFieldSchema: AppFieldSchema;
@@ -12,6 +15,13 @@ export class AppFieldType implements IPropertyProvider {
   constructor(app: AppType, schema: AppFieldSchema) {
     this.application = app;
     this._appFieldSchema = schema;
+  }
+
+  /** Create a data node instance. */
+  create(appNode: AppNode, data: unknown): IValueAccess {
+    if (this.pageable)
+      return new PageNode(this.valueType, data, appNode, this);
+    return this.valueType.create(data, appNode, this);
   }
 
   /** The application that contains this field. */
@@ -26,9 +36,11 @@ export class AppFieldType implements IPropertyProvider {
   /** The type of the field. */
   get type(): string { return this._appFieldSchema.type; }
 
+  /** Whether the field is pageable. */
+  get pageable(): boolean | undefined { return this.getProperty(Pageable)?.getValue<boolean>(); }
+
   /** Whether the field is disabled. */
-  get disable(): boolean | undefined { return this._disable; }
-  private _disable?: boolean;
+  get disable(): boolean | undefined { return this.getProperty(Disable)?.getValue<boolean>(); }
 
   /** The value type of the field. */
   get valueType(): ValueType | undefined { return this._valueType; }
@@ -50,6 +62,7 @@ export class AppFieldType implements IPropertyProvider {
   /** The push source of the field. */
   get pushSource(): AppFieldType | undefined { return this._pushSource; }
   private _pushSource?: AppFieldType;
+  
   /** The combine type of the field. */
   get combine(): DataCombineType | undefined { return this._appFieldSchema.combine; }
 
@@ -57,12 +70,10 @@ export class AppFieldType implements IPropertyProvider {
   get combines(): DataCombine[] | undefined { return this._appFieldSchema.combines; }
 
   /** The filters of the field. */
-  get filters(): FieldFilter[] | undefined { return this._filters; }
-  private _filters?: FieldFilter[];
+  get filters(): FieldFilter[] | undefined { return this.getProperty(Filters)?.getValue<FieldFilter[]>(); }
 
   /** The error message of the field. */
-  get error(): string | undefined { return this._error; }
-  private _error?: string;
+  get error(): string | undefined { return this._appFieldSchema.error; }
 
   /** The observers of the field. */
   private _observers?: AppFieldType[];
@@ -70,7 +81,26 @@ export class AppFieldType implements IPropertyProvider {
 
   /** Load the field. */
   async load(): Promise<void> {
-    
+    this._valueType = await getNodeType(this.type) as ValueType;
+    this._props = Array.from(getPropertiesBySchemaKind(this._appFieldSchema, SCHEMA_KIND_APP_FIELD));
+
+    // load ref types from properties
+    this._refTypes = [];
+    for(let prop of this._props.filter(isTypeRefProperty))
+    {
+      for(let type of prop.getRefTypes())
+      {
+        const nodeType = await getNodeType(type);
+        if (nodeType && !this._refTypes.includes(nodeType)) 
+          this._refTypes.push(nodeType);
+      }
+    }
+
+    // push
+    if (this._appFieldSchema?.source) {
+      this._pushSource = this.application.getField(this._appFieldSchema.source);
+      this._pushFunc = await getNodeType(this._appFieldSchema.push) as FunctionType;
+    }
   }
 
   /** The reference types of the field. */

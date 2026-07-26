@@ -1,4 +1,4 @@
-import { Append, Attach, CallArg, Description, Display, ENTITY_PRIMARY_KEY_MAX_LEN, Meta, NS_SYSTEM_BOOL, NS_SYSTEM_LIST, NS_SYSTEM_OBJECT, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_KIND, NS_SYSTEM_STRING, PrimaryIndex, Require, SchemaKind, SchemaType, UpLimitString } from "schema-node-core";
+import { Append, Attach, CallArg, Description, Display, ENTITY_PRIMARY_KEY_MAX_LEN, Meta, NS_SYSTEM_BOOL, NS_SYSTEM_LIST, NS_SYSTEM_OBJECT, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_KIND, NS_SYSTEM_STRING, PrimaryIndex, Require, SchemaKind, SchemaType, UpLimitString, ValueType } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW_NODE, SCHEMA_KIND_ORDER_APP_WORKFLOW, SCHEMA_KIND_ORDER_APP_WORKFLOW_NODE } from "../../utils/constant";
 
 /** The application workflow schema */
@@ -14,6 +14,9 @@ export interface AppWorkflowSchema {
 
   /** The workflow nodes */
   nodes: AppWorkflowNodeSchema[];
+
+  /** The error message */
+  error?: string;
 }
 
 /** The application workflow node schema */
@@ -53,6 +56,9 @@ export interface AppWorkflowNodeSchema {
 
   /** The error message */
   error?: string;
+
+  /** The payload value type */
+  payloadValueType?: ValueType;
 }
 
 @Meta(SchemaKind, [SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_ORDER_APP_WORKFLOW])

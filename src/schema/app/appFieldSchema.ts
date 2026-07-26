@@ -1,4 +1,4 @@
-import { Append, Attach, buildFuncCall, Call, Default, Description, Disable, Display, DisplayOnly, EntrySource, InVisible, Meta, NODE_SELF, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LIST, NS_SYSTEM_LOGIC, NS_SYSTEM_SCHEMA_ARRAY, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, PrimaryIndex, Relation, Require, SchemaKind, SchemaType, Valid, Visible } from "schema-node-core";
+import { Append, Attach, buildFuncCall, Call, Default, Description, Disable, Display, DisplayOnly, EntrySource, InVisible, Meta, NODE_SELF, NS_SYSTEM_BOOL, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LIST, NS_SYSTEM_LOGIC, NS_SYSTEM_SCHEMA_ARRAY, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, PrimaryIndex, Relation, Require, SCHEMA_KIND_ARRAY, SchemaKind, SchemaType, Valid, Visible } from "schema-node-core";
 import { DataCombineType } from "../../enum/dataCombineType";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_ORDER_APP_FIELD } from "../../utils/constant";
 
@@ -35,6 +35,13 @@ export interface AppFieldSchema {
 
   /** The field view settings */
   view?: FieldView;
+
+  //#endregion
+
+  //#region Status
+
+  /** The error message of the field */
+  error?: string;
 
   //#endregion
 }
