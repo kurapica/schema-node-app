@@ -68,37 +68,33 @@ export class AppFieldType implements IPropertyProvider {
   private _observers?: AppFieldType[];
   get observers(): readonly AppFieldType[] | undefined { return this._observers; }
 
+  /** Load the field. */
+  async load(): Promise<void> {
+    
+  }
+
+  /** The reference types of the field. */
   *getRefTypes(): Generator<NodeType> {
     if (this._valueType) yield this._valueType;
     if (this._refTypes) yield* this._refTypes;
   }
 
+  /** The property of the field. */
   getProperty<T extends IProperty>(propCtor: new () => T): T | undefined {
     return this._props?.find(p => p instanceof propCtor) as T ?? this._valueType?.getProperty(propCtor);
   }
 
+  /** The properties of the field. */
   *getProperties<T extends IProperty>(propCtor: new () => T): Generator<T> {
     return joinProperties(this._props?.filter(p => p instanceof propCtor) as T[], this._valueType?.getProperties(propCtor));
   }
 
+  /** The filtered properties of the field. */
   *filterProperties(predicate: (prop: IProperty) => boolean): Generator<IProperty> {
     return joinProperties(this._props?.filter(predicate), this._valueType?.filterProperties(predicate));
   }
 
-  getSchema(): AppFieldSchema {
-    return {
-      app: this._appFieldSchema.app,
-      name: this._appFieldSchema.name,
-      type: this._appFieldSchema.type,
-      source: this._appFieldSchema.source,
-      push: this._appFieldSchema.push,
-      combine: this._appFieldSchema.combine,
-      combines: this._appFieldSchema.combines,
-      foreigns: this._appFieldSchema.foreigns?.map(f => ({ ...f })),
-      view: this._appFieldSchema.view ? { ...this._appFieldSchema.view } : undefined,
-    };
-  }
-
+  /** Add an observer to the field. */
   addObserver(observer: AppFieldType): void {
     if (!this._observers) this._observers = [];
     if (!this._observers.includes(observer)) {

@@ -1,8 +1,8 @@
 export { EventType, PayloadEvaluatorProperty } from "./runtime/type/eventType";
 export { WorkflowType } from "./runtime/type/workflowType";
-export { AppType } from "./runtime/type/appType";
-export { AppFieldType } from "./runtime/type/appFieldType";
-export { AppWorkflowType } from "./runtime/type/appWorkflowType";
+export { AppType } from "./runtime/app/appType";
+export { AppFieldType } from "./runtime/app/appFieldType";
+export { AppWorkflowType } from "./runtime/app/appWorkflowType";
 export { getAppType } from "./runtime/appRuntime";
 export type { AppSchema } from "./schema/app/appSchema";
 export type { AppFieldSchema, Foreign, FieldView } from "./schema/app/appFieldSchema";

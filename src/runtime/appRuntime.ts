@@ -1,10 +1,10 @@
 import type { AppSchema } from "../schema/app/appSchema";
-import { AppType } from "./type/appType";
+import { AppType } from "./app/appType";
 import type { AppFieldSchema } from "../schema/app/appFieldSchema";
 import type { AppWorkflowSchema } from "../schema/app/appWorkflowSchema";
 import { SchemaLoadState } from "schema-node-core";
-import { AppFieldType } from "./type/appFieldType";
-import { AppWorkflowType } from "./type/appWorkflowType";
+import { AppFieldType } from "./app/appFieldType";
+import { AppWorkflowType } from "./app/appWorkflowType";
 
 const _rootAppSchema: AppSchema = { name: "" };
 const _schemaIndex = new Map<string, AppSchema>();
