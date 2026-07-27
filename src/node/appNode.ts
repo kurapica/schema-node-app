@@ -2,6 +2,7 @@ import { DataNode, IConstraintProperty, IProperty, IRelationInfo, isNull, IValue
 import { AppType } from "../runtime/app/appType";
 import { IAppDataQuery, IAppDataResult, IAppWorkflowState } from "../schema/provider/interface";
 import { AppFieldType } from "../runtime/app/appFieldType";
+import { AllowCreate, AllowDelete, AllowRead, AllowUpdate, Loaded } from "../property";
 
 // The app field node states
 enum AppFieldNodeState {
@@ -13,11 +14,17 @@ enum AppFieldNodeState {
   Readonly = 1 << 4,
 }
 
+interface AppFieldNodeInfo {
+  field: AppFieldType;
+  node: IValueAccess;
+  state: AppFieldNodeState;
+}
+
 /** The app node to manage all field data nodes */
 export class AppNode implements IValueAccess {
   readonly appType: AppType;
   readonly target?: string;
-  private _appFields: { field: AppFieldType, node: IValueAccess, loaded: AppFieldNodeState }[];
+  private _appFields: AppFieldNodeInfo[];
   private _workflowStates?: IAppWorkflowState[];
 
   constructor(appType: AppType, target?: string, query?: IAppDataQuery, data: IAppDataResult | undefined = undefined, readonly = false) {
@@ -25,92 +32,134 @@ export class AppNode implements IValueAccess {
     this.target = target;
     this._appFields = [];
     this._workflowStates = data?.workflows;
-    if (readonly) this.setPropertyValue(ReadOnly, true);
+    if (readonly) this.setPropertyValue(ReadOnly, true); // mark as readonly node
 
     for (const field of appType.getFields())
     {
-      const finfo = data?.infos[field.name];
+      const finfo = data?.infos[field.name]; // field runtime info
       if (field.disable || (finfo && !finfo.allowRead)) continue;
-      
-      //#region The node state
+
+      // The node state, @TODO: should I convert the state to node propety?
       const d = data?.results[field.name];
       let state = AppFieldNodeState.None;
-      
-      // loaded
-      if (!isNull(d) || data?.infos[field.name])
-        state |= AppFieldNodeState.Loaded;
+      {
+        // readonly
+        if (readonly || (finfo && !finfo.allowUpdate)) state |= AppFieldNodeState.Readonly;
+        
+        // loaded
+        if (!isNull(d) || data?.infos[field.name])
+            state |= AppFieldNodeState.Loaded;
 
-      // push field
-      if (field.pushSource) state |= AppFieldNodeState.Push | AppFieldNodeState.Readonly;
+        // push field
+        if (field.pushSource) state |= AppFieldNodeState.Push | AppFieldNodeState.Readonly;
 
-      // display only field
-      if (!field.enableStorage) state |= AppFieldNodeState.Readonly 
-        | AppFieldNodeState.FrontEnd
-        | AppFieldNodeState.Loaded;
+        // display only field
+        if (!field.enableStorage) state |= AppFieldNodeState.Readonly | AppFieldNodeState.FrontEnd | AppFieldNodeState.Loaded;
 
-      // view
-      if (field.view) state |= AppFieldNodeState.Ref | AppFieldNodeState.Readonly;
+        // view
+        if (field.view) state |= AppFieldNodeState.Ref | AppFieldNodeState.Readonly;
+      }
 
-      //#endregion
-      const readonlyField = readonly || state & AppFieldNodeState.Readonly || (finfo && !finfo.allowUpdate);
+      // Generate the data node
       const node = field.create(this, d);
-      if (readonlyField) node.setPropertyValue(ReadOnly, true, this);
-      this._appFields.push({field, node, loaded: state});
+      if (state & AppFieldNodeState.Readonly)
+        node.setPropertyValue(ReadOnly, true, this);
+      if (state & AppFieldNodeState.Loaded)
+        node.setPropertyValue(Loaded, true, this);
+
+      // additonal run time state
+      if (finfo)
+      {
+        node.setPropertyValue(AllowCreate, finfo.allowRead ?? false);
+        node.setPropertyValue(AllowRead, finfo.allowRead ?? false);
+        node.setPropertyValue(AllowUpdate, finfo.allowUpdate ?? false);
+        node.setPropertyValue(AllowDelete, finfo.allowDelete ?? false);
+      }
+      
+      this._appFields.push({field, node, state});
     }
   }
 
-  //#region IValueAccess
+  //#region fields
 
-  get isEmpty(): boolean { return false; }
+  private *_getFields(state: AppFieldNodeState, nostate?: AppFieldNodeState): Generator<IValueAccess> {
+    for (const info of this._appFields.filter(info => (!state || (info.state & state) === state) && !(info.state & (nostate ?? 0)))) 
+      yield info.node;
+  }
 
-  get rawValue(): unknown { return undefined; }
+  /** Get an application field by name */
+  getfield(name: string): IValueAccess | undefined {
+    return this._appFields.find(info => info.field.name.toLowerCase() === name.toLowerCase())?.node;
+  }
 
-  setValue(value: unknown): void { }
-  
-  getValue(): unknown { return undefined; }
+  /** Get all application fields */
+  get fields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.None); }
 
-  getProperty(propCtor: new () => IProperty): IProperty | undefined {
-      throw new Error("Method not implemented.");
-  }
-  getPropertyValue<T>(propCtor: new () => IProperty): T | undefined {
-      throw new Error("Method not implemented.");
-  }
-  getProperties(propCtor: new () => IProperty): Generator<IProperty> {
-      throw new Error("Method not implemented.");
-  }
-  getPropertyValues<T>(propCtor: new () => IProperty): Generator<T> {
-      throw new Error("Method not implemented.");
-  }
-  setPropertyValue(propCtor: new () => IProperty, value?: unknown, source?: IValueAccess): void {
-      throw new Error("Method not implemented.");
-  }
-  subscribe(func: Function, immediate?: boolean): Function {
-      throw new Error("Method not implemented.");
-  }
-  recordSubscription(subscription: Function, source: unknown): void {
-      throw new Error("Method not implemented.");
-  }
-  clearSubscription(source: unknown): void {
-      throw new Error("Method not implemented.");
-  }
-  getAccessValue(path: string, node?: IValueAccess): IValueAccess | undefined {
-      throw new Error("Method not implemented.");
-  }
-  get parent(): IValueAccess {
-      throw new Error("Method not implemented.");
-  }
-  attachRelations(relationInfos: IRelationInfo[]): void {
-      throw new Error("Method not implemented.");
-  }
-  get isValid(): boolean {
-      throw new Error("Method not implemented.");
-  }
-  violated(): Generator<IConstraintProperty> {
-      throw new Error("Method not implemented.");
-  }
-  recordConstraint(constraint: IConstraintProperty, valid: boolean): void {
-      throw new Error("Method not implemented.");
-  }
+  /** Get all application input fields */
+  get inputFields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.None, AppFieldNodeState.Push | AppFieldNodeState.Ref | AppFieldNodeState.FrontEnd); }
+
+  /** Get all application input fields that are loaded */
+  get loadedInputFields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.Loaded, AppFieldNodeState.Push | AppFieldNodeState.Ref | AppFieldNodeState.FrontEnd); }
+
+  /** Get all application push fields */
+  get pushFields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.Push); }
+
+  /** Get all application front end fields */
+  get frontEndFields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.FrontEnd); }
+
+  /** Get all application ref fields */
+  get refFields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.Ref); }
 
   //#endregion
+
+  //#region Status
+
+  //#endregion
+
+  // #region IValueAccess implementation
+
+  // value access
+  get isEmpty(): boolean { return this._appFields.length === 0; }
+  get rawValue(): unknown { return undefined; }
+  setValue(value: unknown): void { throw new Error("Can't set value to app node"); }
+  getValue(): unknown { return undefined; }
+
+  // property access
+  getProperty(propCtor: new () => IProperty): IProperty | undefined { return this.appType.getProperty(propCtor); }
+  getPropertyValue<T>(propCtor: new () => IProperty): T | undefined { return this.getProperty(propCtor)?.getValue() as T; }
+  getProperties(propCtor: new () => IProperty): Generator<IProperty> { return this.appType.getProperties(propCtor); }
+  *getPropertyValues<T>(propCtor: new () => IProperty): Generator<T> { for (const prop of this.getProperties(propCtor)) yield prop.getValue() as T; }
+  setPropertyValue(propCtor: new () => IProperty, value?: unknown, source?: IValueAccess): void {}
+
+  // subscription
+  subscribe(func: Function, immediate?: boolean): Function { return () => {}; }
+  recordSubscription(subscription: Function, source: unknown): void {}
+  clearSubscription(source: unknown): void {}
+
+  // access value
+  getAccessValue(path: string, node?: IValueAccess): IValueAccess | undefined {
+    const dotIndex = path.indexOf(".");
+    let remain: string | undefined;
+    if (dotIndex > 0) {
+      remain = path.substring(dotIndex + 1);
+      path = path.substring(0, dotIndex);
+    }
+
+    for (const field of this._appFields) {
+      if (field.field.name.toLowerCase() === path.toLowerCase()) {
+        return remain ? field.node.getAccessValue(remain, node) : field.node;
+      }
+    }
+
+    return undefined;
+  }
+  get parent(): IValueAccess | undefined { return undefined; }
+
+  // realtion & validation
+  attachRelations(relationInfos: IRelationInfo[]): void {}
+  get isValid(): boolean { return this._appFields.every(field => field.node.isValid); }
+  *violated(): Generator<IConstraintProperty> { for (const field of this._appFields) yield* field.node.violated(); }
+  recordConstraint(constraint: IConstraintProperty, valid: boolean): void {}
+  // #endregion IValueAccess implementation
+
 }

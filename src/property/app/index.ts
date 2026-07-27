@@ -1,5 +1,10 @@
 export { App } from './app';
 export { AllowClear } from './allowClear';
+export { AllowCreate } from './allowCreate';
+export { AllowDelete } from './allowDelete';
+export { AllowRead } from './allowRead';
+export { Loaded } from './loaded';
+export { AllowUpdate } from './allowUpdate';
 export { AttrTableName } from './attrTableName';
 export { Auths, type PolicyItem } from './auths';
 export { ColAuths, type ColPolicy } from './colAuths';
