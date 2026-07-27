@@ -8,12 +8,27 @@ let rootAppType: AppType | undefined;
 export async function getAppType(fullName: string): Promise<AppType | undefined> {
   fullName = fullName.toLowerCase().trim();
   const parts = fullName.split(".");
-  let currentPath = "";
 
   if (!rootAppType) rootAppType = new AppType();
   let node: AppType | undefined = rootAppType;
 
   // Try loading cached app types first
+  for (let i = 0; i < parts.length; i++)
+  {
+    node = await loadAppType(node, parts[i], false, i == parts.length - 1, true);
+    if (!node) break;
+  }
+
+  // Try loading full app types
+  if (!node)
+  {
+    node = await loadAppType(rootAppType, '');
+    for (let i = 0; i < parts.length; i++)
+    {
+      node = await loadAppType(node, parts[i], false, i == parts.length - 1, false);
+      if (!node) break;
+    }
+  }
 
   return node;
 }
@@ -28,7 +43,7 @@ async function loadAppType(root: AppType, segment?: string, reload = false, isLa
   const schema = await loadAppSchema(root, segment, reload);
   if (!schema) return undefined;
 
-  result ??= new AppType(result != root ? root : undefined);
+  result ??= new AppType(root);
   const subApps = schema.apps;
   delete schema.apps;
 

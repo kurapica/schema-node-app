@@ -1,8 +1,8 @@
 import type { AppType } from "./appType";
 import type { AppFieldSchema, Foreign, FieldView, DataCombine } from "../../schema/app/appFieldSchema";
-import { type NodeType, type ValueType, type FunctionType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getMetaPropertiesForSchema, getPropertiesBySchemaKind, isTypeRefProperty, ITypeRefProperty, Disable, IValueAccess, Name } from "schema-node-core";
+import { type NodeType, type ValueType, type FunctionType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getPropertiesBySchemaKind, Disable, IValueAccess, Name } from "schema-node-core";
 import type { DataCombineType } from "../../enum/dataCombineType";
-import { FieldFilter, Filters, Pageable } from "../../property";
+import { EnableStorage, FieldFilter, Filters, Pageable } from "../../property";
 import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 import { AppNode } from "../../node/appNode";
 import { PageNode } from "../../node/pageNode";
@@ -35,6 +35,9 @@ export class AppFieldType implements IPropertyProvider {
 
   /** The type of the field. */
   get type(): string { return this._appFieldSchema.type; }
+
+  /** Whether the field is enabled for storage. */
+  get enableStorage(): boolean | undefined { return this.getProperty(EnableStorage)?.getValue<boolean>(); }
 
   /** Whether the field is pageable. */
   get pageable(): boolean | undefined { return this.getProperty(Pageable)?.getValue<boolean>(); }
