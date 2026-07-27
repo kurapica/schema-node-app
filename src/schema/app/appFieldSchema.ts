@@ -89,8 +89,8 @@ class AppFieldSchemaMeta implements AppFieldSchema {
   app: string;
 
   /** The name of the field */
-  @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
   @Meta(PrimaryIndex, 1)
+  @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
   @Meta(Require, true)
   name: string;
 

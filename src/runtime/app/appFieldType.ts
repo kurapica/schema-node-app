@@ -1,16 +1,16 @@
 import type { AppType } from "./appType";
 import type { AppFieldSchema, Foreign, FieldView, DataCombine } from "../../schema/app/appFieldSchema";
-import { type NodeType, type ValueType, type FunctionType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getMetaPropertiesForSchema, getPropertiesBySchemaKind, isTypeRefProperty, ITypeRefProperty, Disable, IValueAccess } from "schema-node-core";
+import { type NodeType, type ValueType, type FunctionType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getMetaPropertiesForSchema, getPropertiesBySchemaKind, isTypeRefProperty, ITypeRefProperty, Disable, IValueAccess, Name } from "schema-node-core";
 import type { DataCombineType } from "../../enum/dataCombineType";
 import { FieldFilter, Filters, Pageable } from "../../property";
 import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 import { AppNode } from "../../node/appNode";
 import { PageNode } from "../../node/pageNode";
 
+/** The type of the application field. */
 export class AppFieldType implements IPropertyProvider {
   private readonly _appFieldSchema: AppFieldSchema;
   private _props?: IProperty[];
-  private _refTypes?: NodeType[];
 
   constructor(app: AppType, schema: AppFieldSchema) {
     this.application = app;
@@ -83,19 +83,11 @@ export class AppFieldType implements IPropertyProvider {
   async load(): Promise<void> {
     this._valueType = await getNodeType(this.type) as ValueType;
     this._props = Array.from(getPropertiesBySchemaKind(this._appFieldSchema, SCHEMA_KIND_APP_FIELD));
-
-    // load ref types from properties
-    this._refTypes = [];
-    for(let prop of this._props.filter(isTypeRefProperty))
-    {
-      for(let type of prop.getRefTypes())
-      {
-        const nodeType = await getNodeType(type);
-        if (nodeType && !this._refTypes.includes(nodeType)) 
-          this._refTypes.push(nodeType);
-      }
-    }
-
+    
+    // name property
+    const name = new Name();
+    name.setValue(this._appFieldSchema.name);
+    this._props.unshift(name);
     // push
     if (this._appFieldSchema?.source) {
       this._pushSource = this.application.getField(this._appFieldSchema.source);
@@ -106,7 +98,7 @@ export class AppFieldType implements IPropertyProvider {
   /** The reference types of the field. */
   *getRefTypes(): Generator<NodeType> {
     if (this._valueType) yield this._valueType;
-    if (this._refTypes) yield* this._refTypes;
+    if (this._pushFunc) yield this._pushFunc;
   }
 
   /** The property of the field. */

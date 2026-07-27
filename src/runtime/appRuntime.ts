@@ -1,25 +1,17 @@
+import { deepClone } from "schema-node-core";
 import type { AppSchema } from "../schema/app/appSchema";
 import { AppType } from "./app/appType";
-import type { AppFieldSchema } from "../schema/app/appFieldSchema";
-import type { AppWorkflowSchema } from "../schema/app/appWorkflowSchema";
-import { SchemaLoadState } from "schema-node-core";
-import { AppFieldType } from "./app/appFieldType";
-import { AppWorkflowType } from "./app/appWorkflowType";
+import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
 
-const _rootAppSchema: AppSchema = { name: "" };
-const _schemaIndex = new Map<string, AppSchema>();
-
-const _apps = new Map<string, AppType>();
+let rootAppType: AppType | undefined;
 
 export async function getAppType(fullName: string): Promise<AppType | undefined> {
   fullName = fullName.toLowerCase().trim();
-
-  const cached = _apps.get(fullName);
-  if (cached) return cached;
-
   const parts = fullName.split(".");
-  let node: AppType | undefined = rootAppType;
   let currentPath = "";
+
+  if (!rootAppType) rootAppType = new AppType();
+  let node: AppType | undefined = rootAppType;
 
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
@@ -45,33 +37,30 @@ export async function getAppType(fullName: string): Promise<AppType | undefined>
   return node;
 }
 
-async function loadAppSchema(
-  _parent: AppType,
-  _name: string,
-  fullPath: string
-): Promise<AppSchema | undefined> {
-  const schema = getSystemAppSchema(fullPath);
-  if (schema) return { ...schema, apps: schema.apps ? [...schema.apps] : undefined };
-
-  return undefined;
+async function loadAppType(root: AppType, segment?: string, reload = false, isLast = false, onlyCache = false): Promise<AppType | undefined> {
+  let result: AppType | undefined = root;
+  if (segment)
+  {
+    result = result.getAppType(segment);
+  }
 }
 
-async function createAppType(schema: AppSchema): Promise<AppType> {
-  const appType = new AppType();
+async function loadAppSchema(root: AppType | undefined, segment: string, reload?: boolean): Promise<AppSchema | undefined> {
+  let schema = reload ? null : root?.getAppSchema(segment);
+  if (schema) return deepClone(schema);
 
-  appType._schema = schema;
-
-  if (schema.fields?.length) {
-    appType._fields = schema.fields.map(f => new AppFieldType(appType, f));
+  const provider = getAppSchemaProvider();
+  const schemaName = root?.name ? `${root?.name}.${segment}` : segment;
+  if (provider)
+  {
+    try
+    {
+      schema = await provider.getAppSchema(schemaName);
+    }
+    catch (error)
+    {
+      console.error(`Failed to load schema from provider: ${segment}`, error);
+    }
   }
-
-  if (schema.workflows?.length) {
-    appType._workflows = schema.workflows.map(w => new AppWorkflowType(appType, w));
-  }
-
-  if (schema.apps?.length) {
-    appType._schemas = new Map(schema.apps.map(a => [a.name.toLowerCase(), a]));
-  }
-
-  return appType;
+  return schema;
 }
