@@ -1,6 +1,6 @@
 import type { AppType } from "./appType";
 import type { AppFieldSchema } from "../../schema/app/appFieldSchema";
-import { type NodeType, type ValueType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getPropertiesBySchemaKind, IValueAccess, Name, ReadOnly } from "schema-node-core";
+import { type NodeType, type ValueType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getPropertiesBySchemaKind, Name, ReadOnly, DataNode } from "schema-node-core";
 import { EnableStorage, Pageable } from "../../property";
 import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 import { AppNode } from "../../node/appNode";
@@ -20,7 +20,7 @@ export class AppFieldType implements IPropertyProvider {
   }
 
   /** Create a data node instance. */
-  create(appNode: AppNode, data: unknown): IValueAccess {
+  create(appNode: AppNode, data: unknown): DataNode {
     return this.getPropertyValue(Pageable)
       ? new PageNode(this.valueType, data, appNode, this)
       : this.valueType.create(data, appNode, this);
@@ -42,6 +42,9 @@ export class AppFieldType implements IPropertyProvider {
   get valueType(): ValueType | undefined { return this._valueType; }
   private _valueType?: ValueType;
 
+  get inputable(): boolean { return this._inputable; }
+  private _inputable: boolean = false;
+
   /** The error message of the field. */
   get error(): string | undefined { return this._appFieldSchema.error; }
 
@@ -49,6 +52,9 @@ export class AppFieldType implements IPropertyProvider {
   async load(): Promise<void> {
     this._valueType = await getNodeType(this.type) as ValueType;
     this._props = Array.from(getPropertiesBySchemaKind(this._appFieldSchema, SCHEMA_KIND_APP_FIELD));
+
+    // inputable check
+    this._inputable = !(this.getProperty(DataDerive)?.hasValue || this.getProperty(View)?.hasValue);
     
     // readonly check
     if (!this.getPropertyValue(ReadOnly) 
