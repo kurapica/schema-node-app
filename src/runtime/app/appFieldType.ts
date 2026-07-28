@@ -109,6 +109,11 @@ export class AppFieldType implements IPropertyProvider {
     return this._props?.find(p => p instanceof propCtor) as T ?? this._valueType?.getProperty(propCtor);
   }
 
+  /** The property value of the field. */
+  getPropertyValue<T>(propCtor: new () => IProperty): T | undefined {
+    return this.getProperty(propCtor)?.getValue<T>();
+  }
+
   /** The properties of the field. */
   *getProperties<T extends IProperty>(propCtor: new () => T): Generator<T> {
     return joinProperties(this._props?.filter(p => p instanceof propCtor) as T[], this._valueType?.getProperties(propCtor));

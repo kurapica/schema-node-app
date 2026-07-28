@@ -264,26 +264,6 @@ export interface IAppDataFieldInfo {
   descend?: boolean;
 
   /**
-   * Allow create the field data
-   */
-  allowCreate: boolean;
-
-  /**
-   * Allow read the field data
-   */
-  allowRead: boolean;
-
-  /**
-   * Allow update the field data
-   */
-  allowUpdate: boolean;
-
-  /**
-   * Allow delete the field data
-   */
-  allowDelete: boolean;
-
-  /**
    * The black columns in the field data
    */
   blackColumns?: string[];

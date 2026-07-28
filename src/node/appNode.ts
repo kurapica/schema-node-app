@@ -1,8 +1,10 @@
-import { DataNode, IConstraintProperty, IProperty, IRelationInfo, isNull, IValueAccess, ReadOnly } from "schema-node-core";
+import { IConstraintProperty, IProperty, IRelationInfo, isNull, IValueAccess, ReadOnly } from "schema-node-core";
 import { AppType } from "../runtime/app/appType";
 import { IAppDataQuery, IAppDataResult, IAppWorkflowState } from "../schema/provider/interface";
 import { AppFieldType } from "../runtime/app/appFieldType";
-import { AllowCreate, AllowDelete, AllowRead, AllowUpdate, Loaded } from "../property";
+import { Loaded } from "../property";
+import { DataRead } from "../property/app/dataRead";
+import { DataUpdate } from "../property/app/dataUpdate";
 
 // The app field node states
 enum AppFieldNodeState {
@@ -34,17 +36,18 @@ export class AppNode implements IValueAccess {
     this._workflowStates = data?.workflows;
     if (readonly) this.setPropertyValue(ReadOnly, true); // mark as readonly node
 
+    // Generate the data nodes of fields
     for (const field of appType.getFields())
     {
-      const finfo = data?.infos[field.name]; // field runtime info
-      if (field.disable || (finfo && !finfo.allowRead)) continue;
+      if (field.disable || field.getPropertyValue<boolean>(DataRead) === false) continue;
 
       // The node state, @TODO: should I convert the state to node propety?
       const d = data?.results[field.name];
+
       let state = AppFieldNodeState.None;
       {
         // readonly
-        if (readonly || (finfo && !finfo.allowUpdate)) state |= AppFieldNodeState.Readonly;
+        if (readonly || field.getPropertyValue<boolean>(DataUpdate) === false) state |= AppFieldNodeState.Readonly;
         
         // loaded
         if (!isNull(d) || data?.infos[field.name])
@@ -66,15 +69,6 @@ export class AppNode implements IValueAccess {
         node.setPropertyValue(ReadOnly, true, this);
       if (state & AppFieldNodeState.Loaded)
         node.setPropertyValue(Loaded, true, this);
-
-      // additonal run time state
-      if (finfo)
-      {
-        node.setPropertyValue(AllowCreate, finfo.allowRead ?? false);
-        node.setPropertyValue(AllowRead, finfo.allowRead ?? false);
-        node.setPropertyValue(AllowUpdate, finfo.allowUpdate ?? false);
-        node.setPropertyValue(AllowDelete, finfo.allowDelete ?? false);
-      }
       
       this._appFields.push({field, node, state});
     }
