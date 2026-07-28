@@ -1,4 +1,4 @@
-import { IConstraintProperty, IProperty, IRelationInfo, isNull, IValueAccess, ReadOnly } from "schema-node-core";
+import { Disable, IConstraintProperty, IProperty, IRelationInfo, isNull, IValueAccess, ReadOnly } from "schema-node-core";
 import { AppType } from "../runtime/app/appType";
 import { IAppDataQuery, IAppDataResult, IAppWorkflowState } from "../schema/provider/interface";
 import { AppFieldType } from "../runtime/app/appFieldType";
@@ -39,21 +39,17 @@ export class AppNode implements IValueAccess {
     // Generate the data nodes of fields
     for (const field of appType.getFields())
     {
-      if (field.disable || field.getPropertyValue<boolean>(DataRead) === false) continue;
-
-      // The node state, @TODO: should I convert the state to node propety?
-      const d = data?.results[field.name];
+      if (field.getPropertyValue(Disable) || field.getPropertyValue(DataRead) === false) continue;
 
       // Generate the data node
-      const node = field.create(this, d);
+      const node = field.create(this, data?.results[field.name]);
 
       // loaded
       if (!node.isEmpty || !query?.fields?.length || query?.fields?.includes(field.name)) 
         node.setPropertyValue(Loaded, true, this);
 
-      // readonly
-      if (readonly || field.getPropertyValue<boolean>(DataUpdate) === false || !field.enableStorage || field.pushSource || field.view)
-        node.setPropertyValue(ReadOnly, true, this);
+      // readonly (it also may inherit readonly from field type)
+      if (readonly) node.setPropertyValue(ReadOnly, true, this);
       
       let state = AppFieldNodeState.None;
       {
