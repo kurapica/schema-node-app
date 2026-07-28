@@ -44,10 +44,22 @@ export class AppNode implements IValueAccess {
       // The node state, @TODO: should I convert the state to node propety?
       const d = data?.results[field.name];
 
+      // Generate the data node
+      const node = field.create(this, d);
+
+      // loaded
+      if (!node.isEmpty || !query?.fields?.length || query?.fields?.includes(field.name)) 
+        node.setPropertyValue(Loaded, true, this);
+
+      // readonly
+      if (readonly || field.getPropertyValue<boolean>(DataUpdate) === false || !field.enableStorage || field.pushSource || field.view)
+        node.setPropertyValue(ReadOnly, true, this);
+      
       let state = AppFieldNodeState.None;
       {
         // readonly
-        if (readonly || field.getPropertyValue<boolean>(DataUpdate) === false) state |= AppFieldNodeState.Readonly;
+        if (readonly || field.getPropertyValue<boolean>(DataUpdate) === false) 
+          state |= AppFieldNodeState.Readonly;
         
         // loaded
         if (!isNull(d) || data?.infos[field.name])
@@ -63,8 +75,6 @@ export class AppNode implements IValueAccess {
         if (field.view) state |= AppFieldNodeState.Ref | AppFieldNodeState.Readonly;
       }
 
-      // Generate the data node
-      const node = field.create(this, d);
       if (state & AppFieldNodeState.Readonly)
         node.setPropertyValue(ReadOnly, true, this);
       if (state & AppFieldNodeState.Loaded)
