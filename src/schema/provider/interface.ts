@@ -3,6 +3,7 @@ import { ISchemaApiProtocolMeta } from "./protocol";
 import { PolicyScope } from "../../enum/policyScope";
 import { WorkflowStatus } from "../../enum/workflowStatus";
 import { AppSchema } from "../app/appSchema";
+import { AppWorkflowSchema } from "../app/appWorkflowSchema";
 
 /**
  * The Application field data schema provider
@@ -262,11 +263,6 @@ export interface IAppDataFieldInfo {
    * Use descend order
    */
   descend?: boolean;
-
-  /**
-   * The black columns in the field data
-   */
-  blackColumns?: string[];
 }
 
 export interface IAppDataFieldPushQuery {
@@ -311,4 +307,17 @@ export interface IAppWorkflowState {
   name: string;
   togglable: boolean;
   workflowId?: string;
+}
+
+export interface IAppInteractionWorkflow extends AppWorkflowSchema
+{
+    /**
+     * Whether the workflow can be toggled on/off
+     */
+    togglable: boolean
+
+    /**
+     * The workflow identifier to be turned off
+     */
+    workflowId?: string
 }

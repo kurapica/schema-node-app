@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'SchemaNode',
+      name: 'SchemaNodeApp',
       formats: ['es', 'cjs'],
       fileName: (format) => format === 'cjs' ? `index.js` : `index.${format}.js`,
     },

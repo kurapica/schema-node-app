@@ -1,8 +1,5 @@
 /// <summary>
 /// The workflow status enum
-
-import { WorkflowMode } from "./workflowMode";
-
 /// </summary>
 export enum WorkflowStatus
 {
@@ -12,5 +9,3 @@ export enum WorkflowStatus
     Error = "error",
     Terminated = "terminated"
 }
-
-export type WorkflowModeValue = `${WorkflowMode}`

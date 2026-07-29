@@ -1,11 +1,23 @@
-import { DataNode, Disable, IConstraintProperty, IProperty, IRelationInfo, isNull, IValueAccess, ReadOnly } from "schema-node-core";
+import { Call, CallProcess, DataNode, Disable, IConstraintProperty, IProperty, IRelationInfo, isEmpty, isNull, IValueAccess, ReadOnly } from "schema-node-core";
 import { AppType } from "../runtime/app/appType";
-import { IAppDataQuery, IAppDataResult, IAppWorkflowState } from "../schema/provider/interface";
-import { Loaded } from "../property";
+import { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkflow, IAppWorkflowState } from "../schema/provider/interface";
+import { AppScopePolicy, EnableStorage, Loaded, ScopePolicy } from "../property";
 import { DataRead } from "../property/app/dataRead";
+import { Inputable } from "../property/app/inputable";
+import { DataDerive, Derive } from "../property/app/dataDerive";
+import { View } from "../property/app/view";
+import { BigNumber } from "bignumber.js";
+import { DataCombineType } from "../enum/dataCombineType";
+import { AppFieldType } from "../runtime/app/appFieldType";
+import { AppScopeType } from "../enum/appScopeType";
+import { PageNode } from "./pageNode";
+import { getAppSchemaProvider, queryAppData } from "../schema/provider/appSchemaProvider";
+import { WorkflowStatus } from "../enum/workflowStatus";
 ``
 /** The app node to manage all field data nodes */
 export class AppNode implements IValueAccess {
+  //#region constructor & destructor
+
   readonly appType: AppType;
   readonly target?: string;
   private _appFieldNodes: DataNode[];
@@ -36,12 +48,22 @@ export class AppNode implements IValueAccess {
 
       this._appFieldNodes.push(node);
     }
+
+    // attach relations from type
+    this.attachRelations([{owner: this, relations: Array.from(appType.getRelations())}]);
   }
+
+  dispose(): void {
+    this._appFieldNodes.forEach(node => node.dispose());
+  }
+
+  //#endregion
 
   //#region fields
 
-  private *_getFields(predicate: (node: DataNode) => boolean): Generator<DataNode> {
-    for (const info of this._appFieldNodes.filter(predicate)) 
+  /** Get all field nodes that match the predicate predicate */
+  *getFields(predicate?: (node: DataNode) => boolean): Generator<DataNode> {
+    for (const info of this._appFieldNodes.filter(predicate || (() => true)))
       yield info;
   }
 
@@ -51,26 +73,19 @@ export class AppNode implements IValueAccess {
   }
 
   /** Get all application fields */
-  get fields(): Generator<DataNode> { return this._getFields(() => true); }
+  get fields(): Generator<DataNode> { return this.getFields(); }
 
   /** Get all application input fields */
-  get inputFields(): Generator<DataNode> { return this._getFields(AppFieldNodeState.None, AppFieldNodeState.Push | AppFieldNodeState.Ref | AppFieldNodeState.FrontEnd); }
+  get inputFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(Inputable)); }
 
   /** Get all application input fields that are loaded */
-  get loadedInputFields(): Generator<DataNode> { return this._getFields(AppFieldNodeState.Loaded, AppFieldNodeState.Push | AppFieldNodeState.Ref | AppFieldNodeState.FrontEnd); }
+  get loadedInputFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(Loaded) && node.getPropertyValue(Inputable)); }
 
-  /** Get all application push fields */
-  get pushFields(): Generator<  > { return this._getFields(AppFieldNodeState.Push); }
+  /** Get all application data derive fields */
+  get deriveFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(DataDerive)); }
 
-  /** Get all application front end fields */
-  get frontEndFields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.FrontEnd); }
-
-  /** Get all application ref fields */
-  get refFields(): Generator<IValueAccess> { return this._getFields(AppFieldNodeState.Ref); }
-
-  //#endregion
-
-  //#region Status
+  /** Get all application view fields */
+  get viewFields(): Generator<IValueAccess> { return this.getFields((node) => node.getPropertyValue(View)); }
 
   //#endregion
 
@@ -81,6 +96,12 @@ export class AppNode implements IValueAccess {
   get rawValue(): unknown { return undefined; }
   setValue(value: unknown): void { throw new Error("Can't set value to app node"); }
   getValue(): unknown { return undefined; }
+  
+  /** Whether any of the input fields have changed. */
+  get changed(): boolean { return this.inputFields.some(field => field.changed); }
+
+  /** Reset all input fields to their default values. */
+  reset(): void { this.inputFields.forEach(field => field.reset()); }
 
   // property access
   getProperty(propCtor: new () => IProperty): IProperty | undefined { return this.appType.getProperty(propCtor); }
@@ -114,10 +135,309 @@ export class AppNode implements IValueAccess {
   get parent(): IValueAccess | undefined { return undefined; }
 
   // realtion & validation
-  attachRelations(relationInfos: IRelationInfo[]): void {}
-  get isValid(): boolean { return this._appFieldNodes.every(field => field.isValid); }
+
+  // attach relations from given infos
+  attachRelations(relationInfos: IRelationInfo[]): void {
+    const fieldRelations = new Map<string, IRelationInfo[]>();
+
+    // attach relations from given infos
+    relationInfos.forEach(info => {
+      info.relations.forEach(r => {
+        const paths = r.target.split('.').filter(p => p.trim() !== '');
+        let curr: IValueAccess | undefined = info.owner;
+        for (let i = 0; i < paths.length; i++)
+        {
+          if (curr === undefined) return;
+          if (curr === this){
+            if (i < paths.length - 1) { // no relation for the app node
+              const next = paths[i].toLowerCase();
+              const fieldInfos = fieldRelations.get(next) ?? [];
+              const exist = fieldInfos.find(f => f.owner === info.owner);
+              if (exist){
+                exist.relations.push(r);
+              }
+              else{
+                fieldInfos.push({owner: info.owner, relations: [r]});
+              }
+              fieldRelations.set(next, fieldInfos);
+            }
+            break;
+          }
+          curr = curr?.getAccessValue(paths[i], this);
+        }
+      });
+    });
+
+    // attach relations to fields
+    this._appFieldNodes.forEach(field => field.attachRelations(fieldRelations.get(field.name.toLowerCase()) ?? []));
+  }
+
+  get isValid(): boolean { return this._appFieldNodes.every(field => !field.visible || field.isValid); }
   *violated(): Generator<IConstraintProperty> { for (const field of this._appFieldNodes) yield* field.violated(); }
   recordConstraint(constraint: IConstraintProperty, valid: boolean): void {}
+
+  /** Validate the whole loaded input fields. */
+  async validate() {
+    for (const field of this.inputFields) {
+      await field.validate();
+    }
+  }
+
   // #endregion IValueAccess implementation
+
+  //#region app features
+
+  /**
+   * Reload the fields
+   * @param nodes the reload nodes
+   * @param onlyNotLoaded whether only reload unloaded fields
+   */
+  async reload(nodes?: DataNode[] | string[], onlyNotLoaded = false, noPageSet = false): Promise<void> {
+    if (!this.target && this.getPropertyValue<AppScopePolicy>(ScopePolicy)?.type !== AppScopeType.SystemLevel) return;
+
+    let queryNodes: DataNode[] = [];
+    if (!nodes?.length) nodes = Array.from(this.inputFields);
+
+    // reload check
+    const checked = new Set<string>();
+    const checkToQuery = (n: string) => {
+      n = n.toLowerCase();
+      if (isNull(n) || checked.has(n)) return;
+      checked.add(n);
+      const node = this.getfield(n);
+      if (!node || queryNodes.includes(node)) return;
+
+      if (node.getPropertyValue(EnableStorage) && (!onlyNotLoaded || !node.getPropertyValue(Loaded)))
+        queryNodes.push(node);
+
+      // auto load depends fields
+      if (onlyNotLoaded) {
+        this.appType.getRelations().forEach((r) => {
+          if (r.target.toLowerCase() === node.name.toLowerCase() || r.target.toLowerCase().startsWith(node.name.toLowerCase() + "."))
+          {
+            if (r instanceof CallProcess)
+              (r.processer as CallProcess).args.forEach((arg) => arg.source ? checkToQuery(arg.source.split(".").filter((f) => !isNull(f))[0]) : "");
+          }
+        });
+      }
+    };
+
+    for (let i = 0; i < nodes.length; i++) {
+      let n = nodes[i];
+      if (typeof n === "object") n = n.name;
+      n = n.toLowerCase();
+      checkToQuery(n);
+    }
+    const pageableNode: DataNode[] = queryNodes.filter((n) => n instanceof PageNode);
+    queryNodes = queryNodes.filter((n) => !pageableNode.includes(n));
+
+    if (queryNodes.length) {
+      const query: IAppDataQuery = {
+        app: this.appType.name,
+        target: this.target || "00000000-0000-0000-0000-000000000000",
+        fields: queryNodes.map((n) => n.name),
+      };
+
+      const result = await queryAppData(query);
+      if (!result) return;
+
+      // assign data
+      for (let i = 0; i < queryNodes.length; i++) {
+        const n = queryNodes[i];
+        n.setPropertyValue(Loaded, true, this);
+
+        // update field info
+        const qinfo = result.infos[n.name];
+        if (n instanceof PageNode) n.fieldInfo = qinfo;
+
+        n.value = result.results[n.name];
+        n.confirm();
+      }
+    }
+
+    // incr update use set page
+    if (noPageSet) return;
+    for (let i = 0; i < pageableNode.length; i++) {
+      const n = pageableNode[i];
+      n.setPropertyValue(Loaded, true, this);
+      const pageNode = n as PageNode;
+      pageNode.setPage(pageNode.page);
+    }
+  }
+
+  /**
+   * Submit all changes
+   * @param nodes the submit node fields, default all
+   * @param noPageSet whether not set page for array node with incrUpdate when reload after submit
+   * @param onlyDel whether only submit deletes for array node
+   */
+  async submit(nodes?: DataNode[] | string[], noPageSet: boolean = false, onlyDel?: boolean): Promise<IAppDataPushResult | undefined> {
+    if (!this.target) return undefined;
+    const datas: any = {};
+
+    const pushNodes: DataNode[] = [];
+    if (!nodes?.length) nodes = Array.from(this.loadedInputFields);
+    for (let i = 0; i < nodes.length; i++) {
+      let n = nodes[i];
+      if (typeof n === "string") n = this.getfield(n);
+      if (!n.getPropertyValue(ReadOnly) && n.changed) {
+        if (!n.isValid)
+          return { result: false, error: `field ${n.name} is invalid` };
+        if (onlyDel && !(n instanceof PageNode)) continue;
+
+        if (onlyDel) {
+          const deletes = n instanceof PageNode ? n.deletes : null;
+          if (deletes && deletes.length > 0) {
+            pushNodes.push(n);
+            datas[n.name] = { deletes };
+          }
+        } else {
+          const submitData = n.submitValue;
+          const deletes = n instanceof PageNode ? n.deletes : null;
+
+          if (!isEmpty(submitData) || (deletes && deletes.length > 0)) {
+            pushNodes.push(n);
+            datas[n.name] = {};
+            if (!isEmpty(submitData)) datas[n.name].data = n.submitValue;
+            if (deletes?.length) datas[n.name].deletes = deletes;
+          }
+        }
+      }
+    }
+
+    if (!pushNodes.length) return { result: false };
+
+    const provider = getAppSchemaProvider();
+    const result = await provider.pushAppData(this.appType.name, this.target, datas);
+
+    // clear changes
+    if (onlyDel) {
+      const pageNodes: PageNode[] = [];
+      for (const n of pushNodes) {
+        if (n instanceof PageNode) {
+          n.clearDeletes();
+          pageNodes.push(n);
+        }
+      }
+      // reload incrUpdate array nodes from server (same as regular submit does via reload())
+      if (!noPageSet) {
+        for (const node of pageNodes) {
+          await node.setPage(node.page);
+        }
+      }
+    } else {
+      pushNodes.forEach((n) => {
+        n.confirm();
+      });
+      await this.reload(Array.from(this.loadedInputFields), true, noPageSet);
+    }
+
+    //
+
+    return result;
+  }
+
+  //#endregion
+
+  //#region Workflow
+
+  /**
+   * Gets the interaction workflows
+   */
+  get interactionWorkflows(): IAppInteractionWorkflow[] {
+    const workflows: IAppInteractionWorkflow[] = [];
+    for (let wf of this.appType.getWorkflows()) {
+      const state = this._workflowStates.find((w) => w.name === wf.name);
+      if (state) {
+        workflows.push({
+          ...wf,
+          workflowId: state.workflowId,
+          togglable: state.togglable,
+        } as any);
+      }
+    }
+    return workflows;
+  }
+
+  /**
+   * Active the workflow interaction node
+   * @param workflow The workflow name
+   * @param node The workflow node name
+   * @param workflowId The workflow instance id
+   * @param data The interaction form data
+   */
+  async activeWorkflow(
+    workflow: string,
+    node?: string,
+    workflowId?: string,
+    data?: any,
+    reload?: boolean,
+  ): Promise<string | undefined> {
+    const provider = getAppSchemaProvider();
+    const id = await provider.interaction(
+      this.appType.name,
+      this.target,
+      workflow,
+      node,
+      workflowId,
+      data,
+    );
+    const state = this._workflowStates.find((w) => w.name === workflow);
+    if (state?.togglable && id) {
+      state.workflowId = id;
+      return id;
+    }
+    if (reload && id) {
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const status = await provider.workflowInfo(this.appType.name, workflow, id);
+        if (
+          status === WorkflowStatus.Waiting ||
+          status === WorkflowStatus.Running
+        )
+          continue;
+
+        const loadedInputFields = Array.from(this.loadedInputFields);
+        if (loadedInputFields.length > 2) {
+          // Too many loaded input fields: unload them all and clear data so that
+          // schemaView lazy-load logic re-triggers them as they re-enter the viewport.
+          const effected = [];
+          for (const node of loadedInputFields) {
+            node.value = undefined;
+            node.confirm();
+            effected.push(node);
+          }
+          effected.forEach((node) => {
+            node.setPropertyValue(Loaded, false, this);
+          });
+        } else {
+          await this.reload(loadedInputFields);
+        }
+        break;
+      }
+    }
+    return id;
+  }
+
+  /**
+   * Turn off the workflow
+   */
+  async turnOffWorkflow(workflow: string): Promise<void> {
+    const state = this._workflowStates.find((w) => w.name === workflow);
+    if (!state || isNull(state.workflowId)) return;
+    const provider = getAppSchemaProvider();
+    await provider.interaction(
+      this.appType.name,
+      this.target,
+      workflow,
+      undefined,
+      state.workflowId,
+      undefined,
+      true,
+    );
+    state.workflowId = undefined;
+  }
+
+  //#endregion
 
 }

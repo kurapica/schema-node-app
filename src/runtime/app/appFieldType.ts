@@ -1,13 +1,14 @@
 import type { AppType } from "./appType";
 import type { AppFieldSchema } from "../../schema/app/appFieldSchema";
 import { type NodeType, type ValueType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getPropertiesBySchemaKind, Name, ReadOnly, DataNode } from "schema-node-core";
-import { EnableStorage, Pageable } from "../../property";
+import { Pageable } from "../../property";
 import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 import { AppNode } from "../../node/appNode";
 import { PageNode } from "../../node/pageNode";
 import { DataUpdate } from "../../property/app/dataUpdate";
 import { View } from "../../property/app/view";
 import { DataDerive } from "../../property/app/dataDerive";
+import { Inputable } from "../../property/app/inputable";
 
 /** The type of the application field. */
 export class AppFieldType implements IPropertyProvider {
@@ -42,9 +43,6 @@ export class AppFieldType implements IPropertyProvider {
   get valueType(): ValueType | undefined { return this._valueType; }
   private _valueType?: ValueType;
 
-  get inputable(): boolean { return this._inputable; }
-  private _inputable: boolean = false;
-
   /** The error message of the field. */
   get error(): string | undefined { return this._appFieldSchema.error; }
 
@@ -54,12 +52,15 @@ export class AppFieldType implements IPropertyProvider {
     this._props = Array.from(getPropertiesBySchemaKind(this._appFieldSchema, SCHEMA_KIND_APP_FIELD));
 
     // inputable check
-    this._inputable = !(this.getProperty(DataDerive)?.hasValue || this.getProperty(View)?.hasValue);
+    if (!(this.getProperty(DataDerive)?.hasValue || this.getProperty(View)?.hasValue)) {
+      const inputable = new Inputable();
+      inputable.setValue(true);
+      this._props?.unshift(inputable);
+    }
     
-    // readonly check
+    // force readonly
     if (!this.getPropertyValue(ReadOnly) 
         || this.getPropertyValue(DataUpdate) === false // no permission
-        || !this.getPropertyValue(EnableStorage)       // no storage
         || this.getProperty(View)?.hasValue            // is view
         || this.getProperty(DataDerive)?.hasValue)     // is derive
     {

@@ -1,1 +1,1 @@
-export { WorkflowKind } from './workflowKind';
+export * from './workflowKind';

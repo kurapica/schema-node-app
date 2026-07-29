@@ -1,1 +1,1 @@
-export { PayloadEvaluator } from './payloadEvaluator';
+export * from './payloadEvaluator';

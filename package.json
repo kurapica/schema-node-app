@@ -1,7 +1,8 @@
 {
-  "name": "schema-node",
+  "name": "schema-node-app",
   "version": "1.0.13",
   "description": "A TypeScript library for building data nodes from JSON-defined structures and relationships.",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -21,7 +22,7 @@
     "dist"
   ],
   "author": "kurapica125@outlook.com",
-  "license": "MIT",
+  "license": "Apache License 2.0",
   "dependencies": {
     "axios": "^1.13.1",
     "bignumber.js": "^9.3.0",
@@ -33,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kurapica/schema-node.git"
+    "url": "https://github.com/kurapica/schema-node-app.git"
   },
   "publishConfig": {
     "access": "public"

@@ -2,8 +2,7 @@
 // Schema provider protocol
 // =============================================================================
 import axios from "axios";
-import { generateGuid, isNull} from "schema-node-core";
-import { _L, getLanguage } from "../../utils/locale";
+import { generateGuid, getLanguage, isNull} from "schema-node-core";
 import { getAppSchemaProvider } from "./appSchemaProvider";
 
 interface ISchemaApiProtocolRequestMeta {
