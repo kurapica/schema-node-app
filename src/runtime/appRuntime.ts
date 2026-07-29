@@ -5,6 +5,19 @@ import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
 
 let rootAppType: AppType | undefined;
 
+/** Get the cached app type by its full name. */
+export function getCachedAppType(fullName: string): AppType | undefined {
+  const parts = fullName.split(".");
+  let node: AppType | undefined = rootAppType;
+  for (let i = 0; i < parts.length; i++)
+  {
+    node = node?.getAppType(parts[i]);
+    if (!node) break;
+  }
+  return node;
+}
+
+/** Get the app type by its full name. */
 export async function getAppType(fullName: string): Promise<AppType | undefined> {
   fullName = fullName.toLowerCase().trim();
   const parts = fullName.split(".");

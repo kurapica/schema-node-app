@@ -5,6 +5,8 @@ import { IAppDataFieldPushQuery, IAppDataPushResult, IAppDataQuery, IAppDataResu
 import { AppSchema } from "../app/appSchema";
 import { PolicyScope } from "../../enum/policyScope";
 import { AppScopeType } from "../../enum/appScopeType";
+import { getAppType, getCachedAppType } from "../../runtime";
+import { AppScopePolicy, ScopePolicy } from "../../property";
 
 let DEBOUNCE_BATCH_QUERY = 50;
 let schemaProvider: IAppSchemaProvider | null = null;
@@ -86,16 +88,16 @@ let appDataQueryQueue: {
  */
 export function queryAppData(query: IAppDataQuery): Promise<IAppDataResult> {
   query.app = query.app.toLowerCase();
-  const cacheSchema = getAppCachedSchema(query.app);
+  const cacheApp = getCachedAppType(query.app);
 
   // check
   if (!query.workflow && (isNull(query.target) || query.schemaOnly)) {
-    if (cacheSchema)
+    if (cacheApp)
       return new Promise((resolve, _) =>
         resolve({
           app: query.app,
           target: query.target,
-          schema: !query.noSchema ? cacheSchema : undefined,
+          schema: undefined, // cached app type already has schema
           results: {},
           infos: {},
         }),
@@ -106,7 +108,7 @@ export function queryAppData(query: IAppDataQuery): Promise<IAppDataResult> {
   }
 
   if (!getAppSchemaProvider()) throw "No App data provider";
-  if (isNull(query.noSchema) && cacheSchema) query.noSchema = true;
+  if (isNull(query.noSchema) && cacheApp) query.noSchema = true;
 
   // prepare the query
   processAppDataQueryQueue();
@@ -196,13 +198,12 @@ const processAppDataQueryQueue = debounce(() => {
       if (res.schemas?.length)
         registerSchema(res.schemas, SchemaLoadState.Service);
       registerAppSchema(
-        res.results?.filter((r) => r.schema).map((r) => r.schema!) || [],
-        SchemaLoadState.Service,
+        res.results?.filter((r) => r.schema).map((r) => r.schema!) || [], SchemaLoadState.Service,
       );
 
       // resolve
-      queue.forEach((q) => {
-        if (getAppCachedSchema(q.query.app).scopePolicy?.type === AppScopeType.SystemLevel)
+      queue.forEach(async (q) => {
+        if ((await getAppType(q.query.app))?.getProperty(ScopePolicy)?.getValue<AppScopePolicy>()?.type === AppScopeType.SystemLevel)
         {
           const result = res.results.find((r) => r.app === q.query.app);
           if (result) {
