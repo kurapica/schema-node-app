@@ -1,11 +1,11 @@
-import { debounce, deepClone, isNull, NodeSchema, SchemaLoadState, useSchemaProvider } from "schema-node-core";
+import { debounce, deepClone, isNull, NodeSchema, saveNodeSchema, SchemaLoadState, useSchemaProvider } from "schema-node-core";
 import { getSchemaApiBaseUrl, ISchemaApiProtocolMeta, postSchemaApi } from "./protocol";
 import { WorkflowStatus } from "../../enum/workflowStatus";
 import { IAppDataFieldPushQuery, IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppSchemaProvider, IBatchQueryAppDataResult } from "./interface";
 import { AppSchema } from "../app/appSchema";
 import { PolicyScope } from "../../enum/policyScope";
 import { AppScopeType } from "../../enum/appScopeType";
-import { getAppType, getCachedAppType } from "../../runtime";
+import { getAppType, getCachedAppType, saveAppSchema } from "../../runtime";
 import { AppScopePolicy, ScopePolicy } from "../../property";
 
 let DEBOUNCE_BATCH_QUERY = 50;
@@ -196,10 +196,8 @@ const processAppDataQueryQueue = debounce(() => {
     .then((res) => {
       // reg schema
       if (res.schemas?.length)
-        registerSchema(res.schemas, SchemaLoadState.Service);
-      registerAppSchema(
-        res.results?.filter((r) => r.schema).map((r) => r.schema!) || [], SchemaLoadState.Service,
-      );
+        saveNodeSchema(res.schemas, SchemaLoadState.Service);
+      saveAppSchema(res.results?.filter((r) => r.schema).map((r) => r.schema!) || []);
 
       // resolve
       queue.forEach(async (q) => {

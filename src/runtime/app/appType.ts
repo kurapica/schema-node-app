@@ -98,9 +98,9 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
   }
 
   /** Save an application schema */
-  saveAppSchema(schema: AppSchema | AppSchema[]): void {
+  saveAppSchema(schema: AppSchema | AppSchema[], reload= false): void {
     if (Array.isArray(schema)) {
-      schema.forEach(s => this.saveAppSchema(s));
+      schema.forEach(s => this.saveAppSchema(s, reload));
       return;
     }
 
@@ -112,11 +112,14 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
     delete schema.apps;
     
     // save the schema to the map
-    this._schemas.set(name, schema);
+    this._schemas ??= new Map();
+    if (!(this._schemas.has(name) && !reload)){
+      this._schemas.set(name, schema);
 
-    // mark the app type need reload
-    const type = this._subApps.get(name);
-    if (type) type.loaded = false;
+      // mark the app type need reload
+      const type = this._subApps.get(name);
+      if (type) type.loaded = false;
+    }
 
     // Create sub app types to save the schemas
     if (subApps?.length)
@@ -126,7 +129,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
         type = new AppType(this);
         type.load(schema).then(() => type!.loaded = false);
       }
-      (type as AppType).saveAppSchema(subApps);
+      (type as AppType).saveAppSchema(subApps, reload);
     }
   }
 

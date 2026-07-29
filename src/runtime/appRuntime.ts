@@ -5,9 +5,16 @@ import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
 
 let rootAppType: AppType | undefined;
 
+/** Save the app schema. */
+export function saveAppSchema(schema: AppSchema | AppSchema[]): void {
+  rootAppType ??= new AppType();
+  rootAppType?.saveAppSchema(schema);
+}
+
 /** Get the cached app type by its full name. */
 export function getCachedAppType(fullName: string): AppType | undefined {
   const parts = fullName.split(".");
+  rootAppType ??= new AppType();
   let node: AppType | undefined = rootAppType;
   for (let i = 0; i < parts.length; i++)
   {

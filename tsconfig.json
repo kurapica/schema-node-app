@@ -2,6 +2,7 @@
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
+    "experimentalDecorators": true,
     "outDir": "dist",
     "module": "ESNext",
     "target": "ESNext",

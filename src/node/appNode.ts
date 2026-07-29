@@ -4,16 +4,13 @@ import { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkf
 import { AppScopePolicy, EnableStorage, Loaded, ScopePolicy } from "../property";
 import { DataRead } from "../property/app/dataRead";
 import { Inputable } from "../property/app/inputable";
-import { DataDerive, Derive } from "../property/app/dataDerive";
+import { DataDerive } from "../property/app/dataDerive";
 import { View } from "../property/app/view";
-import { BigNumber } from "bignumber.js";
-import { DataCombineType } from "../enum/dataCombineType";
-import { AppFieldType } from "../runtime/app/appFieldType";
 import { AppScopeType } from "../enum/appScopeType";
 import { PageNode } from "./pageNode";
 import { getAppSchemaProvider, queryAppData } from "../schema/provider/appSchemaProvider";
 import { WorkflowStatus } from "../enum/workflowStatus";
-``
+
 /** The app node to manage all field data nodes */
 export class AppNode implements IValueAccess {
   //#region constructor & destructor
@@ -98,7 +95,7 @@ export class AppNode implements IValueAccess {
   getValue(): unknown { return undefined; }
   
   /** Whether any of the input fields have changed. */
-  get changed(): boolean { return this.inputFields.some(field => field.changed); }
+  get changed(): boolean { for (const field of this.inputFields) if (field.changed) return true; return false; }
 
   /** Reset all input fields to their default values. */
   reset(): void { this.inputFields.forEach(field => field.reset()); }
