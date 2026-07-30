@@ -69,7 +69,7 @@ async function loadAppType(root: AppType, segment?: string, reload = false, isLa
 
   if (root != result)
   {
-    result.saveAppSchema(schema);
+    result.saveAppSchema(schema, true);
     root.saveAppType(segment, result);
   }
   result.loaded = true;
