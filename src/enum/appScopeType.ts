@@ -1,6 +1,10 @@
 
 /// <summary>
 /// The application target policy type
+
+import { Meta, OfSchema, SCHEMA_KIND_ENUM, SchemaType, FromEnum } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_APP } from "../utils";
+
 /// </summary>
 export enum AppScopeType
 {
@@ -21,3 +25,9 @@ export enum AppScopeType
 }
 
 export type AppScopeTypeValue = `${AppScopeType}`
+
+/** The schema declaration */
+@Meta(OfSchema, SCHEMA_KIND_ENUM)
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.scope`)
+@Meta(FromEnum, AppScopeType)
+class AppScopeTypeMeta {}

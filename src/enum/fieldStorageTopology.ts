@@ -1,3 +1,6 @@
+import { Meta, OfSchema, SCHEMA_KIND_ENUM, SchemaType, FromEnum } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_APP_FIELD } from "../utils";
+
 /**
  * The topology of field storage, which determines how the data of dynamic type fields is stored in the database.
  */
@@ -15,3 +18,9 @@ export enum FieldStorageTopology {
 }
 
 export type FieldStorageTopologyValue = `${FieldStorageTopology}`
+
+/** The schema declaration */
+@Meta(OfSchema, SCHEMA_KIND_ENUM)
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.topology`)
+@Meta(FromEnum, FieldStorageTopology)
+class FieldStorageTopologyMeta {}

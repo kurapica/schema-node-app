@@ -4,5 +4,4 @@ export * from './fieldFilterMode';
 export * from './fieldStorageTopology';
 export * from './policyCombine';
 export * from './policyScope';
-export * from './workflowMode';
 export * from './workflowStatus';
