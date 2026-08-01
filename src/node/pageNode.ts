@@ -23,39 +23,48 @@ export interface IArrayFieldFilter {
 
 /** The pageable array data node */
 export class PageNode extends ArrayNode {
+  /** The field info for the pageable array */
   fieldInfo: IAppDataFieldInfo | undefined;
 
+  /** The field filters with input nodes */
   private _appFieldFilter: IArrayFieldFilter[] = [];
 
   /** Gets the field filters with input nodes */
   get filters(): IArrayFieldFilter[] { return this._appFieldFilter; }
 
+  /** The change tracker for the pageable array */
   private _tracker: {
     [key: string]: { origin?: {}; update?: {}; delete?: boolean };
   } = {};
 
+  /** The current page number */
   get page(): number {
     return this.fieldInfo?.take
       ? Math.floor((this.fieldInfo.skip || 0) / this.fieldInfo.take)
       : 0;
   }
 
+  /** The page item count */
   get pageCount() {
     return this.fieldInfo?.take;
   }
 
+  /** The total item count */
   get total() {
     return this.fieldInfo?.total ?? this.length;
   }
 
+  /** The query filter for the pageable array */
   get query() {
     return this.fieldInfo?.filter ? { ...this.fieldInfo.filter } : undefined;
   }
 
+  /** The query order by for the pageable array */
   get orderBy(): IAppDataQueryOrder[] {
     return deepClone(this.fieldInfo?.orderBy) || [];
   }
 
+  /** Whether the pageable array has changed */
   get changed(): boolean {
     if (this._elements.some((e) => e.changed)) return true;
     for (let key in this._tracker) {
@@ -65,6 +74,7 @@ export class PageNode extends ArrayNode {
     return false;
   }
 
+  /** The submit value for the pageable array */
   get submitValue(): unknown {
     const result: any[] = [];
     const keys = new Set<string>();
@@ -87,6 +97,7 @@ export class PageNode extends ArrayNode {
     return result;
   }
 
+  /** The delete value for the pageable array */
   get deletes(): any[] {
     const primary = (this.type as any).primary || [];
     if (!primary.length) return [];
@@ -117,6 +128,7 @@ export class PageNode extends ArrayNode {
     return deletes;
   }
 
+  /** get the primary key for the pageable array */
   getPrimaryKey(node: DataNode | any): string | undefined {
     const primarys = (this.type as any).primary;
     if (!primarys?.length) return undefined;
@@ -142,11 +154,13 @@ export class PageNode extends ArrayNode {
     return keys.join(".");
   }
 
+  /** Whether the row is deleted */
   isRowDeleted(row: DataNode): boolean {
     const key = this.getPrimaryKey(row);
     return key && this._tracker[key]?.delete ? true : false;
   }
 
+  /** Set the page */
   async setPage(
     page: number,
     count?: number,
@@ -227,7 +241,8 @@ export class PageNode extends ArrayNode {
     }
   }
 
-  delRows(start: number, count = 1): void {
+  /** Delete the rows */
+  override delRows(start: number, count = 1): void {
     if (start < 0 || start >= this._elements.length) return;
 
     for (let i = start; i < start + count; i++) {
@@ -241,6 +256,7 @@ export class PageNode extends ArrayNode {
     }
   }
 
+  /** Resume the deleted rows */
   resumeRows(start: number, count = 1): void {
     for (let i = start; i < start + count; i++) {
       const ele = this._elements[i];
@@ -252,6 +268,7 @@ export class PageNode extends ArrayNode {
     }
   }
 
+  /** Clear the deleted rows */
   clearDeletes(): void {
     for (const key in this._tracker) {
       if (this._tracker[key].delete) {
@@ -261,12 +278,14 @@ export class PageNode extends ArrayNode {
     this.onNextState();
   }
 
+  /** Confirm the page */
   override confirm(): void {
     this._elements.forEach((e) => e?.confirm());
     this._tracker = {};
     super.confirm();
   }
 
+  /** Reset the page */
   override reset(): void {
     this._elements.forEach((e) => e?.reset());
     this._tracker = {};
