@@ -1,11 +1,34 @@
-import { ArrayNode, DataNode, isNull, isEqual, deepClone } from "schema-node-core";
+import {
+  ArrayNode, ArrayType, DataNode, Display, FunctionType, StructType, ValueType,
+  isNull, deepClone, debounce, getNodeType, getCachedNodeType,
+  type LocaleString,
+} from "schema-node-core";
 import { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/provider/interface";
 import { AppNode } from "./appNode";
 import { queryAppData } from "../schema/provider/appSchemaProvider";
+import { Filters, type FieldFilter } from "../property/app/filters";
+import { FieldFilterMode } from "../enum/fieldFilterMode";
+
+/** The field filter info with input nodes */
+export interface IArrayFieldFilter {
+  /** The filter mode */
+  mode: FieldFilterMode;
+  /** The filter name (function name or field name) */
+  filter: string;
+  /** The input nodes for the filter */
+  nodes?: DataNode[];
+  /** The subscription handlers for auto filter */
+  handlers?: Function[];
+}
 
 /** The pageable array data node */
 export class PageNode extends ArrayNode {
   fieldInfo: IAppDataFieldInfo | undefined;
+
+  private _appFieldFilter: IArrayFieldFilter[] = [];
+
+  /** Gets the field filters with input nodes */
+  get filters(): IArrayFieldFilter[] { return this._appFieldFilter; }
 
   private _tracker: {
     [key: string]: { origin?: {}; update?: {}; delete?: boolean };
@@ -249,4 +272,129 @@ export class PageNode extends ArrayNode {
     this._tracker = {};
     super.reset();
   }
+
+  // #region ── Field Filters ──────────────────────────────────────────────────
+
+  /**
+   * Initialize field filters from the Filters property.
+   * Creates input nodes for each filter:
+   *  - Function filters (FieldFilterMode.Filter): nodes from function args (skip first arg)
+   *  - Light filters (other modes): node from the struct field type
+   */
+  async initFilters(): Promise<void> {
+    const filterConfigs = this.getPropertyValue<FieldFilter[]>(Filters);
+    if (!filterConfigs?.length) return;
+
+    const elementType = (this.type as ArrayType).element;
+    this._appFieldFilter = [];
+
+    for (const f of filterConfigs) {
+      if (f.mode === FieldFilterMode.Filter) {
+        // Function filter: create input nodes from function args (skip first arg = field type)
+        const funcType = getCachedNodeType(f.filter);
+        if (funcType instanceof FunctionType && funcType.args.length > 1) {
+          const nodes: DataNode[] = [];
+          let allValid = true;
+          for (let i = 1; i < funcType.args.length; i++) {
+            const arg = funcType.args[i];
+            const argType = await getNodeType(arg.type) as ValueType | undefined;
+            if (!argType || !(argType as any).create) { allValid = false; break; }
+            const node = (argType as any).create(undefined, this, this.propertyProvider) as DataNode;
+            if (node) {
+              node.setPropertyValue<LocaleString>(Display, { key: arg.name });
+              nodes.push(node);
+            }
+          }
+          if (allValid && nodes.length) {
+            this._appFieldFilter.push({ mode: f.mode, filter: f.filter, nodes });
+          }
+        }
+      } else {
+        // Light filter: create input node from the struct field type
+        if (elementType instanceof StructType) {
+          const field = elementType.getField(f.filter);
+          if (field?.type) {
+            const node = field.type.create(undefined, this, this.propertyProvider) as DataNode;
+            if (node) {
+              this._appFieldFilter.push({ mode: f.mode, filter: f.filter, nodes: [node] });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Process the filter from filter nodes.
+   * Collects values from filter input nodes and calls setPage with the filter.
+   */
+  async processFilter(): Promise<void> {
+    if (!this._appFieldFilter?.length) return;
+
+    const filter: { [key: string]: any } = {};
+    this._appFieldFilter.forEach((f) => {
+      if (f.mode === FieldFilterMode.Filter) {
+        const funcType = getCachedNodeType(f.filter);
+        if (funcType instanceof FunctionType && f.nodes) {
+          const args: any[] = [];
+          for (let i = 0; i < f.nodes.length; i++) {
+            const data = f.nodes[i].rawValue;
+            if (isNull(data)) return; // skip this filter if any arg is null
+            args.push(data);
+          }
+          filter[f.filter] = args;
+        }
+      } else {
+        const data = f.nodes && f.nodes.length ? f.nodes[0].rawValue : undefined;
+        if (isNull(data)) return;
+        filter[f.filter] = data;
+      }
+    });
+
+    await this.setPage(
+      0,
+      this.fieldInfo?.take,
+      this.fieldInfo?.descend,
+      filter,
+    );
+  }
+
+  /**
+   * Reset the filter nodes' values and optionally re-query.
+   * @param load Whether to re-query after reset
+   */
+  async resetFilter(load: boolean = false): Promise<void> {
+    if (!this._appFieldFilter?.length) return;
+
+    this._appFieldFilter.forEach((f) => {
+      f.nodes?.forEach((n) => n.setValue(null));
+    });
+
+    if (load) await this.processFilter();
+  }
+
+  /**
+   * Enable or disable auto filter when filter nodes change.
+   * @param enable Whether to enable auto filter
+   * @param delay Debounce delay in ms
+   */
+  enableAutoFilter(enable: boolean, delay: number = 300): void {
+    if (!this._appFieldFilter?.length) return;
+
+    // clear previous handlers
+    this._appFieldFilter.forEach((f) => f.handlers?.forEach((h) => h()));
+
+    if (enable) {
+      const loadFilter = debounce(() => {
+        this.processFilter();
+      }, delay);
+
+      this._appFieldFilter.forEach((f) => {
+        f.handlers = [];
+        f.nodes?.forEach((n) => f.handlers!.push(n.subscribe(loadFilter)));
+      });
+    }
+  }
+
+  // #endregion
 }
