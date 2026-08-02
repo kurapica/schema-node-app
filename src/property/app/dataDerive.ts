@@ -12,8 +12,8 @@ import { NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SC
 @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappfields`, '@app'), 'dataDerive.source')
 @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappfieldtype`,  '@app', `@dataDerive.source`, true), 'dataDerive.sourceType')
 @Relation(Valid, Assign, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NODE_SELF, '@type', true), 'dataDerive.calc')
-@Relation(InVisible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, '@type', SCHEMA_KIND_STRUCT, true), 'dataDerive.combine')
-@Relation(Visible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, SCHEMA_KIND_STRUCT, true), 'dataDerive.combines')
+@Relation(InVisible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, '@type', true, SCHEMA_KIND_STRUCT), 'dataDerive.combine')
+@Relation(Visible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, '@type', true, SCHEMA_KIND_STRUCT), 'dataDerive.combines')
 export class DataDerive extends Property<Derive> {}
 
 /** The data derive setting */

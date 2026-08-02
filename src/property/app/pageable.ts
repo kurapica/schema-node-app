@@ -5,6 +5,6 @@ import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.pageable`)
 @Meta(PropertyValueType, NS_SYSTEM_BOOL)
-@Relation(Visible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, '@type', SCHEMA_KIND_ARRAY))
+@Relation(Visible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, '@type', false, SCHEMA_KIND_ARRAY))
 @Relation(InVisible, Call, buildFuncCall(`${NS_SYSTEM_LOGIC}.not`, '@enableStorage'))
 export class Pageable extends Property<boolean> {}
