@@ -1,7 +1,7 @@
 import type { AppSchema } from "../../schema/app/appSchema";
 import { AppFieldType } from "./appFieldType";
 import { AppWorkflowType } from "./appWorkflowType";
-import { type NodeType, type ValueType, type IProperty, deepClone, IValueTypeAccess, getPropertiesBySchemaKind, RelationType, getProperty, Relations, RelationSchema, IRelationProvider, SchemaLoadState } from "schema-node-core";
+import { type NodeType, type ValueType, type IProperty, deepClone, IValueTypeAccess, getPropertiesBySchemaKind, RelationType, getProperty, Relations, RelationSchema, IRelationProvider, SchemaLoadState, Entry, setPropertyValue, Display, _LS } from "schema-node-core";
 import { AppScopeType } from "../../enum/appScopeType";
 import { AppScopePolicy, ScopePolicy } from "../../property";
 import { SCHEMA_KIND_APP } from "../../utils/constant";
@@ -218,4 +218,15 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
 
     return undefined;
   }
+
+  getAccessEntries(): Entry<string>[] {
+    return this._fields
+      .filter(f => f.type != null)
+      .map(f => {
+        const entry = { value: f.name, hasChildren: f.valueType?.hasAccessEntries } as Entry<string>;
+        return setPropertyValue(entry, Display, f.getPropertyValue(Display) ?? _LS(f.name));
+      });
+  }
+
+  get hasAccessEntries(): boolean { return !!this._fields.length; }
 }
