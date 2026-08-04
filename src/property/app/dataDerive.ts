@@ -1,4 +1,4 @@
-import { Assign, buildFuncCall, Call, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, NODE_SELF, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_LOGIC, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRUCT, SchemaType, Static, Valid, ValueType, Visible } from "schema-node-core";
+import { Assign, buildFuncCall, Call, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, NODE_SELF, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_LOGIC, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRUCT, SchemaType, Static, Valid, Visible } from "schema-node-core";
 import { DataCombineType } from "../../enum/dataCombineType";
 import { NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 
@@ -12,8 +12,8 @@ import { NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SC
 @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappfields`, '@app'), 'dataDerive.source')
 @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappfieldtype`,  '@app', `@dataDerive.source`, true), 'dataDerive.sourceType')
 @Relation(Valid, Assign, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NODE_SELF, '@type', true), 'dataDerive.calc')
-@Relation(InVisible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, '@type', true, SCHEMA_KIND_STRUCT), 'dataDerive.combine')
-@Relation(Visible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.isschemakind`, '@type', true, SCHEMA_KIND_STRUCT), 'dataDerive.combines')
+@Relation(InVisible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@type', true, SCHEMA_KIND_STRUCT), 'dataDerive.combine')
+@Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@type', true, SCHEMA_KIND_STRUCT), 'dataDerive.combines')
 export class DataDerive extends Property<Derive> {}
 
 /** The data derive setting */
