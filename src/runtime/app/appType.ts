@@ -133,6 +133,15 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
     }
   }
 
+  /** Get all sub-application schemas */
+  *getSubAppSchemas(): Generator<AppSchema> {
+    if (!this._schemas) return;
+    yield* this._schemas.values();
+  }
+
+  /** Whether this application type has sub-applications. */
+  get hasSubApps(): boolean { return this._schemas?.size > 0; }
+
   /** Get all application fields */
   *getFields(): Generator<AppFieldType> {
     if (!this._fields) return;
@@ -192,7 +201,6 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
     if (!this._schema) return { name: "" };
     return deepClone(this._schema);
   }
-
   /** Get all relations */
   *getRelations(): Generator<RelationType> {
     if (!this._relations) return;

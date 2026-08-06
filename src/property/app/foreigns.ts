@@ -1,4 +1,4 @@
-import { buildFuncCall, Call, EntrySource, ForSchema, Meta, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SCHEMA_KIND_PROPERTY, SchemaType, Static, Visible } from "schema-node-core";
+import { AccessEntryConsumer, BlackList, buildFuncCall, Call, Cascade, EntrySource, ForSchema, Meta, NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING, SchemaType, Static, Visible } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 
 /** The foreign field property */
@@ -8,6 +8,7 @@ import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PROP
 @Meta(PropertyValueType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.foreigns`)
 @Meta(Static, true)
 @Relation(Visible, Call, buildFuncCall(`${NS_SYSTEM_INTRINSIC}.assign`, '@enableStorage'))
+@Relation(BlackList, Call, buildFuncCall(`${NS_SYSTEM_COLLECTION}.newarray`, '@app'))
 export class Foreigns extends Property<Foreign[]>{};
 
 /** The foreign field setting */
@@ -28,6 +29,8 @@ export class ForeignMeta implements Foreign {
   app: string;
 
   @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
-  @Meta(EntrySource, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappfields`, "@{app}"))
+  @Meta(AccessEntryConsumer, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NODE_SELF, false, SCHEMA_KIND_ENUM, SCHEMA_KIND_STRING, SCHEMA_KIND_INT, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_DATE, SCHEMA_KIND_BOOL))
+  @Meta(Cascade, 1) // only the first level
+  @Meta(Require, true)
   field: string;
 }

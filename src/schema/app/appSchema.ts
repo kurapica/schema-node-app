@@ -1,4 +1,4 @@
-import { Append, Attach, Base, buildFuncCall, Description, Display, EntrySource, Meta, NODE_SELF, NodeSchema, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT, NS_SYSTEM_STRING, OfSchema, PRIMARY_KEY_MAX_LEN, PrimaryIndex, Relations, SCHEMA_KIND_STRING, SchemaKind, SchemaLoadState, SchemaType, UpLimitString } from "schema-node-core";
+import { Append, Attach, Base, buildFuncCall, Description, Display, ENTRY_ROOT, EntrySource, Meta, NODE_SELF, NodeSchema, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT, NS_SYSTEM_STRING, OfSchema, PRIMARY_KEY_MAX_LEN, PrimaryIndex, Relations, SCHEMA_KIND_STRING, SchemaKind, SchemaLoadState, SchemaType, UpLimitString } from "schema-node-core";
 import { AppFieldSchema } from "./appFieldSchema";
 import { AppWorkflowSchema } from "./appWorkflowSchema";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP, SCHEMA_KIND_ORDER_APP } from "../../utils/constant";
@@ -59,5 +59,5 @@ class AppSchemaMeta implements AppSchema {
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.type`)
 @Meta(Base, NS_SYSTEM_STRING)
 @Meta(UpLimitString, PRIMARY_KEY_MAX_LEN)
-@Meta(EntrySource, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getapps`, NODE_SELF))
-class AnyTypeMeta {}
+@Meta(EntrySource, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappentries`, NODE_SELF, ENTRY_ROOT))
+class AppTypeMeta {}

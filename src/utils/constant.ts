@@ -31,6 +31,9 @@ export const NS_SYSTEM_SCHEMA_WORKFLOW = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_WORK
 
 export const NS_SYSTEM_SCHEMA_REFLECT = `${NS_SYSTEM_SCHEMA}.reflect`;
 export const NS_SYSTEM_SCHEMA_REFLECT_APP = `${NS_SYSTEM_SCHEMA_REFLECT}.app`;
+export const NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW = `${NS_SYSTEM_SCHEMA_REFLECT}.workflow`;
+export const NS_SYSTEM_SCHEMA_REFLECT_EVENT = `${NS_SYSTEM_SCHEMA_REFLECT}.event`;
+
 
 export const NS_SYSTEM_SCHEMA_PROPERTY = `${NS_SYSTEM_SCHEMA}.prop`;
 export const NS_SYSTEM_SCHEMA_PROPERTY_APP = `${NS_SYSTEM_SCHEMA_PROPERTY}.app`;
@@ -40,3 +43,4 @@ export const WORKFLOW_KIND_WORKFLOW = "workflow";
 export const WORKFLOW_KIND_CALL = "call";
 export const WORKFLOW_KIND_EVENT = "event";
 export const WORKFLOW_KIND_INTERACTION = "interaction";
+

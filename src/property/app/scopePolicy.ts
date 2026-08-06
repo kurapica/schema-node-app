@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_STRING, NS_SYSTEM_IDENTIFIER, PrimaryIndex, PropertyValueType } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_STRING, NS_SYSTEM_IDENTIFIER, PrimaryIndex, PropertyValueType, EntrySource, buildFuncCall, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NS_SYSTEM_CONTEXT, ENTRY_ROOT, NODE_SELF, Require, Default, Relation, Call, NS_SYSTEM_LOGIC_EQ, Visible } from "schema-node-core";
 import { SCHEMA_KIND_APP, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 import { AppScopeType } from "../../enum/appScopeType";
 
@@ -30,6 +30,7 @@ export class ScopePolicy extends Property<AppScopePolicy> {
 class AppScopeContextMapMeta implements AppScopeContextMap {
     @Meta(SchemaType, NS_SYSTEM_STRING)
     @Meta(PrimaryIndex, 0)
+    @Meta(EntrySource, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.getaccessentries`, NS_SYSTEM_CONTEXT, NODE_SELF, ENTRY_ROOT))
     contextItem: string;
 
     @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
@@ -39,8 +40,11 @@ class AppScopeContextMapMeta implements AppScopeContextMap {
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.ScopePolicy`)
 class AppScopePolicyMeta implements AppScopePolicy {
     @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.scope`)
+    @Meta(Require, true)
+    @Meta(Default, AppScopeType.BusinessTarget)
     type: AppScopeType;
 
     @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.ScopeContextMaps`)
+    @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_LOGIC_EQ, '@type', AppScopeType.IsolationContext))
     contextMaps?: AppScopeContextMap[];
 }
