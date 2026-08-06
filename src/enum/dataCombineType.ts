@@ -3,24 +3,24 @@ import { NS_SYSTEM_SCHEMA_APP_FIELD } from "../utils/constant";
 
 export enum DataCombineType
 {
-    /**
-     * Assign, always use last
-     */
-    Assign = "assign",
+    /// <summary>
+    /// Assign
+    /// </summary>
+    Newest = "newest",
+    
+    /// <summary>
+    /// Init
+    /// </summary>
+    Oldest = "oldest",
 
-    /**
-     * Use the first assign value
-     */
-    Init = "init",
-
-    /**
-     * Sum
-     */
+    /// <summary>
+    /// Sum
+    /// </summary>
     Sum = "sum",
 
-    /**
-     * Count
-     */
+    /// <summary>
+    /// Count
+    /// </summary>
     Count = "count",
 }
 

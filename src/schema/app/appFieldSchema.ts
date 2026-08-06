@@ -1,4 +1,4 @@
-import { Meta, SchemaKind, SchemaType, Attach, Append, Display, Description, Disable, PrimaryIndex, Require, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE } from "schema-node-core";
+import { Meta, SchemaKind, SchemaType, Attach, Append, Display, Description, Disable, PrimaryIndex, Require, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, ReadOnly, InVisible, Immutable, Relation, Default, Call, buildFuncCall, NS_SYSTEM_SCHEMA_REFLECT_TYPE } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_ORDER_APP_FIELD, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 
 export interface AppFieldSchema {
@@ -29,12 +29,16 @@ class AppFieldSchemaMeta implements AppFieldSchema {
   @Meta(PrimaryIndex, 0)
   @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.type`)
   @Meta(Require, true)
+  @Meta(ReadOnly, true)
+  @Meta(InVisible, true)
   app: string;
 
   /** The name of the field */
   @Meta(PrimaryIndex, 1)
   @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
   @Meta(Require, true)
+  @Meta(Immutable, true)
+  @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.gettypename`, '@type'))
   name: string;
 
   /** The type of the field */

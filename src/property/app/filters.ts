@@ -13,12 +13,14 @@ export interface FieldFilter {
     resolve?: FieldFilterResolve;
 }
 
+/** The field filters property */
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.filters`)
 @Meta(PropertyValueType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.filters`)
 export class Filters extends Property<FieldFilter[]> {}
 
+/** The field filter meta */
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.filter`)
 class FieldFilterMeta implements FieldFilter {
     @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.filtermode`)

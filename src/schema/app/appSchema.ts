@@ -1,4 +1,4 @@
-import { Append, Attach, Base, buildFuncCall, Description, Display, ENTRY_ROOT, EntrySource, Meta, NODE_SELF, NodeSchema, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT, NS_SYSTEM_STRING, OfSchema, PRIMARY_KEY_MAX_LEN, PrimaryIndex, Relations, SCHEMA_KIND_STRING, SchemaKind, SchemaLoadState, SchemaType, UpLimitString } from "schema-node-core";
+import { AccessValueTypeProvider, Append, Attach, Base, buildFuncCall, Description, Display, ENTRY_ROOT, EntrySource, EntrySourceProvider, Meta, NODE_SELF, NodeSchema, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT, NS_SYSTEM_STRING, OfSchema, PRIMARY_KEY_MAX_LEN, PrimaryIndex, Relations, SCHEMA_KIND_STRING, SchemaKind, SchemaLoadState, SchemaType, UpLimitString } from "schema-node-core";
 import { AppFieldSchema } from "./appFieldSchema";
 import { AppWorkflowSchema } from "./appWorkflowSchema";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP, SCHEMA_KIND_ORDER_APP } from "../../utils/constant";
@@ -39,10 +39,16 @@ export interface AppSchema {
   //#endregion
 }
 
+/** Declare the application schema kind */
 @Meta(SchemaKind, [SCHEMA_KIND_APP, SCHEMA_KIND_ORDER_APP])
-@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.schema`)
 @Meta(Append, [Display, Description, Relations])
+class AppKind {}
+
+/** The application schema metadata */
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.schema`)
 @Meta(Attach, SCHEMA_KIND_APP)
+@Meta(EntrySourceProvider, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getaccessentries`, '@container', '@name', NODE_SELF, ENTRY_ROOT))
+@Meta(AccessValueTypeProvider, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getaccessvaluetype`, '@container', '@name', NODE_SELF))
 class AppSchemaMeta implements AppSchema {
   @Meta(PrimaryIndex, 0)
   @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.type`)

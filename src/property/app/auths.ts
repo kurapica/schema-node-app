@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_NODE, NS_SYSTEM_SCHEMA_FUNC_TYPE, Base, buildFuncCall, NODE_SELF, NS_SYSTEM_BOOL, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, SCHEMA_KIND_STRING, Valid, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_LIST, PropertyValueType } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_NODE, NS_SYSTEM_SCHEMA_FUNC_TYPE, Base, buildFuncCall, NODE_SELF, NS_SYSTEM_BOOL, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, SCHEMA_KIND_STRING, Valid, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_LIST, PropertyValueType, IValueAccess, DataNode, Attach, BlackList } from "schema-node-core";
 import { SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 import { PolicyCombine } from "../../enum/policyCombine";
 import { PolicyScope } from "../../enum/policyScope";
@@ -22,14 +22,34 @@ export class Auths extends Property<PolicyItem[]> {}
 @Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NODE_SELF))
 class EvaluatorTypeMeta {}
 
+/** The black list resolver for policy scope */
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.scopeblacklist`)
+class PolicyScopeResolver extends Property<boolean> {
+  override effect(target: IValueAccess, newValue?: unknown | undefined, oldValue?: unknown | undefined): void {
+    while (target && target instanceof DataNode) {
+      const kind = target.type.getProperty(Attach)?.getValue<string>();
+      if (!kind) target = target.parent;
+      if (kind !== SCHEMA_KIND_APP && kind !== SCHEMA_KIND_APP_FIELD)
+        target.setPropertyValue(BlackList, [
+          PolicyScope.DataCreate,
+          PolicyScope.DataRead,
+          PolicyScope.DataUpdate,
+          PolicyScope.DataDelete,
+        ]);
+      break;
+    }
+  }
+}
+
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.item`)
 class PolicyItemMeta implements PolicyItem {
-    @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.scope`)
-    scope: PolicyScope;
+  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.scope`)
+  @Meta(PolicyScopeResolver, true)
+  scope: PolicyScope;
 
-    @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.evaluator`)
-    evaluator: string;
+  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.evaluator`)
+  evaluator: string;
 
-    @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.combine`)
-    combine: PolicyCombine;
+  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.combine`)
+  combine: PolicyCombine;
 }
