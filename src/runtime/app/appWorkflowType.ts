@@ -1,6 +1,6 @@
 import type { AppType } from "./appType";
 import type { AppWorkflowSchema, AppWorkflowNodeSchema } from "../../schema/app/appWorkflowSchema";
-import { type NodeType, type ValueType, type IProperty, getNodeType, getPropertiesBySchemaKind } from "schema-node-core";
+import { type NodeType, type ValueType, type IProperty, getNodeType, getPropertiesBySchemaKind, deepClone } from "schema-node-core";
 import { SCHEMA_KIND_APP_WORKFLOW } from "../../utils/constant";
 
 /** The type of the application workflow. */
@@ -30,6 +30,9 @@ export class AppWorkflowType {
 
   /** The error message of the workflow. */
   get error(): string | undefined { return this._appWorkflowSchema.error; }
+
+  /** The schema of the workflow. */
+  getWorkflowSchema(): AppWorkflowSchema { return deepClone(this._appWorkflowSchema); }
 
   /** Load the workflow. */
   async load() {

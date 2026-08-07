@@ -75,6 +75,9 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
   /** Whether this application type is referenced by any other type. */
   get isUsed(): boolean { return (this._fields?.length ?? 0) > 0 || (this._schemas?.size ?? 0) > 0; }
 
+  /** Get the application schema */
+  getAppSchema(): AppSchema | undefined { return this._schema; }
+
   /** Get all sub-application types */
   *getSubApps(): Generator<AppType> {
     if (!this._subApps) return;
@@ -82,25 +85,25 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
   }
 
   /** Get a sub-application type by name */
-  getAppType(name: string): AppType | undefined {
+  getSubAppType(name: string): AppType | undefined {
     return this._subApps?.get(name.toLowerCase());
   }
 
   /** Save a sub-application type */
-  saveAppType(name: string, app: AppType): void {
+  saveSubAppType(name: string, app: AppType): void {
     this._subApps ??= new Map();
     this._subApps.set(name.toLowerCase(), app);
   }
 
   /** Get an application schema by name */
-  getAppSchema(name: string): AppSchema | undefined {
+  getSubAppSchema(name: string): AppSchema | undefined {
     return this._schemas?.get(name.toLowerCase());
   }
 
   /** Save an application schema */
-  saveAppSchema(schema: AppSchema | AppSchema[], reload= false): void {
+  saveSubAppSchema(schema: AppSchema | AppSchema[], reload= false): void {
     if (Array.isArray(schema)) {
-      schema.forEach(s => this.saveAppSchema(s, reload));
+      schema.forEach(s => this.saveSubAppSchema(s, reload));
       return;
     }
 
@@ -129,7 +132,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
         type = new AppType(this);
         type.load(schema).then(() => type!.loaded = false);
       }
-      (type as AppType).saveAppSchema(subApps, reload);
+      (type as AppType).saveSubAppSchema(subApps, reload);
     }
   }
 

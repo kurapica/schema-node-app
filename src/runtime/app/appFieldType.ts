@@ -1,6 +1,6 @@
 import type { AppType } from "./appType";
 import type { AppFieldSchema } from "../../schema/app/appFieldSchema";
-import { type NodeType, type ValueType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getPropertiesBySchemaKind, Name, ReadOnly, DataNode } from "schema-node-core";
+import { type NodeType, type ValueType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getPropertiesBySchemaKind, Name, ReadOnly, DataNode, deepClone } from "schema-node-core";
 import { Pageable } from "../../property";
 import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 import { AppNode } from "../../node/appNode";
@@ -45,6 +45,9 @@ export class AppFieldType implements IPropertyProvider {
 
   /** The error message of the field. */
   get error(): string | undefined { return this._appFieldSchema.error; }
+
+  /** The schema of the field. */
+  getFieldSchema(): AppFieldSchema { return deepClone(this._appFieldSchema); }
 
   /** Load the field. */
   async load(): Promise<void> {
