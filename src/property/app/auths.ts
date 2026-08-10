@@ -25,7 +25,7 @@ class EvaluatorTypeMeta {}
 /** The black list resolver for policy scope */
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.scopeblacklist`)
 class PolicyScopeResolver extends Property<boolean> {
-  override effect(target: IValueAccess, newValue?: unknown | undefined, oldValue?: unknown | undefined): void {
+  override effect(target: IValueAccess, newValue?: unknown, oldValue?: unknown, source?: IValueAccess): void {
     while (target && target instanceof DataNode) {
       const kind = target.type.getProperty(Attach)?.getValue<string>();
       if (!kind) target = target.parent;

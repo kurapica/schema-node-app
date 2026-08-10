@@ -75,6 +75,9 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
   /** Whether this application type is referenced by any other type. */
   get isUsed(): boolean { return (this._fields?.length ?? 0) > 0 || (this._schemas?.size ?? 0) > 0; }
 
+  /** The load state of the application */
+  get loadState(): SchemaLoadState { return this._schema?.loadState ?? SchemaLoadState.None; }
+
   /** Get the application schema */
   getAppSchema(): AppSchema | undefined { return this._schema; }
 
@@ -136,10 +139,18 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
     }
   }
 
+  /** Remove a sub-application schema */
+  removeSubAppSchema(name: string): void {
+    this._schemas.delete(name.toLowerCase());
+    this._subApps.delete(name.toLowerCase());
+  }
+
   /** Get all sub-application schemas */
   *getSubAppSchemas(): Generator<AppSchema> {
     if (!this._schemas) return;
-    yield* this._schemas.values();
+    for (let schema of this._schemas.values()) {
+      yield deepClone(schema);
+    }
   }
 
   /** Whether this application type has sub-applications. */
