@@ -5,6 +5,7 @@ import { type NodeType, type ValueType, type IProperty, deepClone, IValueTypeAcc
 import { AppScopeType } from "../../enum/appScopeType";
 import { AppScopePolicy, ScopePolicy } from "../../property";
 import { SCHEMA_KIND_APP } from "../../utils/constant";
+import { AppFieldSchema } from "../../schema";
 
 /** The application type */
 export class AppType implements IValueTypeAccess, IRelationProvider {
@@ -155,6 +156,31 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
 
   /** Whether this application type has sub-applications. */
   get hasSubApps(): boolean { return this._schemas?.size > 0; }
+
+  /** Add an application field */
+  async addField(field: AppFieldSchema): Promise<boolean> {
+    if (this.getField(field.name) || !this._schema || this._schema.hasApps || this._schemas?.size) return false;
+
+    this._schema.fields ??= [];
+    this._schema.fields.push(field);
+
+    const fieldType = new AppFieldType(this, field);
+    await fieldType.load();
+
+    this._fields ??= [];
+    this._fields.push(fieldType);
+    return true;
+  }
+
+  /** Remove an application field */
+  removeField(name: string): boolean {
+    const field = this.getField(name);
+    if (!field) return false;
+
+    this._schema.fields = this._schema.fields.filter(f => f.name.toLowerCase() !== name.toLowerCase());
+    this._fields = this._fields.filter(f => f.name.toLowerCase() !== name.toLowerCase());
+    return true;
+  }
 
   /** Get all application fields */
   *getFields(): Generator<AppFieldType> {
