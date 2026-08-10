@@ -1,4 +1,4 @@
-import { Call, CallProcess, DataNode, Disable, IConstraintProperty, IProperty, IRelationInfo, isEmpty, isNull, IValueAccess, ReadOnly } from "schema-node-core";
+import { Call, CallProcess, DataNode, Disable, getNodeType, IConstraintProperty, IProperty, IRelationInfo, isEmpty, isNull, IValueAccess, ReadOnly } from "schema-node-core";
 import { AppType } from "../runtime/app/appType";
 import { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkflow, IAppWorkflowState } from "../schema/provider/interface";
 import { AppScopePolicy, EnableStorage, Loaded, ScopePolicy } from "../property";
@@ -10,6 +10,7 @@ import { AppScopeType } from "../enum/appScopeType";
 import { PageNode } from "./pageNode";
 import { getAppSchemaProvider, queryAppData } from "../schema/provider/appSchemaProvider";
 import { WorkflowStatus } from "../enum/workflowStatus";
+import { getAppType } from "../runtime";
 
 /** The app node to manage all field data nodes */
 export class AppNode implements IValueAccess {
@@ -82,7 +83,7 @@ export class AppNode implements IValueAccess {
   get deriveFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(DataDerive)); }
 
   /** Get all application view fields */
-  get viewFields(): Generator<IValueAccess> { return this.getFields((node) => node.getPropertyValue(View)); }
+  get viewFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(View)); }
 
   //#endregion
 
@@ -438,4 +439,24 @@ export class AppNode implements IValueAccess {
 
   //#endregion
 
+}
+
+
+/**
+ * Get the app node from query
+ * @param query the app data query
+ * @param readonly readonly mode
+ */
+export async function getAppNode(
+  query: IAppDataQuery,
+  readonly?: boolean,
+): Promise<AppNode | undefined> {
+  const result = await queryAppData(query);
+  if (!result) return undefined;
+  const appType = await getAppType(query.app);
+  if (!appType) return undefined;
+  const node = result
+    ? new AppNode(appType, query.target, query, result, readonly)
+    : undefined;
+  return node;
 }

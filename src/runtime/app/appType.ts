@@ -5,7 +5,7 @@ import { type NodeType, type ValueType, type IProperty, deepClone, IValueTypeAcc
 import { AppScopeType } from "../../enum/appScopeType";
 import { AppScopePolicy, ScopePolicy } from "../../property";
 import { SCHEMA_KIND_APP } from "../../utils/constant";
-import { AppFieldSchema } from "../../schema";
+import { AppFieldSchema, AppWorkflowSchema } from "../../schema";
 
 /** The application type */
 export class AppType implements IValueTypeAccess, IRelationProvider {
@@ -157,18 +157,27 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
   /** Whether this application type has sub-applications. */
   get hasSubApps(): boolean { return this._schemas?.size > 0; }
 
-  /** Add an application field */
-  async addField(field: AppFieldSchema): Promise<boolean> {
-    if (this.getField(field.name) || !this._schema || this._schema.hasApps || this._schemas?.size) return false;
+  /** Save an application field */
+  async saveField(field: AppFieldSchema): Promise<boolean> {
+    if (!this._schema || this._schema.hasApps || this._schemas?.size) return false;
 
     this._schema.fields ??= [];
-    this._schema.fields.push(field);
+    let index = this._schema.fields.findIndex(f => f.name.toLowerCase() === field.name.toLowerCase());
+
+    if (index >= 0)
+      this._schema.fields[index] = field;
+    else
+      this._schema.fields.push(field);
 
     const fieldType = new AppFieldType(this, field);
     await fieldType.load();
 
     this._fields ??= [];
-    this._fields.push(fieldType);
+    index = this._fields.findIndex(f => f.name.toLowerCase() === field.name.toLowerCase());
+    if (index >= 0)
+      this._fields[index] = fieldType;
+    else
+      this._fields.push(fieldType);
     return true;
   }
 
@@ -182,6 +191,26 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
     return true;
   }
 
+  /** Swap an application field */
+  swapField(field: string, other: string): void {
+    const fieldIndex = this._fields.findIndex(f => f.name.toLowerCase() === field.toLowerCase());
+    const otherIndex = this._fields.findIndex(f => f.name.toLowerCase() === other.toLowerCase());
+    if (fieldIndex === -1 || otherIndex === -1) return;
+
+    // Swap the fields in the array
+    const temp = this._fields[fieldIndex];
+    this._fields[fieldIndex] = this._fields[otherIndex];
+    this._fields[otherIndex] = temp;
+
+    // Swap the field names in the schema
+    const fieldSchemaIndex = this._schema.fields.findIndex(f => f.name.toLowerCase() === field.toLowerCase());
+    const otherSchemaIndex = this._schema.fields.findIndex(f => f.name.toLowerCase() === other.toLowerCase());
+    if (fieldSchemaIndex === -1 && otherSchemaIndex === -1) return;
+    const tempSchema = this._schema.fields[fieldSchemaIndex];
+    this._schema.fields[fieldSchemaIndex] = this._schema.fields[otherSchemaIndex];
+    this._schema.fields[otherSchemaIndex] = tempSchema;
+  }
+
   /** Get all application fields */
   *getFields(): Generator<AppFieldType> {
     if (!this._fields) return;
@@ -191,6 +220,40 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
   /** Get an application field by name */
   getField(name: string): AppFieldType | undefined {
     return this._fields?.find(f => f.name.toLowerCase() === name.toLowerCase());
+  }
+
+  /** Save an application workflow */
+  async saveWorkflow(workflow: AppWorkflowSchema): Promise<boolean> {
+    if (!this._schema || this._schema.hasApps || this._schemas?.size) return false;
+
+    this._schema.workflows ??= [];
+    let index = this._schema.workflows.findIndex(w => w.name.toLowerCase() === workflow.name.toLowerCase());
+
+    if (index >= 0)
+      this._schema.workflows[index] = workflow;
+    else
+      this._schema.workflows.push(workflow);
+
+    const workflowType = new AppWorkflowType(this, workflow);
+    await workflowType.load();
+
+    this._workflows ??= [];
+    index = this._workflows.findIndex(w => w.name.toLowerCase() === workflow.name.toLowerCase());
+    if (index >= 0)
+      this._workflows[index] = workflowType;
+    else
+      this._workflows.push(workflowType);
+    return true;
+  }
+
+  /** Remove an application workflow */
+  removeWorkflow(name: string): boolean {
+    const workflow = this.getWorkflow(name);
+    if (!workflow) return false;
+
+    this._schema.workflows = this._schema.workflows.filter(w => w.name.toLowerCase() !== name.toLowerCase());
+    this._workflows = this._workflows.filter(w => w.name.toLowerCase() !== name.toLowerCase());
+    return true;
   }
 
   /** Get all application workflows */
