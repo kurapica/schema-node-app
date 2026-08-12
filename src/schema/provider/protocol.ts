@@ -4,30 +4,12 @@
 import axios from "axios";
 import { generateGuid, getLanguage, isNull} from "schema-node-core";
 import { getAppSchemaProvider } from "./appSchemaProvider";
+import type { ISchemaApiProtocolMeta } from "./interface";
+import { getSchemaApiBaseUrl } from "./baseUrl";
 
-interface ISchemaApiProtocolRequestMeta {
-  wrap?: string;
-  fields?: Record<string, any>;
-}
-
-interface ISchemaApiProtocolResponseMeta {
-  unwrap?: string;
-  fields?: Record<string, any>;
-}
-
-export interface ISchemaApiProtocolMeta {
-  name?: string;
-  request?: ISchemaApiProtocolRequestMeta;
-  response?: ISchemaApiProtocolResponseMeta;
-  schemaFormat?: string[];
-  error?: string[];
-}
-
-let schemaApiBaseUrl: string | undefined = document.querySelector('meta[name="schema-api-base-url"]')?.getAttribute("content") || undefined;;
 let schemaApiHeaders = [] as { key: string; value: string }[];
 let schemaApiHeaderSetter: Function | null = null;
 let apiProtocol: ISchemaApiProtocolMeta | undefined = undefined;
-
 
 /** Set the schema api request headers */
 export function setSchemaApiHeaders(
@@ -133,22 +115,6 @@ if (document.querySelector('meta[name="schema-api-protocol"]')) {
 }
 
 /**
- * Sets the schema api base url
- * @param url The schema api base url
- */
-export function setSchemaApiBaseUrl(url: string | undefined): void {
-  schemaApiBaseUrl = !isNull(url) ? url : undefined;
-}
-
-/**
- * Gets the schema api base url
- * @returns The schema api base url
- */
-export function getSchemaApiBaseUrl(): string | undefined {
-  return schemaApiBaseUrl;
-}
-
-/**
  * Gets the app schema format for downloading
  * @returns The app schema format for downloading
  */
@@ -171,7 +137,7 @@ export async function postSchemaApi(
   file: File | undefined = undefined
 ): Promise<any> {
   try {
-    let site: string = schemaApiBaseUrl || "";
+    let site: string = getSchemaApiBaseUrl() || "";
     if (!site) return null;
 
     if (site.endsWith("/")) site = site.substring(0, site.length - 1);

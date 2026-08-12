@@ -1,4 +1,4 @@
-import { ArrayType, Display, EnumType, generateGuid, getNodeType, isNull, LocaleString, NodeType, NS_SYSTEM_GUID, ScalarType, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_INT, SCHEMA_KIND_STRING, StructType } from "schema-node-core";
+import { ArrayType, Display, EnumType, generateGuid, getNodeType, isNull, type LocaleString, NodeType, NS_SYSTEM_GUID, ScalarType, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_INT, SCHEMA_KIND_STRING, StructType } from "schema-node-core";
 
 /** Mocks the schema data */
 export async function mockSchemaData(name: string | NodeType): Promise<any> {

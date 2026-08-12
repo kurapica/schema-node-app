@@ -1,21 +1,24 @@
-import { deepClone, exportNodeType, isNull, NodeSchema } from "schema-node-core";
-import type { AppSchema } from "../schema/app/appSchema";
-import { AppType } from "./app/appType";
+import { deepClone, exportNodeType, isNull, isSchemaKindPropertyType, type NodeSchema } from "schema-node-core";
+import type { AppSchema, IAppType } from "../schema/app/type";
 import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
 
-let rootAppType: AppType | undefined;
+let rootAppType: IAppType | undefined;
+let appTypeCtor: (new(container?: IAppType) => IAppType) | undefined;
+export function setAppTypeConstuctor(ctor: new(container?: IAppType) => IAppType) {
+  appTypeCtor = ctor;
+}
 
 /** Save the app schema. */
 export function saveAppSchema(schema: AppSchema | AppSchema[]): void {
-  rootAppType ??= new AppType();
+  rootAppType ??= new appTypeCtor();
   rootAppType?.saveSubAppSchema(schema);
 }
 
 /** Get the cached app type by its full name. */
-export function getCachedAppType(fullName: string): AppType | undefined {
+export function getCachedAppType(fullName: string): IAppType | undefined {
   const parts = fullName.split(".");
-  rootAppType ??= new AppType();
-  let node: AppType | undefined = rootAppType;
+  rootAppType ??= new appTypeCtor();
+  let node: IAppType | undefined = rootAppType;
   for (let i = 0; i < parts.length; i++)
   {
     node = node?.getSubAppType(parts[i]);
@@ -25,12 +28,12 @@ export function getCachedAppType(fullName: string): AppType | undefined {
 }
 
 /** Get the app type by its full name. */
-export async function getAppType(fullName: string): Promise<AppType | undefined> {
+export async function getAppType(fullName: string): Promise<IAppType | undefined> {
   fullName = fullName.toLowerCase().trim();
   const parts = fullName.split(".");
 
-  if (!rootAppType) rootAppType = new AppType();
-  let node: AppType | undefined = rootAppType;
+  if (!rootAppType) rootAppType = new appTypeCtor();
+  let node: IAppType | undefined = rootAppType;
 
   // Try loading cached app types first
   for (let i = 0; i < parts.length; i++)
@@ -53,8 +56,8 @@ export async function getAppType(fullName: string): Promise<AppType | undefined>
   return node;
 }
 
-async function loadAppType(root: AppType, segment?: string, reload = false, isLast = false, onlyCache = false): Promise<AppType | undefined> {
-  let result: AppType | undefined = root;
+async function loadAppType(root: IAppType, segment?: string, reload = false, isLast = false, onlyCache = false): Promise<IAppType | undefined> {
+  let result: IAppType | undefined = root;
   if (segment)
     result = result.getSubAppType(segment);
   if (result == null && reload || result?.loaded == true && !(isLast && reload))
@@ -63,7 +66,7 @@ async function loadAppType(root: AppType, segment?: string, reload = false, isLa
   const schema = await loadAppSchema(root, segment, reload);
   if (!schema) return undefined;
 
-  result ??= new AppType(root);
+  result ??= new appTypeCtor(root);
   const subApps = schema.apps;
   delete schema.apps;
 
@@ -81,7 +84,7 @@ async function loadAppType(root: AppType, segment?: string, reload = false, isLa
   return result;
 }
 
-async function loadAppSchema(root: AppType | undefined, segment: string, reload?: boolean): Promise<AppSchema | undefined> {
+async function loadAppSchema(root: IAppType | undefined, segment: string, reload?: boolean): Promise<AppSchema | undefined> {
   let schema = reload ? null : root?.getSubAppSchema(segment);
   if (schema) return deepClone(schema);
 

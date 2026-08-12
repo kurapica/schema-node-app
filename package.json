@@ -1,22 +1,23 @@
 {
   "name": "schema-node-app",
-  "version": "1.0.13",
-  "description": "A TypeScript library for building data nodes from JSON-defined structures and relationships.",
+  "version": "1.0.0",
+  "description": "Application schema layer builds on the schema-node-core.",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch"
+    "dev": "vite build --watch",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "typescript",
     "schema",
     "node",
     "data",
-    "relation",
-    "json"
+    "application",
+    "workflow"
   ],
   "files": [
     "dist"
@@ -29,8 +30,17 @@
     "schema-node-core": "workspace:*"
   },
   "devDependencies": {
+    "madge": "^8.0.0",
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.4"
+  },
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./src/index.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
+    }
   },
   "repository": {
     "type": "git",

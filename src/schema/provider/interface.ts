@@ -1,9 +1,26 @@
-import { INodeSchemaProvider, NodeSchema } from "schema-node-core";
-import { ISchemaApiProtocolMeta } from "./protocol";
+import type { INodeSchemaProvider, NodeSchema } from "schema-node-core";
 import { PolicyScope } from "../../enum/policyScope";
 import { WorkflowStatus } from "../../enum/workflowStatus";
-import { AppSchema } from "../app/appSchema";
-import { AppWorkflowSchema } from "../app/appWorkflowSchema";
+import type { AppSchema } from "../app/type";
+import type { AppWorkflowSchema } from "../appWorkflow/type";
+
+interface ISchemaApiProtocolRequestMeta {
+  wrap?: string;
+  fields?: Record<string, any>;
+}
+
+interface ISchemaApiProtocolResponseMeta {
+  unwrap?: string;
+  fields?: Record<string, any>;
+}
+
+export interface ISchemaApiProtocolMeta {
+  name?: string;
+  request?: ISchemaApiProtocolRequestMeta;
+  response?: ISchemaApiProtocolResponseMeta;
+  schemaFormat?: string[];
+  error?: string[];
+}
 
 /**
  * The Application field data schema provider

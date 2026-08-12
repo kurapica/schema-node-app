@@ -1,13 +1,9 @@
-import {
-  ArrayNode, ArrayType, DataNode, Display, FunctionType, StructType, ValueType,
-  isNull, deepClone, debounce, getNodeType, getCachedNodeType,
-  type LocaleString,
-} from "schema-node-core";
-import { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/provider/interface";
-import { AppNode } from "./appNode";
-import { queryAppData } from "../schema/provider/appSchemaProvider";
-import { Filters, type FieldFilter } from "../property/app/filters";
+import { ArrayNode, ArrayType, DataNode, Display, FunctionType, StructType, ValueType, isNull, deepClone, debounce, getNodeType, getCachedNodeType, type LocaleString } from "schema-node-core";
+import type { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/provider/interface";
+import { queryAppData } from "../runtime/batchQuery";
+import { Filters, type FieldFilter } from "../schema/appField/property";
 import { FieldFilterMode } from "../enum/fieldFilterMode";
+import { isAppNode } from "../schema/app/type";
 
 /** The field filter info with input nodes */
 export interface IArrayFieldFilter {
@@ -33,36 +29,22 @@ export class PageNode extends ArrayNode {
   get filters(): IArrayFieldFilter[] { return this._appFieldFilter; }
 
   /** The change tracker for the pageable array */
-  private _tracker: {
-    [key: string]: { origin?: {}; update?: {}; delete?: boolean };
-  } = {};
+  private _tracker: { [key: string]: { origin?: {}; update?: {}; delete?: boolean } } = {};
 
   /** The current page number */
-  get page(): number {
-    return this.fieldInfo?.take
-      ? Math.floor((this.fieldInfo.skip || 0) / this.fieldInfo.take)
-      : 0;
-  }
+  get page(): number { return this.fieldInfo?.take ? Math.floor((this.fieldInfo.skip || 0) / this.fieldInfo.take) : 0 }
 
   /** The page item count */
-  get pageCount() {
-    return this.fieldInfo?.take;
-  }
+  get pageCount() { return this.fieldInfo?.take }
 
   /** The total item count */
-  get total() {
-    return this.fieldInfo?.total ?? this.length;
-  }
+  get total() { return this.fieldInfo?.total ?? this.length }
 
   /** The query filter for the pageable array */
-  get query() {
-    return this.fieldInfo?.filter ? { ...this.fieldInfo.filter } : undefined;
-  }
+  get query() { return this.fieldInfo?.filter ? { ...this.fieldInfo.filter } : undefined }
 
   /** The query order by for the pageable array */
-  get orderBy(): IAppDataQueryOrder[] {
-    return deepClone(this.fieldInfo?.orderBy) || [];
-  }
+  get orderBy(): IAppDataQueryOrder[] { return deepClone(this.fieldInfo?.orderBy) || [] }
 
   /** Whether the pageable array has changed */
   get changed(): boolean {
@@ -172,8 +154,8 @@ export class PageNode extends ArrayNode {
     if (isNull(descend)) descend = this.fieldInfo?.descend;
 
     let appNode = this.parent;
-    while (appNode && !(appNode instanceof AppNode)) appNode = appNode.parent;
-    if (!(appNode && appNode instanceof AppNode && appNode.target)) return;
+    while (appNode && !(isAppNode(appNode))) appNode = appNode.parent;
+    if (!(appNode && isAppNode(appNode) && appNode.target)) return;
 
     try {
       const res = await queryAppData({

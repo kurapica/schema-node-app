@@ -9,7 +9,8 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "verbatimModuleSyntax": true
   },
   "include": ["src"]
 }

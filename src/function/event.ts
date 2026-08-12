@@ -1,4 +1,4 @@
-import { getNodeType, Meta, NS_SYSTEM_SCHEMA, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_STRING, OfSchema, Require, Return, SCHEMA_KIND_FUNCTION, SchemaType } from "schema-node-core";
+import { Meta, NS_SYSTEM_SCHEMA, NS_SYSTEM_STRING, OfSchema, Require, Return, SCHEMA_KIND_FUNCTION, SchemaType } from "schema-node-core";
 import { NS_SYSTEM_EVENT, NS_SYSTEM_SCHEMA_REFLECT_EVENT } from "../utils";
 import { SystemReflectApp } from "./app";
 
