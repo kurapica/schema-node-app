@@ -1,11 +1,12 @@
 import type { AppSchema } from "../../schema/app/appSchema";
 import { AppFieldType } from "./appFieldType";
 import { AppWorkflowType } from "./appWorkflowType";
-import { type NodeType, type ValueType, type IProperty, deepClone, IValueTypeAccess, getPropertiesBySchemaKind, RelationType, getProperty, Relations, RelationSchema, IRelationProvider, SchemaLoadState, Entry, setPropertyValue, Display, _LS } from "schema-node-core";
+import { type ValueType, type IProperty, deepClone, IValueTypeAccess, getPropertiesBySchemaKind, RelationType, getProperty, Relations, RelationSchema, IRelationProvider, SchemaLoadState, Entry, setPropertyValue, Display, _LS, PropertyCtor, INodeType, IPropertyProvider, IValueAccess } from "schema-node-core";
 import { AppScopeType } from "../../enum/appScopeType";
 import { AppScopePolicy, ScopePolicy } from "../../property";
 import { SCHEMA_KIND_APP } from "../../utils/constant";
 import { AppFieldSchema, AppWorkflowSchema } from "../../schema";
+import { AppNode } from "../../node";
 
 /** The application type */
 export class AppType implements IValueTypeAccess, IRelationProvider {
@@ -67,6 +68,9 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
     return this._schema.container ? `${this._schema.container}.${this._schema.name}` : this._schema.name;
   }
 
+  /** The application kind */
+  get kind(): string { return SCHEMA_KIND_APP; }
+
   /** The application scope type */
   get scopeType(): AppScopeType { return this.getProperty(ScopePolicy)?.getValue<AppScopePolicy>()?.type ?? AppScopeType.BusinessTarget; }
 
@@ -78,6 +82,13 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
 
   /** The load state of the application */
   get loadState(): SchemaLoadState { return this._schema?.loadState ?? SchemaLoadState.None; }
+
+  /** Whether this application type is assignable to the other type. */
+  isAssignableTo(other: IValueTypeAccess): boolean { return false; }
+
+  create(value: unknown, parent?: IValueAccess, propProvider?: IPropertyProvider): IValueAccess {
+    return new AppNode(this);
+  }
 
   /** Get the application schema */
   getAppSchema(): AppSchema | undefined { return this._schema; }
@@ -268,24 +279,34 @@ export class AppType implements IValueTypeAccess, IRelationProvider {
   }
 
   /** Get a property from the AppSchema. */
-  getProperty<T extends IProperty>(propCtor: new () => T): T | undefined {
-    return this._props?.find(p => p instanceof propCtor) as T;
+  getProperty<T extends IProperty>(propCtor: PropertyCtor | string): T | undefined {
+    return this._props?.find(p => typeof propCtor === "string" ? p.name.toLowerCase() === propCtor.toLowerCase() : p instanceof propCtor) as T;
   }
 
   /** Get stacked property values. */
-  *getProperties<T extends IProperty>(propCtor: new () => T): Generator<T> {
+  *getProperties<T extends IProperty>(propCtor: PropertyCtor | string): Generator<T> {
     if (this._props) {
       for (const prop of this._props) {
-        if (prop instanceof propCtor) {
-          yield prop;
+        if (typeof propCtor === "string" ? prop.name.toLowerCase() === propCtor.toLowerCase() : prop instanceof propCtor) { 
+          yield prop as T;
           if (!prop.stackable) return;
         }
       }
     }
   }
 
+  /** Filter properties by predicate */
+  *filterProperties(predicate: (prop: IProperty) => boolean): Generator<IProperty> {
+    if (!this._props?.length) return;
+    for(let prop of this._props)
+    {
+      if (predicate(prop))
+        yield prop;
+    }
+  }
+
   /** Get all referenced types */
-  *getRefTypes(): Generator<NodeType> {
+  *getRefTypes(): Generator<INodeType> {
     if (this._fields) {
       for (const field of this._fields) {
         yield* field.getRefTypes();

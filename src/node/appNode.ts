@@ -1,4 +1,4 @@
-import { Call, CallProcess, DataNode, Disable, getNodeType, IConstraintProperty, IProperty, IRelationInfo, isEmpty, isNull, IValueAccess, ReadOnly } from "schema-node-core";
+import { Call, CallProcess, DataNode, Disable, getNodeType, IConstraintProperty, IProperty, IRelationInfo, isEmpty, isNull, IValueAccess, IValueTypeAccess, ReadOnly } from "schema-node-core";
 import { AppType } from "../runtime/app/appType";
 import { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkflow, IAppWorkflowState } from "../schema/provider/interface";
 import { AppScopePolicy, EnableStorage, Loaded, ScopePolicy } from "../property";
@@ -50,6 +50,8 @@ export class AppNode implements IValueAccess {
     // attach relations from type
     this.attachRelations([{owner: this, relations: Array.from(appType.getRelations())}]);
   }
+
+  get type(): IValueTypeAccess { return this.appType; }
 
   dispose(): void {
     this._appFieldNodes.forEach(node => node.dispose());
