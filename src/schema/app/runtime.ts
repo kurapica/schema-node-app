@@ -1,13 +1,17 @@
-import type { AppSchema, IAppType } from "./type";
-import { type ValueType, type IProperty, deepClone, type IValueTypeAccess, getPropertiesBySchemaKind, RelationType, getProperty, Relations, type RelationSchema, type IRelationProvider, SchemaLoadState, type Entry, setPropertyValue, Display, _LS, type PropertyCtor, type INodeType, type IPropertyProvider, type IValueAccess } from "schema-node-core";
+import { deepClone, getPropertiesBySchemaKind, RelationType, getProperty, Relations, SchemaLoadState, setPropertyValue, Display, _LS } from "schema-node-core";
 import { AppScopeType } from "../../enum/appScopeType";
-import { type AppScopePolicy, ScopePolicy } from "./property";
-import { SCHEMA_KIND_APP } from "../../utils/constant";
-import type { AppFieldSchema } from "../appField/type";
-import type { AppWorkflowSchema } from "../appWorkflow/type";
+import { ScopePolicy } from "./property";
 import { AppFieldType } from "../appField/runtime";
 import { AppWorkflowType } from "../appWorkflow/runtime";
 import { setAppTypeConstuctor } from "../../runtime/appRuntime";
+
+import type { AppSchema, IAppType } from "./type";
+import type { ValueType, IProperty, IValueTypeAccess, RelationSchema, IRelationProvider, Entry, PropertyCtor, INodeType, IPropertyProvider, IValueAccess } from "schema-node-core";
+import type { AppScopePolicy } from "./property";
+import type { AppFieldSchema } from "../appField/type";
+import type { AppWorkflowSchema } from "../appWorkflow/type";
+
+import { SCHEMA_KIND_APP } from "../../utils/constant";
 
 /** The application type */
 export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {

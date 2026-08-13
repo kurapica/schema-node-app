@@ -1,5 +1,8 @@
-import { getPropertiesBySchemaKind, type INodeType, type IProperty, NodeType, ValueType, getNodeType } from "schema-node-core";
+import { getPropertiesBySchemaKind, NodeType, ValueType, getNodeType } from "schema-node-core";
+
+import type { INodeType, IProperty } from "schema-node-core";
 import type { WorkflowSchema } from "./type";
+
 import { SCHEMA_KIND_WORKFLOW, WORKFLOW_KIND_WORKFLOW } from "../../utils/constant";
 
 export class WorkflowType extends NodeType {

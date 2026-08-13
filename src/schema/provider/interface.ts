@@ -1,6 +1,7 @@
-import type { INodeSchemaProvider, NodeSchema } from "schema-node-core";
 import { PolicyScope } from "../../enum/policyScope";
 import { WorkflowStatus } from "../../enum/workflowStatus";
+
+import type { INodeSchemaProvider, NodeSchema } from "schema-node-core";
 import type { AppSchema } from "../app/type";
 import type { AppWorkflowSchema } from "../appWorkflow/type";
 

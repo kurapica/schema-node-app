@@ -1,7 +1,10 @@
-import { NodeType, ValueType, FunctionType, type IProperty, getPropertiesBySchemaKind, getNodeType, type INodeType } from "schema-node-core";
-import type { EventSchema } from "./type";
-import { SCHEMA_KIND_EVENT } from "../../utils/constant";
+import { NodeType, ValueType, FunctionType, getPropertiesBySchemaKind, getNodeType } from "schema-node-core";
 import { PayloadEvaluator } from "./property";
+
+import type { IProperty, INodeType } from "schema-node-core";
+import type { EventSchema } from "./type";
+
+import { SCHEMA_KIND_EVENT } from "../../utils/constant";
 
 export class EventType extends NodeType {
   private _eventSchema?: EventSchema;

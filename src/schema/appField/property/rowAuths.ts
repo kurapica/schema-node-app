@@ -1,4 +1,6 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_LIST, PropertyValueType, Relation, Valid, Assign, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, buildFuncCall, NODE_SELF } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, Relation, Valid, Assign, buildFuncCall } from "schema-node-core";
+
+import { SCHEMA_KIND_PROPERTY, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_LIST, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NODE_SELF } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../../utils/constant";
 
 export interface RowPolicy {

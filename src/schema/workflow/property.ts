@@ -1,6 +1,9 @@
-import { buildFuncCall, Call, ForSchema, Meta, NS_SYSTEM_BOOL, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY_CORE, OfSchema, Property, PropertyValueType, ReadOnly, Relation, SCHEMA_KIND_PROPERTY, SchemaType, Static, Visible } from "schema-node-core";
-import { NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_WORKFLOW } from "../../utils/constant";
+import { buildFuncCall, Call, ForSchema, Meta, OfSchema, Property, PropertyValueType, ReadOnly, Relation, SchemaType, Static, Visible } from "schema-node-core";
+
 import type { WorkflowSchema } from "./type";
+
+import { NS_SYSTEM_BOOL, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY_CORE, SCHEMA_KIND_PROPERTY } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_WORKFLOW } from "../../utils/constant";
 
 /** The workflow property for node schema */
 @Meta(ForSchema, [SCHEMA_KIND_WORKFLOW])

@@ -1,9 +1,10 @@
-import { type NodeSchema } from "schema-node-core";
 import { PolicyScope, WorkflowStatus } from "../../enum";
-import { type AppSchema } from "../app";
-import type { IAppSchemaProvider, ISchemaApiProtocolMeta, IAppDataQuery, IBatchQueryAppDataResult, IAppDataFieldPushQuery, IAppDataPushResult } from "./interface";
 import { postSchemaApi } from "./protocol";
 import { useAppSchemaProvider } from "./appSchemaProvider";
+
+import type { NodeSchema } from "schema-node-core";
+import type { AppSchema } from "../app";
+import type { IAppSchemaProvider, ISchemaApiProtocolMeta, IAppDataQuery, IBatchQueryAppDataResult, IAppDataFieldPushQuery, IAppDataPushResult } from "./interface";
 
 /** The default app schema provider */
 const defaultAppSchemaProvider: IAppSchemaProvider = {

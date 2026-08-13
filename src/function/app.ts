@@ -1,9 +1,15 @@
-import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, type Entry, type EntryAccess, getNodeType, getPropertyValue, IntType, type LocaleString, Meta, NS_SYSTEM_BOOL, NS_SYSTEM_ENTRY_ACCESS, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LIST, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_STRING, OfSchema, Return, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_FUNCTION, SCHEMA_KIND_INT, SchemaType, setPropertyValue, StructType, ValueType } from "schema-node-core";
-import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_REFLECT_APP } from "../utils";
+import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, getNodeType, getPropertyValue, IntType, Meta, OfSchema, Return, SchemaType, setPropertyValue, StructType, ValueType } from "schema-node-core";
 import { getAppType } from "../runtime";
-import { type AppScopePolicy, ScopePolicy } from "../schema/app/property";
-import { type Foreign, Foreigns } from "../schema/appField/property";
+import { ScopePolicy } from "../schema/app/property";
+import { Foreigns } from "../schema/appField/property";
 import { AppScopeType, DataCombineType } from "../enum";
+
+import type { Entry, EntryAccess, LocaleString } from "schema-node-core";
+import type { AppScopePolicy } from "../schema/app/property";
+import type { Foreign } from "../schema/appField/property";
+
+import { NS_SYSTEM_BOOL, NS_SYSTEM_ENTRY_ACCESS, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LIST, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_STRING, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_FUNCTION, SCHEMA_KIND_INT } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_REFLECT_APP } from "../utils";
 
 @Meta(SchemaType, NS_SYSTEM_SCHEMA_REFLECT_APP)
 @Meta(OfSchema, SCHEMA_KIND_FUNCTION)

@@ -1,7 +1,11 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_NODE, Base, buildFuncCall, NODE_SELF, SCHEMA_KIND_STRING, Valid, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_LIST, PropertyValueType, type IValueAccess, DataNode, Attach, BlackList } from "schema-node-core";
-import { SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, Base, buildFuncCall, Valid, PropertyValueType, DataNode, Attach, BlackList } from "schema-node-core";
 import { PolicyCombine } from "../../enum/policyCombine";
 import { PolicyScope } from "../../enum/policyScope";
+
+import type { IValueAccess } from "schema-node-core";
+
+import { SCHEMA_KIND_PROPERTY, SCHEMA_KIND_NODE, NODE_SELF, SCHEMA_KIND_STRING, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_LIST } from "schema-node-core";
+import { SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 
 export interface PolicyItem {
     scope: PolicyScope;

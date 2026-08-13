@@ -1,7 +1,10 @@
-import { type NodeType, type ValueType, type IProperty, getNodeType, getPropertiesBySchemaKind, deepClone } from "schema-node-core";
+import { getNodeType, getPropertiesBySchemaKind, deepClone } from "schema-node-core";
+
+import type { NodeType, ValueType, IProperty } from "schema-node-core";
 import type { AppWorkflowSchema, AppWorkflowNodeSchema } from "./type";
+import type { IAppType, IAppWorkflowType } from "../app/type";
+
 import { SCHEMA_KIND_APP_WORKFLOW } from "../../utils/constant";
-import { type IAppType, type IAppWorkflowType } from "../app/type";
 
 /** The type of the application workflow. */
 export class AppWorkflowType implements IAppWorkflowType {

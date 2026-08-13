@@ -1,4 +1,6 @@
-import { FromEnum, Meta, OfSchema, SCHEMA_KIND_ENUM, SchemaType } from "schema-node-core";
+import { FromEnum, Meta, OfSchema, SchemaType } from "schema-node-core";
+
+import { SCHEMA_KIND_ENUM } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP_FIELD } from "../utils/constant";
 
 export enum DataCombineType

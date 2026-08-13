@@ -1,5 +1,6 @@
 import { useSchemaProvider } from "schema-node-core";
-import { type IAppSchemaProvider } from "./interface";
+
+import type { IAppSchemaProvider } from "./interface";
 
 let schemaProvider: IAppSchemaProvider | null = null;
 

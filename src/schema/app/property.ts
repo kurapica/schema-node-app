@@ -1,6 +1,8 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_STRING, NS_SYSTEM_IDENTIFIER, PrimaryIndex, PropertyValueType, EntrySource, buildFuncCall, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NS_SYSTEM_CONTEXT, ENTRY_ROOT, NODE_SELF, Require, Default, Relation, Call, NS_SYSTEM_LOGIC_EQ, Visible } from "schema-node-core";
-import { SCHEMA_KIND_APP, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, PrimaryIndex, PropertyValueType, EntrySource, buildFuncCall, Require, Default, Relation, Call, Visible } from "schema-node-core";
 import { AppScopeType } from "../../enum/appScopeType";
+
+import { SCHEMA_KIND_PROPERTY, NS_SYSTEM_STRING, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NS_SYSTEM_CONTEXT, ENTRY_ROOT, NODE_SELF, NS_SYSTEM_LOGIC_EQ } from "schema-node-core";
+import { SCHEMA_KIND_APP, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 
 /** The app property for node schema */
 export class App extends Property<string> {}

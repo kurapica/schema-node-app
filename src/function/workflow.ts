@@ -1,7 +1,9 @@
-import { Meta, SchemaType, OfSchema, SCHEMA_KIND_FUNCTION, getNodeType, Require, NS_SYSTEM_BOOL, Return } from "schema-node-core";
-import { NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../utils";
+import { Meta, SchemaType, OfSchema, getNodeType, Require, Return } from "schema-node-core";
 import { WorkflowType } from "../schema/workflow/runtime";
 import { Forkable } from "../schema/workflow/property";
+
+import { SCHEMA_KIND_FUNCTION, NS_SYSTEM_BOOL } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../utils";
 
 @Meta(SchemaType, NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW)
 @Meta(OfSchema, SCHEMA_KIND_FUNCTION)

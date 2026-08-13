@@ -1,6 +1,5 @@
-import { CallProcess, DataNode, Disable, type IConstraintProperty, type IProperty, type IRelationInfo, isEmpty, isNull, type IValueAccess, type IValueTypeAccess, ReadOnly } from "schema-node-core";
-import type { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkflow, IAppWorkflowState } from "../provider/interface";
-import { type AppScopePolicy, ScopePolicy } from "./property";
+import { CallProcess, DataNode, Disable, isEmpty, isNull, ReadOnly } from "schema-node-core";
+import { ScopePolicy } from "./property";
 import { EnableStorage, Loaded } from "../appField/property";
 import { DataRead } from "../appField/property";
 import { Inputable } from "../appField/property";
@@ -12,6 +11,10 @@ import { getAppSchemaProvider } from "../provider/appSchemaProvider";
 import { WorkflowStatus } from "../../enum/workflowStatus";
 import { getAppType } from "../../runtime/appRuntime";
 import { queryAppData } from "../../runtime/batchQuery";
+
+import type { IConstraintProperty, IProperty, IRelationInfo, IValueAccess, IValueTypeAccess } from "schema-node-core";
+import type { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkflow, IAppWorkflowState } from "../provider/interface";
+import type { AppScopePolicy } from "./property";
 import type { IAppNode, IAppType } from "./type";
 
 /** The app node to manage all field data nodes */

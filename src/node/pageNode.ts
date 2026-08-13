@@ -1,9 +1,12 @@
-import { ArrayNode, ArrayType, DataNode, Display, FunctionType, StructType, ValueType, isNull, deepClone, debounce, getNodeType, getCachedNodeType, type LocaleString } from "schema-node-core";
-import type { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/provider/interface";
+import { ArrayNode, ArrayType, DataNode, Display, FunctionType, StructType, ValueType, isNull, deepClone, debounce, getNodeType, getCachedNodeType } from "schema-node-core";
 import { queryAppData } from "../runtime/batchQuery";
-import { Filters, type FieldFilter } from "../schema/appField/property";
+import { Filters } from "../schema/appField/property";
 import { FieldFilterMode } from "../enum/fieldFilterMode";
 import { isAppNode } from "../schema/app/type";
+
+import type { LocaleString } from "schema-node-core";
+import type { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/provider/interface";
+import type { FieldFilter } from "../schema/appField/property";
 
 /** The field filter info with input nodes */
 export interface IArrayFieldFilter {

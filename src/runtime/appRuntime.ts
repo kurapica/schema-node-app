@@ -1,6 +1,8 @@
-import { deepClone, exportNodeType, isNull, isSchemaKindPropertyType, type NodeSchema } from "schema-node-core";
-import type { AppSchema, IAppType } from "../schema/app/type";
+import { deepClone, exportNodeType, isNull, isSchemaKindPropertyType } from "schema-node-core";
 import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
+
+import type { NodeSchema } from "schema-node-core";
+import type { AppSchema, IAppType } from "../schema/app/type";
 
 let rootAppType: IAppType | undefined;
 let appTypeCtor: (new(container?: IAppType) => IAppType) | undefined;

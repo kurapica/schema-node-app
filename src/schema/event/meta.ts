@@ -1,7 +1,11 @@
-import { Meta, type FuncArg, NodeSchemaKind, SchemaKind, SchemaType, RuntimeNodeType, Attach, OfSchema, buildFuncCall, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, SCHEMA_KIND_STRING, Valid, Base, NS_SYSTEM_SCHEMA_FUNC, NODE_SELF } from "schema-node-core";
-import { NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_EVENT, SCHEMA_KIND_ORDER_EVENT } from "../../utils/constant";
-import type { EventSchema } from "./type";
+import { Meta, NodeSchemaKind, SchemaKind, SchemaType, RuntimeNodeType, Attach, OfSchema, buildFuncCall, Valid, Base } from "schema-node-core";
 import { EventType } from "./runtime";
+
+import type { FuncArg } from "schema-node-core";
+import type { EventSchema } from "./type";
+
+import { NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, SCHEMA_KIND_STRING, NS_SYSTEM_SCHEMA_FUNC, NODE_SELF } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_EVENT, SCHEMA_KIND_ORDER_EVENT } from "../../utils/constant";
 
 /** The event schema meta */
 @Meta(SchemaKind, [SCHEMA_KIND_EVENT, SCHEMA_KIND_ORDER_EVENT])

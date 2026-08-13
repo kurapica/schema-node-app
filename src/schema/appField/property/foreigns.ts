@@ -1,4 +1,6 @@
-import { AccessEntryConsumer, BlackList, buildFuncCall, Call, Cascade, EntrySource, ForSchema, Meta, NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING, SchemaType, Static, Visible } from "schema-node-core";
+import { AccessEntryConsumer, BlackList, buildFuncCall, Call, Cascade, EntrySource, ForSchema, Meta, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Visible } from "schema-node-core";
+
+import { NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, SCHEMA_KIND_APP_FIELD } from "../../../utils/constant";
 
 /** The foreign key info */

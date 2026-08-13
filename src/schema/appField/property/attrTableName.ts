@@ -1,4 +1,6 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_IDENTIFIER, PropertyValueType, Relation, Visible, Call, buildFuncCall, NS_SYSTEM_INTRINSIC } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, Relation, Visible, Call, buildFuncCall } from "schema-node-core";
+
+import { SCHEMA_KIND_PROPERTY, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP } from "../../../utils/constant";
 
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])

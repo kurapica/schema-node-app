@@ -1,7 +1,8 @@
+import { AppScopeType } from "../../enum/appScopeType";
+
 import type { INodeReference, IPropertyProvider, IRelation, IValueAccess, IValueTypeAccess, NodeSchema, SchemaLoadState } from "schema-node-core";
 import type { AppFieldSchema } from "../appField/type";
 import type { AppWorkflowNodeSchema, AppWorkflowSchema } from "../appWorkflow/type";
-import { AppScopeType } from "../../enum/appScopeType";
 
 export interface AppSchema {
   /** The container for the app */

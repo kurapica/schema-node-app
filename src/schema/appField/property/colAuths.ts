@@ -1,4 +1,6 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_LIST, NS_SYSTEM_IDENTIFIER, PropertyValueType, Relation, Visible, Call, buildFuncCall, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_SCHEMA_REFLECT_GET_ACCESS_ENTRIES, Assign, Cascade, EntrySource, SCHEMA_KIND_STRUCT } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, Relation, Visible, Call, buildFuncCall, Assign, Cascade, EntrySource } from "schema-node-core";
+
+import { SCHEMA_KIND_PROPERTY, NS_SYSTEM_LIST, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_SCHEMA_REFLECT_GET_ACCESS_ENTRIES, SCHEMA_KIND_STRUCT } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../../utils/constant";
 
 export interface ColPolicy {

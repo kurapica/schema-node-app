@@ -1,4 +1,6 @@
-import { Meta, OfSchema, SCHEMA_KIND_ENUM, SchemaType, FromEnum } from "schema-node-core";
+import { Meta, OfSchema, SchemaType, FromEnum } from "schema-node-core";
+
+import { SCHEMA_KIND_ENUM } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP } from "../utils";
 
 export enum PolicyScope {

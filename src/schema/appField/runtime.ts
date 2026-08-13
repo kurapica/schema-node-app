@@ -1,9 +1,12 @@
-import type { AppFieldSchema } from "./type";
-import { type NodeType, type ValueType, type IProperty, type IPropertyProvider, joinProperties, getNodeType, getPropertiesBySchemaKind, Name, ReadOnly, deepClone, type PropertyCtor, type IValueAccess } from "schema-node-core";
+import { joinProperties, getNodeType, getPropertiesBySchemaKind, Name, ReadOnly, deepClone } from "schema-node-core";
 import { Pageable, DataUpdate, View, DataDerive, Inputable } from "./property";
-import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 import { PageNode } from "../../node/pageNode";
-import { type IAppFieldType, type IAppNode, type IAppType } from "../app/type";
+
+import type { AppFieldSchema } from "./type";
+import type { NodeType, ValueType, IProperty, IPropertyProvider, PropertyCtor, IValueAccess } from "schema-node-core";
+import type { IAppFieldType, IAppNode, IAppType } from "../app/type";
+
+import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
 
 /** The type of the application field. */
 export class AppFieldType implements IPropertyProvider, IAppFieldType {

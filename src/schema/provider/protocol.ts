@@ -2,10 +2,11 @@
 // Schema provider protocol
 // =============================================================================
 import axios from "axios";
-import { generateGuid, getLanguage, isNull} from "schema-node-core";
+import { generateGuid, getLanguage, isNull } from "schema-node-core";
 import { getAppSchemaProvider } from "./appSchemaProvider";
-import type { ISchemaApiProtocolMeta } from "./interface";
 import { getSchemaApiBaseUrl } from "./baseUrl";
+
+import type { ISchemaApiProtocolMeta } from "./interface";
 
 let schemaApiHeaders = [] as { key: string; value: string }[];
 let schemaApiHeaderSetter: Function | null = null;

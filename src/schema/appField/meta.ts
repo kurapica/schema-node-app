@@ -1,6 +1,9 @@
-import { Meta, SchemaKind, SchemaType, Attach, Append, Display, Description, Disable, PrimaryIndex, Require, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, ReadOnly, InVisible, Immutable, Relation, Default, Call, buildFuncCall, NS_SYSTEM_SCHEMA_REFLECT_TYPE } from "schema-node-core";
-import { SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_ORDER_APP_FIELD, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
+import { Meta, SchemaKind, SchemaType, Attach, Append, Display, Description, Disable, PrimaryIndex, Require, ReadOnly, InVisible, Immutable, Relation, Default, Call, buildFuncCall } from "schema-node-core";
+
 import type { AppFieldSchema } from "./type";
+
+import { NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_TYPE } from "schema-node-core";
+import { SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_ORDER_APP_FIELD, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 
 /** The meta of the app field schema */
 @Meta(SchemaKind, [SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_ORDER_APP_FIELD])

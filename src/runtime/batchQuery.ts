@@ -1,11 +1,16 @@
 // Batch query app data
 
-import { isNull, debounce, deepClone, SchemaLoadState, getNodeType, type INamespaceNodeType, type NodeSchema, SCHEMA_KIND_NAMESPACE } from "schema-node-core";
+import { isNull, debounce, deepClone, SchemaLoadState, getNodeType } from "schema-node-core";
 import { AppScopeType } from "../enum/appScopeType";
 import { getCachedAppType, saveAppSchema, getAppType } from "./appRuntime";
-import type { IAppDataQuery, IAppDataResult } from "../schema/provider/interface";
 import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
-import { type AppScopePolicy, ScopePolicy } from "../schema/app/property";
+import { ScopePolicy } from "../schema/app/property";
+
+import type { INamespaceNodeType, NodeSchema } from "schema-node-core";
+import type { IAppDataQuery, IAppDataResult } from "../schema/provider/interface";
+import type { AppScopePolicy } from "../schema/app/property";
+
+import { SCHEMA_KIND_NAMESPACE } from "schema-node-core";
 
 let DEBOUNCE_BATCH_QUERY = 50;
 

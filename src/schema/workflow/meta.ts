@@ -1,7 +1,11 @@
-import { Attach, type FuncArg, Base, buildFuncCall, Meta, NODE_SELF, NodeSchemaKind, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, OfSchema, Require, RuntimeNodeType, SCHEMA_KIND_STRING, SchemaKind, SchemaType, Valid } from "schema-node-core";
-import { SCHEMA_KIND_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../../utils/constant";
-import type { WorkflowSchema } from "./type";
+import { Attach, Base, buildFuncCall, Meta, NodeSchemaKind, OfSchema, Require, RuntimeNodeType, SchemaKind, SchemaType, Valid } from "schema-node-core";
 import { WorkflowType } from "./runtime";
+
+import type { FuncArg } from "schema-node-core";
+import type { WorkflowSchema } from "./type";
+
+import { NODE_SELF, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, SCHEMA_KIND_STRING } from "schema-node-core";
+import { SCHEMA_KIND_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../../utils/constant";
 
 @Meta(SchemaKind, [SCHEMA_KIND_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW])
 @Meta(NodeSchemaKind, SCHEMA_KIND_WORKFLOW)

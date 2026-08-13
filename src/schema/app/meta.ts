@@ -1,6 +1,9 @@
-import { AccessValueTypeProvider, Append, Attach, Base, buildFuncCall, Description, Display, ENTRY_ROOT, EntrySource, EntrySourceProvider, Meta, NODE_SELF, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT, NS_SYSTEM_STRING, OfSchema, PRIMARY_KEY_MAX_LEN, PrimaryIndex, SCHEMA_KIND_STRING, SchemaKind, SchemaType, UpLimitString } from "schema-node-core";
-import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP, SCHEMA_KIND_ORDER_APP } from "../../utils/constant";
+import { AccessValueTypeProvider, Append, Attach, Base, buildFuncCall, Description, Display, EntrySource, EntrySourceProvider, Meta, OfSchema, PrimaryIndex, SchemaKind, SchemaType, UpLimitString } from "schema-node-core";
+
 import type { AppSchema } from "./type";
+
+import { ENTRY_ROOT, NODE_SELF, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT, NS_SYSTEM_STRING, PRIMARY_KEY_MAX_LEN, SCHEMA_KIND_STRING } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP, SCHEMA_KIND_ORDER_APP } from "../../utils/constant";
 
 /** Declare the application schema kind */
 @Meta(SchemaKind, [SCHEMA_KIND_APP, SCHEMA_KIND_ORDER_APP])
