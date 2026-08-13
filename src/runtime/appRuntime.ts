@@ -60,7 +60,7 @@ export async function getAppType(fullName: string): Promise<IAppType | undefined
 
 async function loadAppType(root: IAppType, segment?: string, reload = false, isLast = false, onlyCache = false): Promise<IAppType | undefined> {
   let result: IAppType | undefined = root;
-  if (segment)
+  if (segment?.length)
     result = result.getSubAppType(segment);
   if (result == null && reload || result?.loaded == true && !(isLast && reload))
     return result;
