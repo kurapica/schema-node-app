@@ -1,10 +1,10 @@
-import { AccessEntryConsumer, Append, Attach, buildFuncCall, Call, Description, Display, EntrySource, InVisible, Meta, PrimaryIndex, Relation, Require, SchemaKind, SchemaType, UpLimitString, ValueType, Visible } from "schema-node-core";
+import { AccessEntryConsumer, Append, Attach, buildFuncCall, Call, Description, Display, EntrySource, InVisible, Meta, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, PrimaryIndex, Relation, Require, SchemaKind, SchemaType, UpLimitString, ValueType, Visible } from "schema-node-core";
 
 import type { CallArg } from "schema-node-core";
 import type { AppWorkflowSchema, AppWorkflowNodeSchema } from "./type";
 
 import { ENTITY_PRIMARY_KEY_MAX_LEN, NODE_SELF, NS_SYSTEM_BOOL, NS_SYSTEM_INTRINSIC, NS_SYSTEM_LIST, NS_SYSTEM_LOGIC, NS_SYSTEM_OBJECT, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_KIND, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NS_SYSTEM_STRING, SCHEMA_KIND_ARRAY, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_STRING } from "schema-node-core";
-import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW_NODE, SCHEMA_KIND_ORDER_APP_WORKFLOW, SCHEMA_KIND_ORDER_APP_WORKFLOW_NODE } from "../../utils/constant";
+import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW_NODE, SCHEMA_KIND_ORDER_APP_WORKFLOW, SCHEMA_KIND_ORDER_APP_WORKFLOW_NODE } from "../../utils/constant";
 
 @Meta(SchemaKind, [SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_ORDER_APP_WORKFLOW])
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_WORKFLOW}.schema`)
@@ -46,13 +46,13 @@ class AppWorkflowNodeSchemaMata implements AppWorkflowNodeSchema {
   name: string;
 
   /** The workflow node type */
-  @Meta(SchemaType, NS_SYSTEM_SCHEMA_NODE_VALUE_KIND)
+  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_WORKFLOW}.type`)
   @Meta(Require, true)
   @Meta(AccessEntryConsumer, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NODE_SELF, false, SCHEMA_KIND_STRING, SCHEMA_KIND_INT, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_ENUM, SCHEMA_KIND_ARRAY))
   type: string;
 
   /** The workflow node payload */
-  @Meta(SchemaType, NS_SYSTEM_SCHEMA_NODE_VALUE_KIND)
+  @Meta(SchemaType, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE)
   payload: string;
 
   /** The workflow node arguments */
@@ -99,7 +99,5 @@ class AppWorkflowNodeSchemaMata implements AppWorkflowNodeSchema {
   error?: string;
 
   /** The payload value type */
-  @Meta(SchemaType, NS_SYSTEM_SCHEMA_NODE_VALUE_KIND)
-  @Meta(InVisible, true)
   payloadValueType?: ValueType;
 }
