@@ -1,4 +1,4 @@
-import { buildFuncCall, Call, ForSchema, Meta, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY_CORE, OfSchema, Property, PropertyValueType, ReadOnly, Relation, SCHEMA_KIND_PROPERTY, SchemaType, Static, Visible } from "schema-node-core";
+import { buildFuncCall, Call, ForSchema, Meta, NS_SYSTEM_BOOL, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY_CORE, OfSchema, Property, PropertyValueType, ReadOnly, Relation, SCHEMA_KIND_PROPERTY, SchemaType, Static, Visible } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_WORKFLOW } from "../../utils/constant";
 import type { WorkflowSchema } from "./type";
 
@@ -15,6 +15,7 @@ export class WorkflowProperty extends Property<WorkflowSchema> {}
 @Meta(ForSchema, SCHEMA_KIND_WORKFLOW)
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY}.workflow.forkable`)
+@Meta(PropertyValueType, NS_SYSTEM_BOOL)
 @Meta(Static, true)
 @Meta(ReadOnly, true)
 export class Forkable extends Property<boolean> {};

@@ -25,7 +25,7 @@ class AppWorkflowSchemaMata implements AppWorkflowSchema {
   active: boolean;
 
   /** The workflow nodes */
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_WORKFLOW}.node`)
+  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_WORKFLOW}.nodes`)
   nodes: AppWorkflowNodeSchema[];
 }
 

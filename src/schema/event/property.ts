@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY_CORE, PropertyValueType, ReadOnly, Visible, Call, buildFuncCall, NS_SYSTEM_LOGIC_EQ, Relation } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, SCHEMA_KIND_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY_CORE, PropertyValueType, ReadOnly, Visible, Call, buildFuncCall, NS_SYSTEM_LOGIC_EQ, Relation, NS_SYSTEM_SCHEMA_FUNC_TYPE } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_EVENT } from "../../utils/constant";
 import { type EventSchema } from "./type";
 
@@ -15,4 +15,5 @@ export class EventProperty extends Property<EventSchema> {}
 @Meta(ForSchema, [SCHEMA_KIND_EVENT])
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY}.event.payloadEvaluator`)
+@Meta(PropertyValueType, NS_SYSTEM_SCHEMA_FUNC_TYPE)
 export class PayloadEvaluator extends Property<string> {};
