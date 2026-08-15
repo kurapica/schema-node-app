@@ -9,7 +9,7 @@ import { NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_EVENT, SCHEMA_KIND_ORDER_EVENT } fr
 
 /** The event schema meta */
 @Meta(SchemaKind, [SCHEMA_KIND_EVENT, SCHEMA_KIND_ORDER_EVENT])
-@Meta(NodeSchemaKind, SCHEMA_KIND_EVENT)
+@Meta(NodeSchemaKind, [SCHEMA_KIND_EVENT, SCHEMA_KIND_ORDER_EVENT])
 @Meta(RuntimeNodeType, EventType)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_EVENT}.schema`)
 @Meta(Attach, SCHEMA_KIND_EVENT)
