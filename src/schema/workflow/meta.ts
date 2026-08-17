@@ -33,5 +33,5 @@ class WorkflowSchemaMeta implements WorkflowSchema {
 @Meta(OfSchema, SCHEMA_KIND_STRING)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_WORKFLOW}.type`)
 @Meta(Base, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE)
-@Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NODE_SELF, SCHEMA_KIND_WORKFLOW))
+@Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NODE_SELF, false, SCHEMA_KIND_WORKFLOW))
 class WorkflowTypeMeta {}

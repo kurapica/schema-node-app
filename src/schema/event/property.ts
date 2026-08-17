@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, ReadOnly, Visible, Call, buildFuncCall, Relation } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, ReadOnly, Visible, Call, buildFuncCall, Relation, SCHEMA_KIND_NODE } from "schema-node-core";
 
 import type { EventSchema } from "./type";
 
@@ -6,7 +6,7 @@ import { SCHEMA_KIND_PROPERTY, NS_SYSTEM_SCHEMA_PROPERTY, NS_SYSTEM_SCHEMA_PROPE
 import { NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_EVENT } from "../../utils/constant";
 
 /** The event property for node schema */
-@Meta(ForSchema, [SCHEMA_KIND_EVENT])
+@Meta(ForSchema, [SCHEMA_KIND_NODE])
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_CORE}.event`)
 @Meta(PropertyValueType, `${NS_SYSTEM_SCHEMA_EVENT}.schema`)

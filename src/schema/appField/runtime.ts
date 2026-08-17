@@ -94,7 +94,8 @@ export class AppFieldType implements IPropertyProvider, IAppFieldType {
 
   /** The properties of the field. */
   *getProperties<T extends IProperty>(propCtor: string | PropertyCtor): Generator<T> {
-    return joinProperties(this._props?.filter(p => typeof propCtor === "string" ? p.name.toLowerCase() === propCtor.toLowerCase() : p instanceof propCtor) as T[], this._valueType?.getProperties(propCtor));
+    for (let prop of joinProperties(this._props?.filter(p => typeof propCtor === "string" ? p.name.toLowerCase() === propCtor.toLowerCase() : p instanceof propCtor) as T[], this._valueType?.getProperties(propCtor))) 
+      yield prop as T;
   }
   
   /** Gets the property values */
@@ -103,6 +104,6 @@ export class AppFieldType implements IPropertyProvider, IAppFieldType {
 
   /** The filtered properties of the field. */
   *filterProperties(predicate: (prop: IProperty) => boolean): Generator<IProperty> {
-    return joinProperties(this._props?.filter(predicate), this._valueType?.filterProperties(predicate));
+    for (let prop of joinProperties(this._props?.filter(predicate), this._valueType?.filterProperties(predicate))) yield prop;
   }
 }

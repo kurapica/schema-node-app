@@ -24,5 +24,5 @@ class EventSchemaMeta implements EventSchema {
 @Meta(OfSchema, SCHEMA_KIND_STRING)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_EVENT}.type`)
 @Meta(Base, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE)
-@Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NODE_SELF, SCHEMA_KIND_EVENT))
+@Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NODE_SELF, false, SCHEMA_KIND_EVENT))
 class EventTypeMeta {}
