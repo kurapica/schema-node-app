@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, Base, buildFuncCall, Valid, PropertyValueType, DataNode, Attach, BlackList } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, Base, buildFuncCall, Valid, PropertyValueType, DataNode, Attach, BlackList, NS_SYSTEM_BOOL, SCHEMA_KIND_ENUM, Static, InVisible } from "schema-node-core";
 import { PolicyCombine } from "../../enum/policyCombine";
 import { PolicyScope } from "../../enum/policyScope";
 
@@ -27,21 +27,32 @@ export class Auths extends Property<PolicyItem[]> {}
 class EvaluatorTypeMeta {}
 
 /** The black list resolver for policy scope */
+@Meta(ForSchema, [SCHEMA_KIND_ENUM])
+@Meta(OfSchema, SCHEMA_KIND_PROPERTY)
+@Meta(PropertyValueType, NS_SYSTEM_BOOL)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.scopeblacklist`)
+@Meta(Static, true)
+@Meta(InVisible, true)
 class PolicyScopeResolver extends Property<boolean> {
   override effect(target: IValueAccess, newValue?: unknown, oldValue?: unknown, source?: IValueAccess): void {
-    while (target && target instanceof DataNode) {
-      const kind = target.type.getProperty(Attach)?.getValue<string>();
-      if (!kind) target = target.parent;
-      if (kind !== SCHEMA_KIND_APP && kind !== SCHEMA_KIND_APP_FIELD)
-        target.setPropertyValue(BlackList, [
-          PolicyScope.DataCreate,
-          PolicyScope.DataRead,
-          PolicyScope.DataUpdate,
-          PolicyScope.DataDelete,
-        ]);
-      break;
-    }
+    setTimeout(() => {
+      let curr = target;
+      while (curr && curr instanceof DataNode) {
+        const kind = curr.type.getProperty(Attach)?.getValue<string>();
+        if (!kind) {
+          curr = curr.parent;
+          continue;
+        }
+        if (kind !== SCHEMA_KIND_APP && kind !== SCHEMA_KIND_APP_FIELD)
+          target.setPropertyValue(BlackList, [
+            PolicyScope.DataCreate,
+            PolicyScope.DataRead,
+            PolicyScope.DataUpdate,
+            PolicyScope.DataDelete,
+          ]);
+        break;
+      }
+    }, 0);
   }
 }
 
