@@ -261,7 +261,7 @@ export async function postSchemaApi(
     }
     return data;
   } catch (ex) {
-    console.log(ex);
+    console.error(ex);
     throw ex;
   }
 }

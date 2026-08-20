@@ -1,4 +1,4 @@
-import { AccessEntryConsumer, Assign, BlackList, buildFuncCall, Call, Cascade, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
+import { AccessEntryConsumer, ARRAY_ELEMENT, Assign, BlackList, buildFuncCall, Call, Cascade, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
 import { DataCombineType } from "../../../enum/dataCombineType";
 
 import { ARRAY_PREVIOUS, NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_SCHEMA_REFLECT_TYPE, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING, SCHEMA_KIND_STRUCT } from "schema-node-core";
@@ -58,9 +58,9 @@ class DeriveMeta implements Derive {
 
   @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.combines`)
   @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@fieldType', true, SCHEMA_KIND_STRUCT))
-  @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getcombinefields`, '@fieldType'), 'combines.field')
-  @Relation(BlackList, Call, buildFuncCall(`${NS_SYSTEM_COLLECTION}.getfields`, `@combines.${ARRAY_PREVIOUS}`, 'field'), 'combines.field')
-  @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.getaccesstype`, '@fieldType', '@combines.field'), 'combines.fieldType')
+  @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getcombinefields`, '@fieldType'), `combines.${ARRAY_ELEMENT}.field`)
+  @Relation(BlackList, Call, buildFuncCall(`${NS_SYSTEM_COLLECTION}.getfields`, `@combines.${ARRAY_PREVIOUS}`, 'field'), `combines.${ARRAY_ELEMENT}.field`)
+  @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.getaccesstype`, '@fieldType', `combines.${ARRAY_ELEMENT}.field`), `combines.${ARRAY_ELEMENT}.fieldType`)
   combines?: FieldCombine[];
 }
 

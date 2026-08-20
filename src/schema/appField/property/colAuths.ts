@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, Relation, Visible, Call, buildFuncCall, Assign, Cascade, EntrySource } from "schema-node-core";
+import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, Relation, Visible, Call, buildFuncCall, Assign, Cascade, EntrySource, ARRAY_ELEMENT } from "schema-node-core";
 
 import { SCHEMA_KIND_PROPERTY, NS_SYSTEM_LIST, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_SCHEMA_REFLECT_GET_ACCESS_ENTRIES, SCHEMA_KIND_STRUCT } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../../utils/constant";
@@ -13,7 +13,7 @@ export interface ColPolicy {
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.colAuths`)
 @Meta(PropertyValueType, `${NS_SYSTEM_LIST}<${NS_SYSTEM_SCHEMA_PROPERTY_APP}.policy.col>`)
 @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@type', true, SCHEMA_KIND_STRUCT))
-@Relation(EntrySource, Assign, NS_SYSTEM_SCHEMA_REFLECT_GET_ACCESS_ENTRIES, '@type')
+@Relation(EntrySource, Assign, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_GET_ACCESS_ENTRIES, '@type'), `colAuths.${ARRAY_ELEMENT}.name`)
 export class ColAuths extends Property<ColPolicy[]> {}
 
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.policy.col`)
