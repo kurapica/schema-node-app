@@ -114,7 +114,6 @@ export class AppNode implements IValueAccess, IAppNode {
   getProperties(propCtor: new () => IProperty): Generator<IProperty> { return this.appType.getProperties(propCtor); }
   *getPropertyValues<T>(propCtor: new () => IProperty): Generator<T> { for (const prop of this.getProperties(propCtor)) yield prop.getValue() as T; }
   setPropertyValue(propCtor: new () => IProperty, value?: unknown, source?: IValueAccess): void {}
-  getPropertySource(propCtor: new () => IProperty): IValueAccess { return this; }
 
   // subscription
   subscribe(func: Function, immediate?: boolean): Function { return () => {}; }
