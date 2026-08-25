@@ -7,6 +7,7 @@ import { isAppNode } from "../schema/app/type";
 import type { LocaleString } from "schema-node-core";
 import type { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/provider/interface";
 import type { FieldFilter } from "../schema/appField/property";
+import { Deleted } from "../property/common/deleted";
 
 /** The field filter info with input nodes */
 export interface IArrayFieldFilter {
@@ -28,11 +29,11 @@ export class PageNode extends ArrayNode {
   /** The field filters with input nodes */
   private _appFieldFilter: IArrayFieldFilter[] = [];
 
-  /** Gets the field filters with input nodes */
-  get filters(): IArrayFieldFilter[] { return this._appFieldFilter; }
-
   /** The change tracker for the pageable array */
   private _tracker: { [key: string]: { origin?: {}; update?: {}; delete?: boolean } } = {};
+
+  /** Gets the field filters with input nodes */
+  get filters(): IArrayFieldFilter[] { return this._appFieldFilter; }
 
   /** The current page number */
   get page(): number { return this.fieldInfo?.take ? Math.floor((this.fieldInfo.skip || 0) / this.fieldInfo.take) : 0 }
@@ -211,8 +212,11 @@ export class PageNode extends ArrayNode {
         }
 
         const key = this.getPrimaryKey(data[i]);
-        if (key && this._tracker[key]?.update) {
-          eleNode.setValue(this._tracker[key].update);
+        if (key && this._tracker[key]) {
+          if (this._tracker[key].update)
+            eleNode.setValue(this._tracker[key].update);
+          if (this._tracker[key].delete)
+            eleNode.setPropertyValue(Deleted, true);
         }
       }
 
@@ -236,7 +240,7 @@ export class PageNode extends ArrayNode {
       if (key && !this._tracker[key]?.delete) {
         this._tracker[key] ||= {};
         this._tracker[key].delete = true;
-        ele.onNextState();
+        ele.setPropertyValue(Deleted, true);
       }
     }
   }
@@ -248,7 +252,7 @@ export class PageNode extends ArrayNode {
       const key = this.getPrimaryKey(ele);
       if (key && this._tracker[key]?.delete) {
         this._tracker[key].delete = undefined;
-        ele.onNextState();
+        ele.setPropertyValue(Deleted, undefined);
       }
     }
   }
@@ -260,7 +264,7 @@ export class PageNode extends ArrayNode {
         delete this._tracker[key];
       }
     }
-    this.onNextState();
+    this._elements.forEach((e) => e?.setPropertyValue(Deleted, undefined));
   }
 
   /** Confirm the page */

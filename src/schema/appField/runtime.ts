@@ -3,7 +3,7 @@ import { Pageable, DataUpdate, View, DataDerive, Inputable } from "./property";
 import { PageNode } from "../../node/pageNode";
 
 import type { AppFieldSchema } from "./type";
-import type { NodeType, ValueType, IProperty, IPropertyProvider, PropertyCtor, IValueAccess } from "schema-node-core";
+import type { NodeType, ValueType, IProperty, IPropertyProvider, PropertyCtor, IValueAccess, ArrayType } from "schema-node-core";
 import type { IAppFieldType, IAppNode, IAppType } from "../app/type";
 
 import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
@@ -21,7 +21,7 @@ export class AppFieldType implements IPropertyProvider, IAppFieldType {
   /** Create a data node instance. */
   create(appNode: IAppNode, data: unknown): IValueAccess {
     return this.getPropertyValue(Pageable)
-      ? new PageNode(this.valueType, data, appNode, this)
+      ? new PageNode(this.valueType as ArrayType, data, appNode, this)
       : this.valueType.create(data, appNode, this);
   }
 
