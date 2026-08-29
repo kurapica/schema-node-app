@@ -56,6 +56,10 @@ export class AppNode implements IValueAccess, IAppNode {
     this.attachRelations([{owner: this, relations: Array.from(appType.getRelations())}]);
   }
 
+  /** The access path */
+  get access(): string { return "" }
+
+  /** The type of the node */
   get type(): IValueTypeAccess { return this.appType; }
 
   dispose(): void {
