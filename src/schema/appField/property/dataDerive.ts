@@ -60,7 +60,7 @@ class DeriveMeta implements Derive {
   @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@fieldType', true, SCHEMA_KIND_STRUCT))
   @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getcombinefields`, '@fieldType'), `combines.${ARRAY_ELEMENT}.field`)
   @Relation(BlackList, Call, buildFuncCall(`${NS_SYSTEM_COLLECTION}.getfields`, `@combines.${ARRAY_PREVIOUS}`, 'field'), `combines.${ARRAY_ELEMENT}.field`)
-  @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.getaccesstype`, '@fieldType', `combines.${ARRAY_ELEMENT}.field`), `combines.${ARRAY_ELEMENT}.fieldType`)
+  @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.getaccessvaluetype`, '@fieldType', `combines.${ARRAY_ELEMENT}.field`), `combines.${ARRAY_ELEMENT}.fieldType`)
   combines?: FieldCombine[];
 }
 
