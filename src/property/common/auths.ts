@@ -5,7 +5,7 @@ import { PolicyScope } from "../../enum/policyScope";
 import type { IValueAccess } from "schema-node-core";
 
 import { SCHEMA_KIND_PROPERTY, SCHEMA_KIND_NODE, NODE_SELF, SCHEMA_KIND_STRING, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_LIST } from "schema-node-core";
-import { SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
+import { SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 
 export interface PolicyItem {
     scope: PolicyScope;
@@ -15,7 +15,7 @@ export interface PolicyItem {
 
 @Meta(ForSchema, [SCHEMA_KIND_NODE, SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW])
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
-@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.auths`)
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.auths`)
 @Meta(PropertyValueType, `${NS_SYSTEM_LIST}<${NS_SYSTEM_SCHEMA_APP}.policy.item>`)
 export class Auths extends Property<PolicyItem[]> {}
 

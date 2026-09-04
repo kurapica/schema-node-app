@@ -1,4 +1,4 @@
-import { CallProcess, DataNode, Disable, isEmpty, isNull, ReadOnly } from "schema-node-core";
+import { CallProcess, DataNode, Disable, isEmpty, isNull, ReadOnly, splitString } from "schema-node-core";
 import { ScopePolicy } from "./property";
 import { EnableStorage, Loaded } from "../appField/property";
 import { DataRead } from "../appField/property";
@@ -102,6 +102,7 @@ export class AppNode implements IValueAccess, IAppNode {
 
   // value access
   get isEmpty(): boolean { return this._appFieldNodes.length === 0; }
+  get original(): unknown { return undefined; }
   get rawValue(): unknown { return undefined; }
   setValue(value: unknown): void { throw new Error("Can't set value to app node"); }
   getValue(): unknown { return undefined; }
@@ -152,7 +153,7 @@ export class AppNode implements IValueAccess, IAppNode {
     // attach relations from given infos
     relationInfos.forEach(info => {
       info.relations.forEach(r => {
-        const paths = r.target.split('.').filter(p => p.trim() !== '');
+        const paths = splitString(r.target);
         let curr: IValueAccess | undefined = info.owner;
         for (let i = 0; i < paths.length; i++)
         {

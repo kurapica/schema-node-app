@@ -202,7 +202,7 @@ export class PageNode extends ArrayNode {
         let eleNode: DataNode | undefined;
         if (this._elements.length <= i) {
           if (!elementType) continue;
-          eleNode = elementType.create(data[i], this, this.propertyProvider);
+          eleNode = elementType.create(data[i], this, ...this.propertyProviders);
           if (!eleNode) continue;
           this._elements.push(eleNode);
         } else {
@@ -307,7 +307,7 @@ export class PageNode extends ArrayNode {
             const arg = funcType.args[i];
             const argType = await getNodeType(arg.type) as ValueType | undefined;
             if (!argType || !(argType as any).create) { allValid = false; break; }
-            const node = (argType as any).create(undefined, this, this.propertyProvider) as DataNode;
+            const node = (argType as any).create(undefined, this, ...this.propertyProviders) as DataNode;
             if (node) {
               node.setPropertyValue<LocaleString>(Display, { key: arg.name });
               nodes.push(node);
@@ -322,7 +322,7 @@ export class PageNode extends ArrayNode {
         if (elementType instanceof StructType) {
           const field = elementType.getField(f.filter);
           if (field?.type) {
-            const node = field.type.create(undefined, this, this.propertyProvider) as DataNode;
+            const node = field.type.create(undefined, this, ...this.propertyProviders) as DataNode;
             if (node) {
               this._appFieldFilter.push({ mode: f.mode, filter: f.filter, nodes: [node] });
             }

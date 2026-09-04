@@ -1,7 +1,7 @@
-import { buildFuncCall, Call, Cascade, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, Property, PropertyValueType, Relation, SchemaType, Static, Valid } from "schema-node-core";
+import { buildFuncCall, Call, CascadeDepth, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, Property, PropertyValueType, Relation, SchemaType, Static, Valid } from "schema-node-core";
 
 import { NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NODE_SELF, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING } from "schema-node-core";
-import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP_FIELD } from "../../../utils/constant";
+import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP_FIELD } from "../../../utils/constant";
 
 export interface FieldView {
     app: string;
@@ -10,7 +10,7 @@ export interface FieldView {
 }
 
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
-@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.view`)
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.view`)
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(PropertyValueType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.view`)
 @Meta(Static, true)
@@ -40,7 +40,7 @@ class FieldViewMeta implements FieldView {
 
     @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
     @Meta(EntrySource, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.gettypeentries`, "@fieldType"))
-    @Meta(Cascade, 1)
+    @Meta(CascadeDepth, 1)
     @Meta(Valid, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.isschemakindaccess`, "@fieldType", NODE_SELF, false, SCHEMA_KIND_STRING))
     map: string;
 }

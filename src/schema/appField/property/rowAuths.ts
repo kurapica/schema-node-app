@@ -1,7 +1,7 @@
 import { Meta, ForSchema, OfSchema, SchemaType, Property, PropertyValueType, Relation, Valid, Assign, buildFuncCall, ARRAY_ELEMENT } from "schema-node-core";
 
 import { SCHEMA_KIND_PROPERTY, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_LIST, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NODE_SELF } from "schema-node-core";
-import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP } from "../../../utils/constant";
+import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_APP } from "../../../utils/constant";
 
 export interface RowPolicy {
     evaluator: string;
@@ -10,7 +10,7 @@ export interface RowPolicy {
 
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
-@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.rowAuths`)
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.rowAuths`)
 @Meta(PropertyValueType, `${NS_SYSTEM_LIST}<${NS_SYSTEM_SCHEMA_APP}.policy.row>`)
 @Relation(Valid, Assign, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NODE_SELF, '@type'), `rowAuths.${ARRAY_ELEMENT}.filter`)
 export class RowAuths extends Property<RowPolicy[]> {}

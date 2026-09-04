@@ -1,4 +1,4 @@
-import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, getNodeType, getPropertyValue, IntType, Meta, OfSchema, Return, SchemaType, setPropertyValue, StructType, ValueType } from "schema-node-core";
+import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, EntryRoot, getNodeType, getPropertyValue, IntType, Meta, OfSchema, Return, SchemaType, setPropertyValue, StructType, ValueType } from "schema-node-core";
 import { getAppType } from "../runtime";
 import { ScopePolicy } from "../schema/app/property";
 import { Foreigns } from "../schema/appField/property";
@@ -16,7 +16,6 @@ import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_REFL
 export class SystemReflectApp
 {
   /** Gets the sub entries of the struct fields */
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getaccessentries`)
   @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_ENTRY_ACCESS}<${NS_SYSTEM_STRING}>>`)
   static async getaccessentries(
     @Meta(ArgName, 'container')
@@ -33,6 +32,7 @@ export class SystemReflectApp
 
     @Meta(ArgName, 'root')
     @Meta(SchemaType, NS_SYSTEM_STRING)
+    @Meta(EntryRoot, true)
     root?: string
   ): Promise<EntryAccess<string>[]> {
     if (!container || !name) return [];
@@ -94,7 +94,6 @@ export class SystemReflectApp
   }
 
   /** Gets the value type of the struct field */
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getaccessvaluetype`)
   @Meta(Return, NS_SYSTEM_STRING)
   static async getaccessvaluetype(
     @Meta(ArgName, 'container')
@@ -122,12 +121,12 @@ export class SystemReflectApp
   /// <summary>
   /// Gets the application entries
   /// </summary>
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappentries`)
   @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_ENTRY_ACCESS}<${NS_SYSTEM_STRING}>>`)
   static async getappentries(
     @Meta(ArgName, "name")
     @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.type`)
-    name?: string, root?: string)
+    name?: string, 
+    @Meta(EntryRoot, true) root?: string)
   {
     name = name?.toLowerCase() ?? '';
     root = root?.toLowerCase() ?? '';
@@ -170,7 +169,6 @@ export class SystemReflectApp
   /// <summary>
   /// Gets the application fields
   /// </summary>
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappfields`)
   @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_ENTRY_ACCESS}<${NS_SYSTEM_STRING}>>`)
   static async getappfields(
     @Meta(ArgName, "app")
@@ -192,7 +190,6 @@ export class SystemReflectApp
   /// <summary>
   /// Gets the application foreign field entries to the given application
   /// </summary>
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappforeignfields`)
   @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_ENTRY_ACCESS}<${NS_SYSTEM_STRING}>>`)
   static async getappforeignfields(
     @Meta(ArgName, "app")
@@ -222,7 +219,6 @@ export class SystemReflectApp
   /// <summary>
   /// Checks if the application has any fields
   /// </summary>
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.hasfields`)
   @Meta(Return, NS_SYSTEM_BOOL)
   static async hasfields(
     @Meta(ArgName, "app")
@@ -236,7 +232,6 @@ export class SystemReflectApp
   /// <summary>
   /// Gets the app field type
   /// </summary>
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappfieldtype`)
   @Meta(Return, NS_SYSTEM_STRING)
   static async getappfieldtype(
     @Meta(ArgName, "app")
@@ -261,7 +256,6 @@ export class SystemReflectApp
   }
 
   /** Gets the combinable fields */
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getcombinefields`)
   @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_ENTRY_ACCESS}<${NS_SYSTEM_STRING}>>`)
   static async getcombinefields(
     @Meta(ArgName, 'type')
@@ -287,7 +281,6 @@ export class SystemReflectApp
   }
 
   /** Gets the combinable types */
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.getcombinetype`)
   @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_SCHEMA_APP_FIELD}.combinetype>`)
   static async getcombinetype(
     @Meta(ArgName, 'type')
@@ -314,7 +307,6 @@ export class SystemReflectApp
   /// <summary>
   /// Checks if the application has a scope policy
   /// </summary>
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_REFLECT_APP}.isscopepolicy`)
   @Meta(Return, NS_SYSTEM_BOOL)
   static async isscopepolicy(
     @Meta(ArgName, "app")

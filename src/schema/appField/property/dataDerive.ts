@@ -1,9 +1,9 @@
-import { AccessEntryConsumer, ARRAY_ELEMENT, Assign, BlackList, buildFuncCall, Call, Cascade, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
+import { AccessEntryConsumer, ARRAY_ELEMENT, Assign, BlackList, buildFuncCall, Call, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
 import { DataCombineType } from "../../../enum/dataCombineType";
 
 import { ARRAY_PREVIOUS, NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_SCHEMA_REFLECT_TYPE, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING, SCHEMA_KIND_STRUCT } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_REFLECT_APP } from "../../../utils/constant";
-import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PROPERTY_APP, NS_SYSTEM_SCHEMA_APP_FIELD } from "../../../utils/constant";
+import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_APP_FIELD } from "../../../utils/constant";
 
 export interface Derive {
   source?: string;
@@ -18,7 +18,7 @@ export interface FieldCombine {
 }
 
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
-@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PROPERTY_APP}.dataDerive`)
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.dataDerive`)
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(PropertyValueType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.derive`)
 @Meta(Static, true)
