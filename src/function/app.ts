@@ -118,9 +118,7 @@ export class SystemReflectApp
     return dotIndex === -1 ? valueType?.name : valueType?.getAccessValueType(path.substring(dotIndex + 1))?.name;
   }
 
-  /// <summary>
-  /// Gets the application entries
-  /// </summary>
+  /** Gets the application entries */
   @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_ENTRY_ACCESS}<${NS_SYSTEM_STRING}>>`)
   static async getappentries(
     @Meta(ArgName, "name")
@@ -132,37 +130,37 @@ export class SystemReflectApp
   {
     name = name?.toLowerCase() ?? '';
     root = root?.toLowerCase() ?? '';
-    if (!name && !root || name !== root && !name.startsWith(`${root}.`))
+    if (!name && !root && name !== root && !name.startsWith(`${root}.`))
       return [];
 
-    let ns = await getAppType(name ?? root);
-    if (!ns) return [];
+    let app = await getAppType(name ?? root);
+    if (!app) return [];
 
     let result: EntryAccess<string>[] = [];
-    while (ns != null)
+    while (app != null)
     {
       let access: EntryAccess<string> = {};
-      if (ns.container != null)
+      if (app.container != null)
       {
         access.entry = setPropertyValue(
-          { value: ns.name, hasChildren: ns.hasSubApps },
+          { value: app.name, hasChildren: app.hasSubApps },
           Display,
-          ns.getProperty(Display)?.getValue<LocaleString>()
+          app.getProperty(Display)?.getValue<LocaleString>()
         );
       }
-      if (ns.hasSubApps)
+      if (app.hasSubApps)
       {
-        access.children = Array.from(ns.getSubAppSchemas().map(s => {
+        access.children = Array.from(app.getSubAppSchemas().map(s => {
           return setPropertyValue(
-            { value: combinePaths(ns!.name, s.name), hasChildren: s.hasApps ?? !(s.hasFields || s.fields?.length) },
+            { value: combinePaths(app!.name, s.name), hasChildren: s.hasApps ?? !(s.hasFields || s.fields?.length) },
             Display,
             getPropertyValue(s, Display)
           );
         }));
       }
       result.push(access);
-      ns = ns.container;
-      if (root && ns?.name === root) break;
+      app = app.container;
+      if (root && app?.name === root) break;
     }
     result.reverse();
     return result;

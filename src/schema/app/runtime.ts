@@ -72,7 +72,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
   /** The application name */
   get name(): string {
     if (!this._schema) return "";
-    return this._schema.container ? `${this._schema.container}.${this._schema.name}` : this._schema.name;
+    return (this._schema.container ? `${this._schema.container}.${this._schema.name}` : this._schema.name) ?? '';
   }
 
   /** The application kind */
@@ -131,7 +131,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
     }
 
     // Ignore the schema name case sensitivity
-    if (this.name.toLowerCase() !== schema.container?.toLowerCase()) return;
+    if ((this.name ?? '').toLowerCase() !== (schema.container ?? '').toLowerCase()) return;
 
     const name = schema.name.toLowerCase();
     const subApps = schema.apps;
@@ -236,6 +236,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
 
   /** Get an application field by name */
   getField(name: string): AppFieldType | undefined {
+    if (!name?.length) return undefined;
     return this._fields?.find(f => f.name.toLowerCase() === name.toLowerCase());
   }
 

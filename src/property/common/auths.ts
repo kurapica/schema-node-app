@@ -1,5 +1,4 @@
 import { Meta, ForSchema, OfSchema, SchemaType, Property, Base, buildFuncCall, Valid, PropertyValueType, DataNode, Attach, BlackList, NS_SYSTEM_BOOL, SCHEMA_KIND_ENUM, Static, InVisible } from "schema-node-core";
-import { PolicyCombine } from "../../enum/policyCombine";
 import { PolicyScope } from "../../enum/policyScope";
 
 import type { IValueAccess } from "schema-node-core";
@@ -10,7 +9,6 @@ import { SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW, NS_SY
 export interface PolicyItem {
   scope: PolicyScope;
   evaluator: string;
-  combine: PolicyCombine;
 }
 
 /** The auths property for node schema and app schema. */
@@ -66,7 +64,4 @@ class PolicyItemMeta implements PolicyItem {
 
   @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.evaluator`)
   evaluator: string;
-
-  @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.combine`)
-  combine: PolicyCombine;
 }

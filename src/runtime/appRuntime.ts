@@ -30,8 +30,8 @@ export function getCachedAppType(fullName: string): IAppType | undefined {
 }
 
 /** Get the app type by its full name. */
-export async function getAppType(fullName: string): Promise<IAppType | undefined> {
-  fullName = fullName.toLowerCase().trim();
+export async function getAppType(fullName: string, reload?: boolean): Promise<IAppType | undefined> {
+  fullName = fullName?.toLowerCase().trim() ?? '';
   const parts = fullName.split(".");
 
   if (!rootAppType) rootAppType = new appTypeCtor();
@@ -40,7 +40,7 @@ export async function getAppType(fullName: string): Promise<IAppType | undefined
   // Try loading cached app types first
   for (let i = 0; i < parts.length; i++)
   {
-    node = await loadAppType(node, parts[i], false, i == parts.length - 1, true);
+    node = await loadAppType(node, parts[i], reload, i == parts.length - 1, true);
     if (!node) break;
   }
 
@@ -50,7 +50,7 @@ export async function getAppType(fullName: string): Promise<IAppType | undefined
     node = await loadAppType(rootAppType, '');
     for (let i = 0; i < parts.length; i++)
     {
-      node = await loadAppType(node, parts[i], false, i == parts.length - 1, false);
+      node = await loadAppType(node, parts[i], reload, i == parts.length - 1, false);
       if (!node) break;
     }
   }
@@ -58,14 +58,26 @@ export async function getAppType(fullName: string): Promise<IAppType | undefined
   return node;
 }
 
-async function loadAppType(root: IAppType, segment?: string, reload = false, isLast = false, onlyCache = false): Promise<IAppType | undefined> {
+async function loadAppType(root: IAppType, segment?: string, reload?: boolean, isLast?: boolean, onlyCache?: boolean): Promise<IAppType | undefined> {
   let result: IAppType | undefined = root;
   if (segment?.length)
     result = result.getSubAppType(segment);
-  if (result == null && reload || result?.loaded == true && !(isLast && reload))
-    return result;
-
-  const schema = await loadAppSchema(root, segment, reload);
+  
+  if (result)
+  {
+    if (isLast && reload) {
+      result.loaded = false;
+    }
+    else if (result.loaded || !isLast && onlyCache) {
+      return result;
+    }
+  }
+  else if(reload || onlyCache)
+  {
+    return undefined; // reload only on existing types
+  }
+  
+  const schema = await loadAppSchema(root, segment);
   if (!schema) return undefined;
 
   result ??= new appTypeCtor(root);
@@ -86,7 +98,7 @@ async function loadAppType(root: IAppType, segment?: string, reload = false, isL
   return result;
 }
 
-async function loadAppSchema(root: IAppType | undefined, segment: string, reload?: boolean): Promise<AppSchema | undefined> {
+async function loadAppSchema(root: IAppType | undefined, segment: string): Promise<AppSchema | undefined> {
   let schema: AppSchema | undefined = undefined;
 
   const provider = getAppSchemaProvider();

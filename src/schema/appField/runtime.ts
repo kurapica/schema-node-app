@@ -61,9 +61,8 @@ export class AppFieldType implements IPropertyProvider, IAppFieldType {
     
     // force readonly
     if (!this.getPropertyValue(ReadOnly) 
-        || this.getPropertyValue(DataUpdate) === false
-        || this.getProperty(View)?.hasValue
-        || this.getProperty(DataDerive)?.hasValue)
+        && (this.getPropertyValue(DataUpdate) === false
+        || !this.getPropertyValue(Inputable)))
     {
       const readonly = new ReadOnly();
       readonly.setValue(true);

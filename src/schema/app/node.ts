@@ -26,7 +26,7 @@ export class AppNode implements IValueAccess, IAppNode {
   private _appFieldNodes: DataNode[];
   private _workflowStates?: IAppWorkflowState[];
 
-  constructor(appType: IAppType, target?: string, query?: IAppDataQuery, data: IAppDataResult | undefined = undefined, readonly = false) {
+  constructor(appType: IAppType, target?: string, query?: IAppDataQuery, data: IAppDataResult | undefined = undefined, readonly?: boolean) {
     this.appType = appType;
     this.target = target;
     this._appFieldNodes = [];
@@ -42,7 +42,7 @@ export class AppNode implements IValueAccess, IAppNode {
       const node = field.create(this, data?.results[field.name]);
 
       // loaded
-      if (!node.isEmpty || !query?.fields?.length || query?.fields?.includes(field.name)) 
+      if (!query.schemaOnly && (!node.isEmpty || !query?.fields?.length || query?.fields?.includes(field.name))) 
         node.setPropertyValue(Loaded, true, this);
 
       // readonly (it also may inherit readonly from field type)
@@ -146,6 +146,12 @@ export class AppNode implements IValueAccess, IAppNode {
   get parent(): IValueAccess | undefined { return undefined; }
 
   // realtion & validation
+
+  *getErrorNodes(): Generator<IValueAccess> {
+    for (const f of this.loadedInputFields)
+      if (!f.isValid)
+        yield* f.getErrorNodes();
+  }
 
   // attach relations from given infos
   attachRelations(relationInfos: IRelationInfo[]): void {
@@ -283,7 +289,7 @@ export class AppNode implements IValueAccess, IAppNode {
    * @param onlyDel whether only submit deletes for array node
    */
   async submit(nodes?: DataNode[] | string[], noPageSet: boolean = false, onlyDel?: boolean): Promise<IAppDataPushResult | undefined> {
-    if (!this.target) return undefined;
+    if (!this.target && this.getPropertyValue<AppScopePolicy>(ScopePolicy)?.type !== AppScopeType.SystemLevel) return undefined;
     const datas: any = {};
 
     const pushNodes: DataNode[] = [];
