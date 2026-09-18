@@ -108,6 +108,7 @@ export class SystemReflectApp
     @Meta(SchemaType, NS_SYSTEM_STRING)
     path: string
   ): Promise<string | undefined> {
+    path ??= "";
     const dotIndex = path.indexOf('.');
     const fieldName = dotIndex === -1 ? path : path.substring(0, dotIndex);
     const app = container ? `${container}.${name}` : name;
@@ -203,7 +204,7 @@ export class SystemReflectApp
     let appType = await getAppType(app);
     if (!appType) return [];
     return [{ 
-      children: appType.getFields().filter(s => {
+      children: Array.from(appType.getFields().filter(s => {
         const foreigns = s.getPropertyValue<Foreign[]>(Foreigns);
         return foreigns?.some(f => f.app.toLowerCase() === foreignApp.toLowerCase());
       })
@@ -212,7 +213,7 @@ export class SystemReflectApp
         let display = s.getPropertyValue(Display);
         if (display != null) setPropertyValue(entry, Display, display);
         return entry;
-      })
+      }))
     }];
   }
 

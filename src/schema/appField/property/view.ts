@@ -1,4 +1,4 @@
-import { buildFuncCall, Call, CascadeDepth, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, Property, PropertyValueType, Relation, SchemaType, Static, Valid } from "schema-node-core";
+import { Assign, buildFuncCall, Call, CascadeDepth, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, OfSchema, Property, PropertyValueType, Relation, SchemaType, Static, Valid } from "schema-node-core";
 
 import { NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NODE_SELF, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP_FIELD } from "../../../utils/constant";
@@ -29,7 +29,7 @@ class FieldViewMeta implements FieldView {
     app: string;
 
     @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
-    @Meta(EntrySource, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappforeignfields`, "@app", "@owner"))
+    @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getappforeignfields`, "@app", "@owner"), 'field')
     field: string;
 
     @Meta(SchemaType, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE)
@@ -39,8 +39,8 @@ class FieldViewMeta implements FieldView {
     fieldType?: string;
 
     @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
-    @Meta(EntrySource, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.gettypeentries`, "@fieldType"))
     @Meta(CascadeDepth, 1)
-    @Meta(Valid, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.isschemakindaccess`, "@fieldType", NODE_SELF, false, SCHEMA_KIND_STRING))
+    @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.gettypeentries`, "@fieldType"), 'map')
+    @Relation(Valid, Assign,  buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.isschemakindaccess`, "@fieldType", NODE_SELF, false, SCHEMA_KIND_STRING), 'map')
     map: string;
 }
