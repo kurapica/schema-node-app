@@ -1,4 +1,4 @@
-import { AccessEntryConsumer, AccessValueTypeResolver, buildFuncCall, Call, CascadeDepth, Default, DisplayOnly, ForSchema, InVisible, Meta, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, SchemaType, Valid, Visible } from "schema-node-core";
+import { AccessEntryConsumer, AccessValueTypeResolver, buildFuncCall, Call, CascadeDepth, Default, DisplayOnly, ForSchema, InVisible, Meta, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, SCHEMA_KIND_STRUCT, SchemaType, Valid, Visible } from "schema-node-core";
 import { FieldFilterMode, FieldFilterResolve } from "../../../enum/fieldFilterMode";
 
 import { NODE_SELF, NS_SYSTEM_BOOL, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_ENUM, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING } from "schema-node-core";
@@ -15,6 +15,7 @@ export interface FieldFilter {
 @Meta(OfSchema, SCHEMA_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.filters`)
 @Meta(PropertyValueType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.filters`)
+@Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@type', true, SCHEMA_KIND_STRUCT))
 export class Filters extends Property<FieldFilter[]> {}
 
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.filter`)

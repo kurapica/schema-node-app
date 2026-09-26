@@ -1,4 +1,4 @@
-import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, EntryRoot, getNodeType, getPropertyValue, IntType, Meta, OfSchema, Return, SchemaType, setPropertyValue, StructType, ValueType } from "schema-node-core";
+import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, EntryRoot, getNodeType, getPropertyValue, IntType, Meta, OfSchema, Return, SchemaType, setPropertyValue, StructType, SystemReflectType, ValueType } from "schema-node-core";
 import { getAppType } from "../runtime";
 import { ScopePolicy } from "../schema/app/property";
 import { Foreigns } from "../schema/appField/property";
@@ -35,14 +35,14 @@ export class SystemReflectApp
     @Meta(EntryRoot, true)
     root?: string
   ): Promise<EntryAccess<string>[]> {
-    if (!container || !name) return [];
+    if (!name) return [];
     path = path?.toLowerCase() ?? '';
     root = root?.toLowerCase() ?? '';
     if (path && root && path !== root && !path.startsWith(`${root}.`)) return [];
-    if (!root) root = path;
+    path = path ?? root;
 
     // first
-    const app = container ? `${container}.${name}` : name;
+    const app = container?.length ? `${container}.${name}` : name;
     const appType = await getAppType(app);
     if (!appType) return [];
     const first: Entry<string>[] = [];
@@ -57,7 +57,7 @@ export class SystemReflectApp
     }
 
     const result: EntryAccess<string>[] = [ { children: first} ];
-    let curr = result[0].children?.find(c => c.value.toLowerCase() === root || root.startsWith(`${c.value.toLowerCase()}.`));
+    let curr = result[0].children?.find(c => c.value.toLowerCase() === path || path.startsWith(`${c.value.toLowerCase()}.`));
     let valueType = curr ? await getNodeType(appType.getFields().find(f => f.name === curr?.value)?.type) as ValueType : undefined;
     while (valueType)
     {
@@ -75,6 +75,7 @@ export class SystemReflectApp
 
       // check next part
       let next: ValueType | undefined;
+      let nextCurr: Entry<string> | undefined;
       for (const a of accesses)
       {
         const n = a.value;
@@ -82,15 +83,16 @@ export class SystemReflectApp
         if (path && (path === a.value || path.startsWith(a.value + '.')))
         {
           next = valueType.getAccessValueType(n);
-          curr = a;
+          nextCurr = a;
         }
       }
       result.push(accessEntry);
       valueType = next;
+      curr = nextCurr;
     }
 
     // cut
-    return root ? result.filter(e => (e.entry?.value?.length ?? 0) < root.length) : result;
+    return root ? result.filter(e => (e.entry?.value?.length ?? 0) >= root.length) : result;
   }
 
   /** Gets the value type of the struct field */
@@ -179,12 +181,12 @@ export class SystemReflectApp
     let appType = await getAppType(app);
     if (!appType) return [];
     return [{ 
-      children: appType.getFields().map(s => {
+      children: Array.from(appType.getFields().map(s => {
         const entry: Entry<string> = { value: s.name, hasChildren: false };
         let display = s.getPropertyValue(Display);
         if (display != null) setPropertyValue(entry, Display, display);
         return entry;
-      })
+      }))
     }];
   }
 
@@ -204,10 +206,10 @@ export class SystemReflectApp
     let appType = await getAppType(app);
     if (!appType) return [];
     return [{ 
-      children: Array.from(appType.getFields().filter(s => {
+      children: Array.from((appType.scopeType === AppScopeType.SystemLevel ? appType.getFields() : appType.getFields().filter(s => {
         const foreigns = s.getPropertyValue<Foreign[]>(Foreigns);
         return foreigns?.some(f => f.app.toLowerCase() === foreignApp.toLowerCase());
-      })
+      }))
       .map(s => {
         const entry: Entry<string> = { value: s.name, hasChildren: false };
         let display = s.getPropertyValue(Display);
@@ -229,6 +231,46 @@ export class SystemReflectApp
     let appType = await getAppType(app);
     return appType?.hasAccessEntries ?? false;
   }
+  
+  /// <summary>
+  /// Gets the application field entries to the given application
+  /// </summary>
+  @Meta(Return, `${NS_SYSTEM_LIST}<${NS_SYSTEM_ENTRY_ACCESS}<${NS_SYSTEM_STRING}>>`)
+  static async getappfieldentries(
+    @Meta(ArgName, "app")
+    @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.type`)
+    app: string,
+
+    @Meta(ArgName, "field")
+    @Meta(SchemaType, NS_SYSTEM_IDENTIFIER)
+    field: string,
+
+    @Meta(ArgName, "elementType")
+    @Meta(SchemaType, NS_SYSTEM_BOOL)
+    elementType?: boolean,
+
+    @Meta(ArgName, 'path')
+    @Meta(SchemaType, NS_SYSTEM_STRING)
+    path?: string,
+
+    @Meta(ArgName, 'root')
+    @Meta(SchemaType, NS_SYSTEM_STRING)
+    @Meta(EntryRoot, true)
+    root?: string
+  ): Promise<EntryAccess<string>[]> {
+    path = path?.toLowerCase() ?? '';
+    root = root?.toLowerCase() ?? '';
+    if (path && root && path !== root && !path.startsWith(`${root}.`))
+      return [];
+    let appType = await getAppType(app);
+    let fieldType = appType?.getField(field);
+    if (!fieldType) return [];
+    let type = elementType && fieldType.valueType instanceof ArrayType
+      ? fieldType.valueType.element
+      : fieldType.valueType;
+    if (!type) return [];
+    return SystemReflectType.getaccessentries(type.name, path, root);
+  }
 
   /// <summary>
   /// Gets the app field type
@@ -245,15 +287,20 @@ export class SystemReflectApp
 
     @Meta(ArgName, "elementType")
     @Meta(SchemaType, NS_SYSTEM_BOOL)
-    elementType?: boolean
+    elementType?: boolean,
+
+    @Meta(ArgName, 'path')
+    @Meta(SchemaType, NS_SYSTEM_STRING)
+    path?: string,
   ): Promise<string | undefined>
   {
     let appType = await getAppType(app);
     let fieldType = appType?.getField(field);
     if (fieldType == null) return undefined;
-    return elementType && fieldType.valueType instanceof ArrayType
-      ? fieldType.valueType.element?.name
-      : fieldType.valueType?.name;
+    let type = elementType && fieldType.valueType instanceof ArrayType
+      ? fieldType.valueType.element
+      : fieldType.valueType;
+    return path?.length ? type?.getAccessValueType(path)?.name : type?.name;
   }
 
   /** Gets the combinable fields */

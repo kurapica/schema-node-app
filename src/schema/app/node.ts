@@ -1,4 +1,4 @@
-import { CallProcess, DataNode, Disable, isEmpty, isNull, ReadOnly, splitString } from "schema-node-core";
+import { AssignProcess, CallProcess, DataNode, Disable, isEmpty, isNull, logger, ReadOnly, RelationType, splitString } from "schema-node-core";
 import { ScopePolicy } from "./property";
 import { EnableStorage, Loaded } from "../appField/property";
 import { DataRead } from "../appField/property";
@@ -42,7 +42,7 @@ export class AppNode implements IValueAccess, IAppNode {
       const node = field.create(this, data?.results[field.name]);
 
       // loaded
-      if (!query.schemaOnly && (!node.isEmpty || !query?.fields?.length || query?.fields?.includes(field.name))) 
+      if (!query?.schemaOnly && (!node.isEmpty || !query?.fields?.length || query?.fields?.includes(field.name))) 
         node.setPropertyValue(Loaded, true, this);
 
       // readonly (it also may inherit readonly from field type)
@@ -224,7 +224,7 @@ export class AppNode implements IValueAccess, IAppNode {
       const node = this.getfield(n);
       if (!node || queryNodes.includes(node)) return;
 
-      if (node.getPropertyValue(EnableStorage) && (!onlyNotLoaded || !node.getPropertyValue(Loaded)))
+      if (!onlyNotLoaded || !node.getPropertyValue(Loaded))
         queryNodes.push(node);
 
       // auto load depends fields
@@ -232,8 +232,14 @@ export class AppNode implements IValueAccess, IAppNode {
         this.appType.getRelations().forEach((r) => {
           if (r.target.toLowerCase() === node.name.toLowerCase() || r.target.toLowerCase().startsWith(node.name.toLowerCase() + "."))
           {
-            if (r instanceof CallProcess)
-              r.args.forEach((arg: any) => arg.source ? checkToQuery(arg.source.split(".").filter((f: string) => !isNull(f))[0]) : "");
+            if (r instanceof RelationType)
+              if (r.processer instanceof CallProcess)
+                r.processer.args.forEach((arg: any) => arg.source ? checkToQuery(splitString(arg.source, '.', 2)[0]) : "");
+              else if(r.processer instanceof AssignProcess){
+                const value = r.processer.value;
+                if (typeof(value) === 'object' && Array.isArray(value['args']))
+                  value['args'].forEach((arg: any) => arg.source ? checkToQuery(splitString(arg.source, '.', 2)[0]) : "");
+              }
           }
         });
       }
@@ -254,6 +260,8 @@ export class AppNode implements IValueAccess, IAppNode {
         target: this.target || "00000000-0000-0000-0000-000000000000",
         fields: queryNodes.map((n) => n.name),
       };
+
+      logger.trace("[App]", query.app, "[Fields]", query.fields);
 
       const result = await queryAppData(query);
       if (!result) return;

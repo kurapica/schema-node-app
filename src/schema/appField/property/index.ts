@@ -1,8 +1,6 @@
 export * from './allowClear';
-export * from './attrTableName';
 export * from './blockColumns';
 export * from './colAuths';
-export * from './dataCombine';
 export * from './dataCreate';
 export * from './dataDelete';
 export * from './dataDerive';
@@ -15,6 +13,4 @@ export * from './inputable';
 export * from './loaded';
 export * from './pageable';
 export * from './rowAuths';
-export * from './tableName';
-export * from './topology';
 export * from './view';

@@ -2,8 +2,8 @@ import { PolicyScope, WorkflowStatus } from "../../enum";
 import { postSchemaApi } from "./protocol";
 import { useAppSchemaProvider } from "./appSchemaProvider";
 
-import type { NodeSchema } from "schema-node-core";
-import type { AppSchema } from "../app";
+import type { ApplyMode, IValueAccess, NodeSchema } from "schema-node-core";
+import { AppNode, type AppSchema } from "../app";
 import type { IAppSchemaProvider, ISchemaApiProtocolMeta, IAppDataQuery, IBatchQueryAppDataResult, IAppDataFieldPushQuery, IAppDataPushResult } from "./interface";
 
 /** The default app schema provider */
@@ -21,8 +21,15 @@ const defaultAppSchemaProvider: IAppSchemaProvider = {
     return (await postSchemaApi("/get-app-schema", {name, includeTypes, format}))?.schema;
   },
 
-  callFunction: async (name: string, args: any[], retType?: string): Promise<any> => {
-    return (await postSchemaApi("/call-function", { name, args, return: retType }))?.result;
+  callFunction: async (name: string, args: any[], retType?: string, applyMode?: ApplyMode, source?: IValueAccess): Promise<any> => {
+    const params: any = { name, args, return: retType, applyMode };
+    while (source && !(source instanceof AppNode))
+      source = source.parent;
+    if (source && source instanceof AppNode) {
+      params.app = source.appType.name;
+      params.target = source.target;
+    }
+    return (await postSchemaApi("/call-function", params))?.result;
   },
 
   authorize: async (scope: PolicyScope = PolicyScope.DataRead, name?: string, app?: string, field?: string,  workflow?: string): Promise<boolean> => {

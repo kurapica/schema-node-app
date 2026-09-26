@@ -1,4 +1,4 @@
-import { deepClone, getPropertiesBySchemaKind, RelationType, getProperty, Relations, SchemaLoadState, setPropertyValue, Display, _LS } from "schema-node-core";
+import { deepClone, getPropertiesBySchemaKind, RelationType, getProperty, Relations, setPropertyValue, Display, _LS } from "schema-node-core";
 import { AppScopeType } from "../../enum/appScopeType";
 import { ScopePolicy } from "./property";
 import { AppFieldType } from "../appField/runtime";
@@ -92,6 +92,10 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
 
   /** Whether this application type is assignable to the other type. */
   isAssignableTo(other: IValueTypeAccess): boolean { return false; }
+  addConverter(other: IValueTypeAccess, converter: INodeType): void {}
+  getConverter(other: IValueTypeAccess): INodeType | undefined { return undefined; }
+  removeConverter(other: IValueTypeAccess, converter: INodeType): void {}
+
 
   /** Don't use this to create an app node */
   create(value: unknown, parent?: IValueAccess, propProvider?: IPropertyProvider): IValueAccess {
