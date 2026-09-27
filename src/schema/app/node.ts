@@ -78,23 +78,23 @@ export class AppNode implements IValueAccess, IAppNode {
 
   /** Get an application field by name */
   getfield(name: string): DataNode | undefined {
-    return this._appFieldNodes.find(node => node.name.toLowerCase() === name.toLowerCase());
+    return this._appFieldNodes.find(node => node.name!.toLowerCase() === name.toLowerCase());
   }
 
   /** Get all application fields */
   get fields(): Generator<DataNode> { return this.getFields(); }
 
   /** Get all application input fields */
-  get inputFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(Inputable)); }
+  get inputFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(Inputable) ?? false); }
 
   /** Get all application input fields that are loaded */
-  get loadedInputFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(Loaded) && node.getPropertyValue(Inputable)); }
+  get loadedInputFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(Loaded) && node.getPropertyValue(Inputable) ? true : false); }
 
   /** Get all application data derive fields */
-  get deriveFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(DataDerive)); }
+  get deriveFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(DataDerive) ?? false); }
 
   /** Get all application view fields */
-  get viewFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(View)); }
+  get viewFields(): Generator<DataNode> { return this.getFields((node) => node.getPropertyValue(View) ? true : false); }
 
   //#endregion
 
@@ -136,7 +136,7 @@ export class AppNode implements IValueAccess, IAppNode {
     }
 
     for (const field of this._appFieldNodes) {
-      if (field.name.toLowerCase() === path.toLowerCase()) {
+      if (field.name!.toLowerCase() === path.toLowerCase()) {
         return remain ? field.getAccessValue(remain, node) : field;
       }
     }
@@ -186,7 +186,7 @@ export class AppNode implements IValueAccess, IAppNode {
     });
 
     // attach relations to fields
-    this._appFieldNodes.forEach(field => field.attachRelations(fieldRelations.get(field.name.toLowerCase()) ?? []));
+    this._appFieldNodes.forEach(field => field.attachRelations(fieldRelations.get(field.name!.toLowerCase()) ?? []));
   }
 
   get isValid(): boolean { return this._appFieldNodes.every(field => !field.visible || field.isValid); }
@@ -230,13 +230,13 @@ export class AppNode implements IValueAccess, IAppNode {
       // auto load depends fields
       if (onlyNotLoaded) {
         this.appType.getRelations().forEach((r) => {
-          if (r.target.toLowerCase() === node.name.toLowerCase() || r.target.toLowerCase().startsWith(node.name.toLowerCase() + "."))
+          if (r.target.toLowerCase() === node.name!.toLowerCase() || r.target.toLowerCase().startsWith(node.name!.toLowerCase() + "."))
           {
             if (r instanceof RelationType)
               if (r.processer instanceof CallProcess)
                 r.processer.args.forEach((arg: any) => arg.source ? checkToQuery(splitString(arg.source, '.', 2)[0]) : "");
               else if(r.processer instanceof AssignProcess){
-                const value = r.processer.value;
+                const value: any = r.processer.value;
                 if (typeof(value) === 'object' && Array.isArray(value['args']))
                   value['args'].forEach((arg: any) => arg.source ? checkToQuery(splitString(arg.source, '.', 2)[0]) : "");
               }
@@ -247,7 +247,7 @@ export class AppNode implements IValueAccess, IAppNode {
 
     for (let i = 0; i < nodes.length; i++) {
       let n = nodes[i];
-      if (typeof n === "object") n = n.name;
+      if (typeof n === "object") n = n.name!;
       n = n.toLowerCase();
       checkToQuery(n);
     }
@@ -258,7 +258,7 @@ export class AppNode implements IValueAccess, IAppNode {
       const query: IAppDataQuery = {
         app: this.appType.name,
         target: this.target || "00000000-0000-0000-0000-000000000000",
-        fields: queryNodes.map((n) => n.name),
+        fields: queryNodes.map((n) => n.name!),
       };
 
       logger.trace("[App]", query.app, "[Fields]", query.fields);
@@ -272,10 +272,10 @@ export class AppNode implements IValueAccess, IAppNode {
         n.setPropertyValue(Loaded, true, this);
 
         // update field info
-        const qinfo = result.infos[n.name];
+        const qinfo = result.infos[n.name!];
         if (n instanceof PageNode) n.fieldInfo = qinfo;
 
-        n.value = result.results[n.name];
+        n.value = result.results[n.name!];
         n.confirm();
       }
     }
@@ -314,7 +314,7 @@ export class AppNode implements IValueAccess, IAppNode {
           const deletes = n instanceof PageNode ? n.deletes : null;
           if (deletes && deletes.length > 0) {
             pushNodes.push(n);
-            datas[n.name] = { deletes };
+            datas[n.name!] = { deletes };
           }
         } else {
           const submitData = n.submitValue;
@@ -322,9 +322,9 @@ export class AppNode implements IValueAccess, IAppNode {
 
           if (!isEmpty(submitData) || (deletes && deletes.length > 0)) {
             pushNodes.push(n);
-            datas[n.name] = {};
-            if (!isEmpty(submitData)) datas[n.name].data = n.submitValue;
-            if (deletes?.length) datas[n.name].deletes = deletes;
+            datas[n.name!] = {};
+            if (!isEmpty(submitData)) datas[n.name!].data = n.submitValue;
+            if (deletes?.length) datas[n.name!].deletes = deletes;
           }
         }
       }
@@ -332,8 +332,8 @@ export class AppNode implements IValueAccess, IAppNode {
 
     if (!pushNodes.length) return { result: false };
 
-    const provider = getAppSchemaProvider();
-    const result = await provider.pushAppData(this.appType.name, this.target, datas);
+    const provider = getAppSchemaProvider()!;
+    const result = await provider.pushAppData(this.appType.name, this.target ?? '', datas);
 
     // clear changes
     if (onlyDel) {
@@ -395,10 +395,10 @@ export class AppNode implements IValueAccess, IAppNode {
     data?: any,
     reload?: boolean,
   ): Promise<string | undefined> {
-    const provider = getAppSchemaProvider();
+    const provider = getAppSchemaProvider()!;
     const id = await provider.interaction(
       this.appType.name,
-      this.target,
+      this.target ?? '',
       workflow,
       node,
       workflowId,
@@ -447,10 +447,10 @@ export class AppNode implements IValueAccess, IAppNode {
   async turnOffWorkflow(workflow: string): Promise<void> {
     const state = this._workflowStates?.find((w) => w.name === workflow);
     if (!state || isNull(state.workflowId)) return;
-    const provider = getAppSchemaProvider();
+    const provider = getAppSchemaProvider()!;
     await provider.interaction(
       this.appType.name,
-      this.target,
+      this.target ?? '',
       workflow,
       undefined,
       state.workflowId,
