@@ -13,8 +13,8 @@ const defaultAppSchemaProvider: IAppSchemaProvider = {
     return (await postSchemaApi("/protocol", {}, true)) || undefined;
   },
 
-  getSchema: async (names: string[]): Promise<NodeSchema[]> => {
-    return (await postSchemaApi("/get-schema", { names }))?.schemas || [];
+  getSchema: async (names: string[], includeRefs?: boolean): Promise<NodeSchema[]> => {
+    return (await postSchemaApi("/get-schema", { names, includeRefs }))?.schemas || [];
   },
 
   getAppSchema: async (name: string, includeTypes?: boolean, format?: string): Promise<AppSchema | undefined> => {
