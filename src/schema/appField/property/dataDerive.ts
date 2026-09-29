@@ -46,8 +46,8 @@ class DeriveMeta implements Derive {
   sourceType?: string;
 
   @Meta(SchemaType, NS_SYSTEM_SCHEMA_FUNC_TYPE)
-  @Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NODE_SELF, '@sourceType'))
-  @Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NODE_SELF, '@fieldType', true))
+  @Relation(Valid, Assign, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NODE_SELF, '@sourceType'))
+  @Relation(Valid, Assign, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NODE_SELF, '@fieldType', true))
   @Meta(Require, true)
   calc!: string;
 

@@ -4,8 +4,8 @@ import { Filters } from "../schema/appField/property";
 import { FieldFilterMode } from "../enum/fieldFilterMode";
 import { isAppNode } from "../schema/app/type";
 
-import type { LocaleString } from "schema-node-core";
-import type { IAppDataFieldInfo, IAppDataQueryOrder } from "../schema/provider/interface";
+import type { IPropertyProvider, IValueAccess, LocaleString } from "schema-node-core";
+import type { IAppDataFieldResult, IAppDataQueryOrder } from "../schema/app/type";
 import type { FieldFilter } from "../schema/appField/property";
 import { Deleted } from "../property/common/deleted";
 
@@ -23,8 +23,20 @@ export interface IArrayFieldFilter {
 
 /** The pageable array data node */
 export class PageNode extends ArrayNode {
+  constructor(type: ArrayType, value: IAppDataFieldResult, parent?: IValueAccess, ...propProviders: IPropertyProvider[]) {
+    super(type, value?.result, parent, ...propProviders);
+    if (value) value.result = undefined;
+    this._fieldInfo = value;
+  }
+
   /** The field info for the pageable array */
-  fieldInfo: IAppDataFieldInfo | undefined;
+  private _fieldInfo: IAppDataFieldResult | undefined;
+
+  set fieldInfo(value: IAppDataFieldResult | undefined) {
+    this.value = value?.result;
+    if (value) value.result = undefined;
+    this._fieldInfo = value;
+  }
 
   /** The field filters with input nodes */
   private _appFieldFilter: IArrayFieldFilter[] = [];
@@ -36,19 +48,19 @@ export class PageNode extends ArrayNode {
   get filters(): IArrayFieldFilter[] { return this._appFieldFilter; }
 
   /** The current page number */
-  get page(): number { return this.fieldInfo?.take ? Math.floor((this.fieldInfo.skip || 0) / this.fieldInfo.take) : 0 }
+  get page(): number { return this._fieldInfo?.take ? Math.floor((this._fieldInfo.skip || 0) / this._fieldInfo.take) : 0 }
 
   /** The page item count */
-  get pageCount() { return this.fieldInfo?.take }
+  get pageCount() { return this._fieldInfo?.take }
 
   /** The total item count */
-  get total() { return this.fieldInfo?.total ?? this.length }
+  get total() { return this._fieldInfo?.total ?? this.length }
 
   /** The query filter for the pageable array */
-  get query() { return this.fieldInfo?.filter ? { ...this.fieldInfo.filter } : undefined }
+  get query() { return this._fieldInfo?.filter ? { ...this._fieldInfo.filter } : undefined }
 
   /** The query order by for the pageable array */
-  get orderBy(): IAppDataQueryOrder[] { return deepClone(this.fieldInfo?.orderBy) || [] }
+  get orderBy(): IAppDataQueryOrder[] { return deepClone(this._fieldInfo?.orderBy) || [] }
 
   /** Whether the pageable array has changed */
   get changed(): boolean {
@@ -154,8 +166,8 @@ export class PageNode extends ArrayNode {
     filter?: { [key: string]: any },
     orderBy?: IAppDataQueryOrder[],
   ) {
-    count ||= this.fieldInfo?.take;
-    if (isNull(descend)) descend = this.fieldInfo?.descend;
+    count ||= this._fieldInfo?.take;
+    if (isNull(descend)) descend = this._fieldInfo?.descend;
 
     let appNode = this.parent;
     while (appNode && !(isAppNode(appNode))) appNode = appNode.parent;
@@ -177,8 +189,10 @@ export class PageNode extends ArrayNode {
         },
       });
 
-      this.fieldInfo = res.infos[this.name || ""];
-      const data = res.results[this.name || ""] || [];
+      const fieldResult = res.results[this.name || ""];
+      const data = fieldResult?.result || [];
+      if (fieldResult) fieldResult.result = undefined;
+      this._fieldInfo = fieldResult;
 
       this._elements.forEach((e) => {
         const key = this.getPrimaryKey(e);
@@ -361,8 +375,8 @@ export class PageNode extends ArrayNode {
 
     await this.setPage(
       0,
-      this.fieldInfo?.take,
-      this.fieldInfo?.descend,
+      this._fieldInfo?.take,
+      this._fieldInfo?.descend,
       filter,
     );
   }

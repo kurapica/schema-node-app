@@ -7,10 +7,10 @@ import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
 import { ScopePolicy } from "../schema/app/property";
 
 import type { INamespaceNodeType, NodeSchema } from "schema-node-core";
-import type { IAppDataQuery, IAppDataResult } from "../schema/provider/interface";
 import type { AppScopePolicy } from "../schema/app/property";
 
 import { SCHEMA_KIND_NAMESPACE } from "schema-node-core";
+import type { IAppDataQuery, IAppDataResult } from "../schema/app/type";
 
 let DEBOUNCE_BATCH_QUERY = 50;
 
@@ -25,27 +25,9 @@ let appDataQueryQueue: {
  */
 export function queryAppData(query: IAppDataQuery): Promise<IAppDataResult> {
   query.app = query.app.toLowerCase();
-  const cacheApp = getCachedAppType(query.app);
-
-  // check
-  if (!query.workflow && (isNull(query.target) || query.schemaOnly)) {
-    if (cacheApp)
-      return new Promise((resolve, _) =>
-        resolve({
-          app: query.app,
-          target: query.target,
-          schema: undefined, // cached app type already has schema
-          results: {},
-          infos: {},
-        }),
-      );
-
-    query.schemaOnly = true;
-    query.noSchema = undefined;
-  }
 
   if (!getAppSchemaProvider()) throw "No App data provider";
-  if (isNull(query.noSchema) && cacheApp) query.noSchema = true;
+  if (isNull(query.noSchema) && getCachedAppType(query.app)) query.noSchema = true;
 
   // prepare the query
   processAppDataQueryQueue();

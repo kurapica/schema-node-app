@@ -3,8 +3,8 @@ import { postSchemaApi } from "./protocol";
 import { useAppSchemaProvider } from "./appSchemaProvider";
 
 import type { ApplyMode, IValueAccess, NodeSchema } from "schema-node-core";
-import { AppNode, type AppSchema } from "../app";
-import type { IAppSchemaProvider, ISchemaApiProtocolMeta, IAppDataQuery, IBatchQueryAppDataResult, IAppDataFieldPushQuery, IAppDataPushResult } from "./interface";
+import { AppNode, type AppSchema, type IAppDataFieldPushQuery, type IAppDataPushResult, type IAppDataQuery, type IBatchQueryAppDataResult } from "../app";
+import type { IAppSchemaProvider, ISchemaApiProtocolMeta } from "./interface";
 
 /** The default app schema provider */
 const defaultAppSchemaProvider: IAppSchemaProvider = {

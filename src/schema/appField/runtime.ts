@@ -1,5 +1,5 @@
 import { joinProperties, getNodeType, getPropertiesBySchemaKind, Name, ReadOnly, deepClone } from "schema-node-core";
-import { Pageable, DataUpdate, View, DataDerive, Inputable } from "./property";
+import { Pageable, DataUpdate, View, DataDerive, Inputable, Loaded } from "./property";
 import { PageNode } from "../../node/pageNode";
 
 import type { AppFieldSchema } from "./type";
@@ -7,6 +7,7 @@ import type { NodeType, ValueType, IProperty, IPropertyProvider, PropertyCtor, I
 import type { IAppFieldType, IAppNode, IAppType } from "../app/type";
 
 import { SCHEMA_KIND_APP_FIELD } from "../../utils/constant";
+import type { IAppDataFieldResult } from "../app/type";
 
 /** The type of the application field. */
 export class AppFieldType implements IPropertyProvider, IAppFieldType {
@@ -19,10 +20,18 @@ export class AppFieldType implements IPropertyProvider, IAppFieldType {
   }
 
   /** Create a data node instance. */
-  create(appNode: IAppNode, data: unknown): IValueAccess {
-    return this.getPropertyValue(Pageable)
-      ? new PageNode(this.valueType as ArrayType, data, appNode, this)
-      : this.valueType.create(data, appNode, this);
+  create(appNode: IAppNode, data?: IAppDataFieldResult): IValueAccess {
+    const node = this.getPropertyValue(Pageable)
+     ? new PageNode(this.valueType as ArrayType, data, appNode, this)
+     : this.valueType.create(data?.result, appNode, this);
+
+    if (data?.queried)
+      node.setPropertyValue(Loaded, true, appNode);
+
+    if (!data?.dataUpdate)
+      node.setPropertyValue(ReadOnly, true, appNode);
+
+     return node;
   }
 
   /** The application that contains this field. */

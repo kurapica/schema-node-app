@@ -1,6 +1,6 @@
-import { AssignProcess, CallProcess, DataNode, Disable, isEmpty, isNull, logger, ReadOnly, RelationType, splitString } from "schema-node-core";
+import { ArrayNode, AssignProcess, CallProcess, DataNode, Disable, isEmpty, isNull, logger, ReadOnly, RelationType, splitString } from "schema-node-core";
 import { ScopePolicy } from "./property";
-import { EnableStorage, Loaded } from "../appField/property";
+import { Loaded } from "../appField/property";
 import { DataRead } from "../appField/property";
 import { Inputable } from "../appField/property";
 import { DataDerive } from "../appField/property";
@@ -13,9 +13,8 @@ import { getAppType } from "../../runtime/appRuntime";
 import { queryAppData } from "../../runtime/batchQuery";
 
 import type { IConstraintProperty, IProperty, IRelationInfo, IValueAccess, IValueTypeAccess, Observer, PropertyCtor } from "schema-node-core";
-import type { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkflow, IAppWorkflowState } from "../provider/interface";
 import type { AppScopePolicy } from "./property";
-import type { IAppNode, IAppType } from "./type";
+import type { IAppDataPushResult, IAppDataQuery, IAppDataResult, IAppInteractionWorkflow, IAppNode, IAppType, IAppWorkflowState } from "./type";
 
 /** The app node to manage all field data nodes */
 export class AppNode implements IValueAccess, IAppNode {
@@ -36,14 +35,11 @@ export class AppNode implements IValueAccess, IAppNode {
     // Generate the data nodes of fields
     for (const field of appType.getFields())
     {
-      if (field.getPropertyValue(Disable) || field.getPropertyValue(DataRead) === false) continue;
+      const fieldResult = data?.results[field.name];
+      if (field.getPropertyValue(Disable) || field.getPropertyValue(DataRead) === false && !fieldResult.dataRead) continue;
 
       // Generate the data node
-      const node = field.create(this, data?.results[field.name]);
-
-      // loaded
-      if (!query?.schemaOnly && (!node.isEmpty || !query?.fields?.length || query?.fields?.includes(field.name))) 
-        node.setPropertyValue(Loaded, true, this);
+      const node = field.create(this, fieldResult);
 
       // readonly (it also may inherit readonly from field type)
       if (readonly) 
@@ -272,10 +268,11 @@ export class AppNode implements IValueAccess, IAppNode {
         n.setPropertyValue(Loaded, true, this);
 
         // update field info
-        const qinfo = result.infos[n.name!];
-        if (n instanceof PageNode) n.fieldInfo = qinfo;
-
-        n.value = result.results[n.name!];
+        const qinfo = result.results[n.name!];
+        if (n instanceof PageNode) 
+          n.fieldInfo = qinfo;
+        else
+          n.value = qinfo?.result;
         n.confirm();
       }
     }
@@ -308,17 +305,17 @@ export class AppNode implements IValueAccess, IAppNode {
       if (!n.getPropertyValue(ReadOnly) && n.changed) {
         if (!n.isValid)
           return { result: false, error: `field ${n.name} is invalid` };
-        if (onlyDel && !(n instanceof PageNode)) continue;
+        if (onlyDel && !(n instanceof PageNode || n instanceof ArrayNode)) continue;
 
         if (onlyDel) {
-          const deletes = n instanceof PageNode ? n.deletes : null;
+          const deletes = n instanceof PageNode || n instanceof ArrayNode ? n.deletes : null;
           if (deletes && deletes.length > 0) {
             pushNodes.push(n);
             datas[n.name!] = { deletes };
           }
         } else {
           const submitData = n.submitValue;
-          const deletes = n instanceof PageNode ? n.deletes : null;
+          const deletes = n instanceof PageNode || n instanceof ArrayNode ? n.deletes : null;
 
           if (!isEmpty(submitData) || (deletes && deletes.length > 0)) {
             pushNodes.push(n);
