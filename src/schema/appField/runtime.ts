@@ -27,11 +27,9 @@ export class AppFieldType implements IPropertyProvider, IAppFieldType {
 
     if (data?.queried)
       node.setPropertyValue(Loaded, true, appNode);
+    node.setPropertyValue(ReadOnly, data?.dataUpdate ? false : true, appNode);
 
-    if (!data?.dataUpdate)
-      node.setPropertyValue(ReadOnly, true, appNode);
-
-     return node;
+    return node;
   }
 
   /** The application that contains this field. */
