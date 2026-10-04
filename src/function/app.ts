@@ -1,4 +1,4 @@
-import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, EntryRoot, getNodeType, getPropertyValue, IntType, Meta, OfSchema, Return, SchemaType, setPropertyValue, StructType, SystemReflectType, ValueType } from "schema-node-core";
+import { _LS, ArgName, ArrayType, combinePaths, DecimalType, Display, EntryRoot, getNodeType, getPropertyValue, IntType, Meta, OfNodeKind, Return, SchemaType, setPropertyValue, StructType, SystemReflectType, ValueType } from "schema-node-core";
 import { getAppType } from "../runtime";
 import { ScopePolicy } from "../schema/app/property";
 import { Foreigns } from "../schema/appField/property";
@@ -8,11 +8,11 @@ import type { Entry, EntryAccess, LocaleString } from "schema-node-core";
 import type { AppScopePolicy } from "../schema/app/property";
 import type { Foreign } from "../schema/appField/property";
 
-import { NS_SYSTEM_BOOL, NS_SYSTEM_ENTRY_ACCESS, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LIST, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_STRING, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_FUNCTION, SCHEMA_KIND_INT } from "schema-node-core";
+import { NS_SYSTEM_BOOL, NS_SYSTEM_ENTRY_ACCESS, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LIST, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_STRING, NODE_KIND_BOOL, NODE_KIND_DATE, NODE_KIND_DECIMAL, NODE_KIND_ENUM, NODE_KIND_FUNCTION, NODE_KIND_INT } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, NS_SYSTEM_SCHEMA_REFLECT_APP } from "../utils";
 
 @Meta(SchemaType, NS_SYSTEM_SCHEMA_REFLECT_APP)
-@Meta(OfSchema, SCHEMA_KIND_FUNCTION)
+@Meta(OfNodeKind, NODE_KIND_FUNCTION)
 export class SystemReflectApp
 {
   /** Gets the sub entries of the struct fields */
@@ -316,7 +316,7 @@ export class SystemReflectApp
     if (valueType instanceof StructType) return [ 
       { children: Array.from(valueType.getFields()
         .filter(f => !primary.some(p => p.toLowerCase() === f.name.toLowerCase() && 
-            [SCHEMA_KIND_ENUM, SCHEMA_KIND_BOOL, SCHEMA_KIND_INT, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_DATE]
+            [NODE_KIND_ENUM, NODE_KIND_BOOL, NODE_KIND_INT, NODE_KIND_DECIMAL, NODE_KIND_DATE]
             .includes(f.type.kind)))
         .map(s => {
           const entry: Entry<string> = { value: s.name, hasChildren: false };

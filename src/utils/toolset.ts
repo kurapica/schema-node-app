@@ -2,7 +2,7 @@ import { ArrayType, Display, EnumType, generateGuid, getNodeType, isNull, NodeTy
 
 import type { LocaleString } from "schema-node-core";
 
-import { NS_SYSTEM_GUID, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_INT, SCHEMA_KIND_STRING } from "schema-node-core";
+import { NS_SYSTEM_GUID, NODE_KIND_BOOL, NODE_KIND_DATE, NODE_KIND_DECIMAL, NODE_KIND_INT, NODE_KIND_STRING } from "schema-node-core";
 
 /** Mocks the schema data */
 export async function mockSchemaData(name: string | NodeType): Promise<any> {
@@ -14,15 +14,15 @@ export async function mockSchemaData(name: string | NodeType): Promise<any> {
   {
     switch (schema.kind)
     {
-      case SCHEMA_KIND_INT:
+      case NODE_KIND_INT:
         return 0;
-      case SCHEMA_KIND_DECIMAL:
+      case NODE_KIND_DECIMAL:
         return 0.0;
-      case SCHEMA_KIND_STRING:
+      case NODE_KIND_STRING:
         return schema.name == NS_SYSTEM_GUID ? generateGuid() : "";
-      case SCHEMA_KIND_DATE:
+      case NODE_KIND_DATE:
         return new Date();
-      case SCHEMA_KIND_BOOL:
+      case NODE_KIND_BOOL:
         return false;
     }
   }

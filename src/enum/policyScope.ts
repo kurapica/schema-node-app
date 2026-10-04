@@ -1,6 +1,6 @@
-import { Meta, OfSchema, SchemaType, FromEnum } from "schema-node-core";
+import { Meta, OfNodeKind, SchemaType, FromEnum } from "schema-node-core";
 
-import { SCHEMA_KIND_ENUM } from "schema-node-core";
+import { NODE_KIND_ENUM } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP } from "../utils";
 
 export enum PolicyScope {
@@ -53,7 +53,7 @@ export enum PolicyScope {
 export type PolicyScopeValue = `${PolicyScope}`
 
 /** The schema declaration */
-@Meta(OfSchema, SCHEMA_KIND_ENUM)
+@Meta(OfNodeKind, NODE_KIND_ENUM)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.scope`)
 @Meta(FromEnum, PolicyScope)
 class PolicyScopeMeta {}

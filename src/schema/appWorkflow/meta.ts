@@ -3,7 +3,7 @@ import { Append, Attach, buildFuncCall, Call, Description, Display, InVisible, M
 import type { CallArg } from "schema-node-core";
 import type { AppWorkflowSchema, AppWorkflowNodeSchema } from "./type";
 
-import { ENTITY_PRIMARY_KEY_MAX_LEN, NS_SYSTEM_BOOL, NS_SYSTEM_INTRINSIC, NS_SYSTEM_LIST, NS_SYSTEM_LOGIC, NS_SYSTEM_OBJECT, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_STRING, SCHEMA_KIND_ARRAY } from "schema-node-core";
+import { ENTITY_PRIMARY_KEY_MAX_LEN, NS_SYSTEM_BOOL, NS_SYSTEM_INTRINSIC, NS_SYSTEM_LIST, NS_SYSTEM_LOGIC, NS_SYSTEM_OBJECT, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, NS_SYSTEM_STRING, NODE_KIND_ARRAY } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_WORKFLOW, NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_APP_WORKFLOW_NODE, SCHEMA_KIND_ORDER_APP_WORKFLOW, SCHEMA_KIND_ORDER_APP_WORKFLOW_NODE } from "../../utils/constant";
 
 @Meta(SchemaKind, [SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_ORDER_APP_WORKFLOW])
@@ -76,7 +76,7 @@ class AppWorkflowNodeSchemaMata implements AppWorkflowNodeSchema {
   /** The fork key paths in the payload */
   @Meta(SchemaType, `${NS_SYSTEM_LIST}<${NS_SYSTEM_STRING}>`)
   @Relation(Visible, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW}.isforkable`, `@type`))
-  @Relation(InVisible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@payload', false, SCHEMA_KIND_ARRAY))
+  @Relation(InVisible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, '@payload', false, NODE_KIND_ARRAY))
   forkKey?: string[];
 
   /** Whether the workflow node is un cancelable */

@@ -1,17 +1,17 @@
-import { Attach, Base, buildFuncCall, Meta, NodeSchemaKind, OfSchema, Require, RuntimeNodeType, SchemaKind, SchemaType, Valid } from "schema-node-core";
+import { Attach, Base, buildFuncCall, Meta, NodeKind, OfNodeKind, Require, RuntimeNodeType, SchemaKind, SchemaType, Valid } from "schema-node-core";
 import { WorkflowType } from "./runtime";
 
 import type { FuncArg } from "schema-node-core";
 import type { WorkflowSchema } from "./type";
 
-import { NODE_SELF, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, SCHEMA_KIND_STRING } from "schema-node-core";
-import { SCHEMA_KIND_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../../utils/constant";
+import { NODE_SELF, NS_SYSTEM_SCHEMA_FUNC, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, NODE_KIND_STRING } from "schema-node-core";
+import { SCHEMA_KIND_NODE_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../../utils/constant";
 
-@Meta(SchemaKind, [SCHEMA_KIND_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW])
-@Meta(NodeSchemaKind, [SCHEMA_KIND_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW])
+@Meta(SchemaKind, [SCHEMA_KIND_NODE_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW])
+@Meta(NodeKind, [SCHEMA_KIND_NODE_WORKFLOW, SCHEMA_KIND_ORDER_WORKFLOW])
 @Meta(RuntimeNodeType, WorkflowType)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_WORKFLOW}.schema`)
-@Meta(Attach, SCHEMA_KIND_WORKFLOW)
+@Meta(Attach, SCHEMA_KIND_NODE_WORKFLOW)
 class WorkflowSchemaMeta implements WorkflowSchema {
     @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_WORKFLOW}.kind`)
     @Meta(Require, true)
@@ -30,8 +30,8 @@ class WorkflowSchemaMeta implements WorkflowSchema {
     args?: FuncArg[];
 }
 
-@Meta(OfSchema, SCHEMA_KIND_STRING)
+@Meta(OfNodeKind, NODE_KIND_STRING)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_WORKFLOW}.type`)
 @Meta(Base, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE)
-@Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NODE_SELF, false, SCHEMA_KIND_WORKFLOW))
+@Meta(Valid, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, NODE_SELF, false, SCHEMA_KIND_NODE_WORKFLOW))
 class WorkflowTypeMeta {}

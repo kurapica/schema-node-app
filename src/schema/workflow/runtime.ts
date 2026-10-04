@@ -3,7 +3,7 @@ import { getPropertiesBySchemaKind, NodeType, ValueType, getNodeType } from "sch
 import type { INodeType, IProperty } from "schema-node-core";
 import type { WorkflowSchema } from "./type";
 
-import { SCHEMA_KIND_WORKFLOW, WORKFLOW_KIND_WORKFLOW } from "../../utils/constant";
+import { SCHEMA_KIND_NODE_WORKFLOW, WORKFLOW_KIND_WORKFLOW } from "../../utils/constant";
 
 export class WorkflowType extends NodeType {
   private _workflowSchema?: WorkflowSchema;
@@ -23,7 +23,7 @@ export class WorkflowType extends NodeType {
 
   override loadProperties(): IProperty[] {
     this._workflowSchema = this.getProperty("workflow")?.getValue();
-    return this._workflowSchema ? Array.from(getPropertiesBySchemaKind(this._workflowSchema, SCHEMA_KIND_WORKFLOW)) : [];
+    return this._workflowSchema ? Array.from(getPropertiesBySchemaKind(this._workflowSchema, SCHEMA_KIND_NODE_WORKFLOW)) : [];
   }
 
   override async load() {

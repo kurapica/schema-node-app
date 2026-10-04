@@ -4,7 +4,7 @@ import { PayloadEvaluator } from "./property";
 import type { IProperty, INodeType } from "schema-node-core";
 import type { EventSchema } from "./type";
 
-import { SCHEMA_KIND_EVENT } from "../../utils/constant";
+import { SCHEMA_KIND_NODE_EVENT } from "../../utils/constant";
 
 export class EventType extends NodeType {
   private _eventSchema?: EventSchema;
@@ -21,7 +21,7 @@ export class EventType extends NodeType {
 
   override loadProperties(): IProperty[] {
     this._eventSchema = this.getProperty("event")?.getValue();
-    return this._eventSchema ? Array.from(getPropertiesBySchemaKind(this._eventSchema, SCHEMA_KIND_EVENT)) : [];
+    return this._eventSchema ? Array.from(getPropertiesBySchemaKind(this._eventSchema, SCHEMA_KIND_NODE_EVENT)) : [];
   }
 
   override async load() {

@@ -1,10 +1,12 @@
 export const SCHEMA_KIND_APP = "app";
-export const SCHEMA_KIND_APP_FIELD = "appfield";
-export const SCHEMA_KIND_APP_WORKFLOW = "appworkflow";
-export const SCHEMA_KIND_APP_WORKFLOW_NODE = "appworkflownode";
+export const SCHEMA_KIND_APP_FIELD = "app.field";
+export const SCHEMA_KIND_APP_WORKFLOW = "app.workflow";
+export const SCHEMA_KIND_APP_WORKFLOW_NODE = "app.workflow.node";
 
-export const SCHEMA_KIND_EVENT = "event";
-export const SCHEMA_KIND_WORKFLOW = "workflow";
+export const SCHEMA_KIND_NODE_EVENT = "node.event";
+export const SCHEMA_KIND_NODE_WORKFLOW = "node.workflow";
+export const NODE_KIND_EVENT = "event";
+export const NODE_KIND_WORKFLOW = "workflow";
 
 export const SCHEMA_KIND_ORDER_EVENT = 20;
 export const SCHEMA_KIND_ORDER_WORKFLOW = 21;
@@ -25,8 +27,8 @@ export const NS_SYSTEM_SCHEMA = "system.schema";
 export const NS_SYSTEM_SCHEMA_APP = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_APP}`;
 export const NS_SYSTEM_SCHEMA_APP_FIELD = `${NS_SYSTEM_SCHEMA_APP}.field`;
 export const NS_SYSTEM_SCHEMA_APP_WORKFLOW = `${NS_SYSTEM_SCHEMA_APP}.workflow`;
-export const NS_SYSTEM_SCHEMA_EVENT = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_EVENT}`;
-export const NS_SYSTEM_SCHEMA_WORKFLOW = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_WORKFLOW}`;
+export const NS_SYSTEM_SCHEMA_EVENT = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_NODE_EVENT}`;
+export const NS_SYSTEM_SCHEMA_WORKFLOW = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_NODE_WORKFLOW}`;
 
 
 export const NS_SYSTEM_SCHEMA_REFLECT = `${NS_SYSTEM_SCHEMA}.reflect`;

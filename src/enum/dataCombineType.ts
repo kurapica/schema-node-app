@@ -1,6 +1,6 @@
-import { FromEnum, Meta, OfSchema, SchemaType } from "schema-node-core";
+import { FromEnum, Meta, OfNodeKind, SchemaType } from "schema-node-core";
 
-import { SCHEMA_KIND_ENUM } from "schema-node-core";
+import { NODE_KIND_ENUM } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP_FIELD } from "../utils/constant";
 
 export enum DataCombineType
@@ -29,7 +29,7 @@ export enum DataCombineType
 export type DataCombineTypeValue = `${DataCombineType}`
 
 /** The enum value type schema declaration */
-@Meta(OfSchema, SCHEMA_KIND_ENUM)
+@Meta(OfNodeKind, NODE_KIND_ENUM)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.combinetype`)
 @Meta(FromEnum, DataCombineType)
 class DataCombineTypeMeta {}

@@ -1,12 +1,12 @@
-import { Meta, SchemaType, OfSchema, getNodeType, Require, Return } from "schema-node-core";
+import { Meta, SchemaType, OfNodeKind, getNodeType, Require, Return } from "schema-node-core";
 import { WorkflowType } from "../schema/workflow/runtime";
 import { Forkable } from "../schema/workflow/property";
 
-import { SCHEMA_KIND_FUNCTION, NS_SYSTEM_BOOL } from "schema-node-core";
+import { NODE_KIND_FUNCTION, NS_SYSTEM_BOOL } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW } from "../utils";
 
 @Meta(SchemaType, NS_SYSTEM_SCHEMA_REFLECT_WORKFLOW)
-@Meta(OfSchema, SCHEMA_KIND_FUNCTION)
+@Meta(OfNodeKind, NODE_KIND_FUNCTION)
 export class SystemReflectWorkflow
 {
   /** Whether the workflow kind is the same */

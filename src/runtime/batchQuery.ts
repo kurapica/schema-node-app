@@ -9,7 +9,7 @@ import { ScopePolicy } from "../schema/app/property";
 import type { INamespaceNodeType, NodeSchema } from "schema-node-core";
 import type { AppScopePolicy } from "../schema/app/property";
 
-import { SCHEMA_KIND_NAMESPACE } from "schema-node-core";
+import { NODE_KIND_NAMESPACE } from "schema-node-core";
 import type { IAppDataQuery, IAppDataResult } from "../schema/app/type";
 
 let DEBOUNCE_BATCH_QUERY = 50;
@@ -169,7 +169,7 @@ function _setLoadState(schema: NodeSchema, loadStage: SchemaLoadState): void {
   schema.loadState ??= loadStage;
   schema.loadState! |= loadStage;
 
-  if (schema.kind === SCHEMA_KIND_NAMESPACE && schema.schemas) {
+  if (schema.kind === NODE_KIND_NAMESPACE && schema.schemas) {
     for (const child of schema.schemas) {
       _setLoadState(child, loadStage);
     }

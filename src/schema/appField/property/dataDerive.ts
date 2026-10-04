@@ -1,7 +1,7 @@
-import { Any, ARRAY_ELEMENT, Assign, BlackList, buildFuncCall, Call, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, NS_SYSTEM_LOGIC, OfSchema, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
+import { Any, ARRAY_ELEMENT, Assign, BlackList, buildFuncCall, Call, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, NS_SYSTEM_LOGIC, OfNodeKind, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
 import { DataCombineType } from "../../../enum/dataCombineType";
 
-import { ARRAY_PREVIOUS, NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, NS_SYSTEM_SCHEMA_REFLECT_TYPE, SCHEMA_KIND_BOOL, SCHEMA_KIND_DATE, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_ENUM, SCHEMA_KIND_INT, SCHEMA_KIND_PROPERTY, SCHEMA_KIND_STRING, SCHEMA_KIND_STRUCT } from "schema-node-core";
+import { ARRAY_PREVIOUS, NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NODE_KIND_BOOL, NODE_KIND_DATE, NODE_KIND_DECIMAL, NODE_KIND_ENUM, NODE_KIND_INT, NODE_KIND_PROPERTY, NODE_KIND_STRING, NODE_KIND_STRUCT } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_REFLECT_APP } from "../../../utils/constant";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_APP_FIELD } from "../../../utils/constant";
 
@@ -19,7 +19,7 @@ export interface FieldCombine {
 
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.dataDerive`)
-@Meta(OfSchema, SCHEMA_KIND_PROPERTY)
+@Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(PropertyValueType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.derive`)
 @Meta(Static, true)
 @Relation(InVisible, Call, buildFuncCall(`${NS_SYSTEM_LOGIC}.neq`, '@enableStorage', true))
@@ -52,12 +52,12 @@ class DeriveMeta implements Derive {
   calc!: string;
 
   @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.combinetype`)
-  @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@fieldType', true, SCHEMA_KIND_ENUM, SCHEMA_KIND_BOOL, SCHEMA_KIND_STRING, SCHEMA_KIND_INT, SCHEMA_KIND_DECIMAL, SCHEMA_KIND_DATE))
+  @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, '@fieldType', true, NODE_KIND_ENUM, NODE_KIND_BOOL, NODE_KIND_STRING, NODE_KIND_INT, NODE_KIND_DECIMAL, NODE_KIND_DATE))
   @Relation(WhiteList, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getcombinetype`, '@fieldType'))
   combine?: DataCombineType;
 
   @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.combines`)
-  @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_SCHEMA_KIND, '@fieldType', true, SCHEMA_KIND_STRUCT))
+  @Relation(Visible, Call, buildFuncCall(NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, '@fieldType', true, NODE_KIND_STRUCT))
   @Relation(EntrySource, Assign, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getcombinefields`, '@fieldType'), `combines.${ARRAY_ELEMENT}.field`)
   @Relation(BlackList, Call, buildFuncCall(`${NS_SYSTEM_COLLECTION}.getfields`, `@combines.${ARRAY_PREVIOUS}`, 'field'), `combines.${ARRAY_ELEMENT}.field`)
   @Relation(Default, Call, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_TYPE}.getaccessvaluetype`, '@fieldType', `combines.${ARRAY_ELEMENT}.field`), `combines.${ARRAY_ELEMENT}.fieldType`)

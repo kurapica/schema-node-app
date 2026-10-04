@@ -1,11 +1,11 @@
-import { Meta, OfSchema, Require, Return, SchemaType } from "schema-node-core";
+import { Meta, OfNodeKind, Require, Return, SchemaType } from "schema-node-core";
 import { SystemReflectApp } from "./app";
 
-import { NS_SYSTEM_SCHEMA, NS_SYSTEM_STRING, SCHEMA_KIND_FUNCTION } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA, NS_SYSTEM_STRING, NODE_KIND_FUNCTION } from "schema-node-core";
 import { NS_SYSTEM_EVENT, NS_SYSTEM_SCHEMA_REFLECT_EVENT } from "../utils";
 
 @Meta(SchemaType, NS_SYSTEM_SCHEMA_REFLECT_EVENT)
-@Meta(OfSchema, SCHEMA_KIND_FUNCTION)
+@Meta(OfNodeKind, NODE_KIND_FUNCTION)
 export class SystemReflectEvent
 {
   /** Get app field data change event payload type */

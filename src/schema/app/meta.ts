@@ -1,8 +1,8 @@
-import { AccessValueTypeProvider, Append, Attach, Base, buildFuncCall, Call, Description, Display, EntrySource, EntrySourceProvider, Meta, NS_SYSTEM_LOGIC, OfSchema, PrimaryIndex, ReadOnly, Relation, Relations, Require, SchemaKind, SchemaType, SystemDefined, UpLimitString } from "schema-node-core";
+import { AccessValueTypeProvider, Append, Attach, Base, buildFuncCall, Call, Description, Display, EntrySource, EntrySourceProvider, Meta, NS_SYSTEM_LOGIC, OfNodeKind, PrimaryIndex, ReadOnly, Relation, Relations, Require, SchemaKind, SchemaType, SystemDefined, UpLimitString } from "schema-node-core";
 
 import type { AppSchema } from "./type";
 
-import { NODE_SELF, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_STRING, PRIMARY_KEY_MAX_LEN, SCHEMA_KIND_STRING } from "schema-node-core";
+import { NODE_SELF, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_STRING, PRIMARY_KEY_MAX_LEN, NODE_KIND_STRING } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_REFLECT_APP, SCHEMA_KIND_APP, SCHEMA_KIND_ORDER_APP } from "../../utils/constant";
 
 /** Declare the application schema kind */
@@ -28,7 +28,7 @@ class AppSchemaMeta implements AppSchema {
 }
 
 /** Represents the app type */
-@Meta(OfSchema, SCHEMA_KIND_STRING)
+@Meta(OfNodeKind, NODE_KIND_STRING)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.type`)
 @Meta(Base, NS_SYSTEM_STRING)
 @Meta(UpLimitString, PRIMARY_KEY_MAX_LEN)
