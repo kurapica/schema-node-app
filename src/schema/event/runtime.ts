@@ -24,13 +24,13 @@ export class EventType extends NodeType {
     return this._eventSchema ? Array.from(getPropertiesBySchemaKind(this._eventSchema, SCHEMA_KIND_NODE_EVENT)) : [];
   }
 
-  override async load() {
+  override async load(threadId?: string) {
     if (this._eventSchema?.payload)
-      this._payload = await getNodeType(this._eventSchema.payload, this.generics, this.genericParams) as ValueType;
+      this._payload = await getNodeType(this._eventSchema.payload, this.generics, this.genericParams, undefined, threadId) as ValueType;
 
     const payloadEvaluator = this.getProperty(PayloadEvaluator)?.getValue<string>();
     if (payloadEvaluator) {
-      this._payloadEvaluator = await getNodeType(payloadEvaluator) as FunctionType;
+      this._payloadEvaluator = await getNodeType(payloadEvaluator, undefined, undefined, undefined, threadId) as FunctionType;
     }
   }
 

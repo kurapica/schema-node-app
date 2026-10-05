@@ -38,12 +38,12 @@ export class AppWorkflowType implements IAppWorkflowType {
   getWorkflowSchema(): AppWorkflowSchema { return deepClone(this._appWorkflowSchema); }
 
   /** Load the workflow. */
-  async load() {
+  async load(threadId?: string) {
     this._props = Array.from(getPropertiesBySchemaKind(this._appWorkflowSchema, SCHEMA_KIND_APP_WORKFLOW));
 
     for (const node of this._appWorkflowSchema.nodes) {
       if (node.payload) {
-        node.payloadValueType = await getNodeType(node.payload) as ValueType;
+        node.payloadValueType = await getNodeType(node.payload, undefined, undefined, undefined, threadId) as ValueType;
       }
     }
   }

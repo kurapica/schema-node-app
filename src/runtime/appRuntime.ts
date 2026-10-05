@@ -1,4 +1,4 @@
-import { deepClone, exportNodeType, isNull } from "schema-node-core";
+import { deepClone, exportNodeType, generateGuid, isNull } from "schema-node-core";
 import { getAppSchemaProvider } from "../schema/provider/appSchemaProvider";
 
 import type { NodeSchema } from "schema-node-core";
@@ -30,8 +30,11 @@ export function getCachedAppType(fullName: string): IAppType | undefined {
 }
 
 /** Get the app type by its full name. */
-export async function getAppType(fullName: string, reload?: boolean): Promise<IAppType | undefined> {
+export async function getAppType(fullName: string, reload?: boolean, threadId?: string): Promise<IAppType | undefined> {
   fullName = fullName?.toLowerCase().trim() ?? '';
+  // A single thread drives the whole app load chain so that nested/core type
+  // resolution shares one identity (re-entrant) and never deadlocks.
+  threadId ??= typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : generateGuid();
   const parts = fullName.split(".");
 
   if (!rootAppType) rootAppType = new appTypeCtor();
@@ -40,17 +43,17 @@ export async function getAppType(fullName: string, reload?: boolean): Promise<IA
   // Try loading cached app types first
   for (let i = 0; i < parts.length; i++)
   {
-    node = await loadAppType(node, parts[i], reload, i == parts.length - 1, true);
+    node = await loadAppType(node, parts[i], reload, i == parts.length - 1, true, threadId);
     if (!node) break;
   }
 
   // Try loading full app types
   if (!node)
   {
-    node = await loadAppType(rootAppType, '');
+    node = await loadAppType(rootAppType, '', false, false, false, threadId);
     for (let i = 0; i < parts.length; i++)
     {
-      node = await loadAppType(node, parts[i], reload, i == parts.length - 1, false);
+      node = await loadAppType(node, parts[i], reload, i == parts.length - 1, false, threadId);
       if (!node) break;
     }
   }
@@ -58,7 +61,7 @@ export async function getAppType(fullName: string, reload?: boolean): Promise<IA
   return node;
 }
 
-async function loadAppType(root: IAppType, segment?: string, reload?: boolean, isLast?: boolean, onlyCache?: boolean): Promise<IAppType | undefined> {
+async function loadAppType(root: IAppType, segment?: string, reload?: boolean, isLast?: boolean, onlyCache?: boolean, threadId?: string): Promise<IAppType | undefined> {
   let result: IAppType | undefined = root;
   if (segment?.length)
     result = result.getSubAppType(segment);
@@ -86,14 +89,15 @@ async function loadAppType(root: IAppType, segment?: string, reload?: boolean, i
 
   if (root != result)
   {
-    root.saveSubAppSchema(schema, true);
+    root.saveSubAppSchema(schema, true, threadId);
     root.saveSubAppType(segment, result);
   }
+
+  await result.load(schema, threadId);
   result.loaded = true;
-  await result.load(schema);
 
   if (subApps)
-    result.saveSubAppSchema(subApps);
+    result.saveSubAppSchema(subApps, false, threadId);
 
   return result;
 }

@@ -1,4 +1,4 @@
-import { deepClone, getPropertiesBySchemaKind, RelationType, getProperty, Relations, setPropertyValue, Display, _LS } from "schema-node-core";
+import { deepClone, getPropertiesBySchemaKind, RelationType, getProperty, Relations, setPropertyValue, Display, _LS, SCHEMA_KIND_NODE_STRUCT_FIELD } from "schema-node-core";
 import { AppScopeType } from "../../enum/appScopeType";
 import { ScopePolicy } from "./property";
 import { AppFieldType } from "../appField/runtime";
@@ -29,7 +29,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
   }
 
   /** Load the application schema */
-  async load(schema: AppSchema) {
+  async load(schema: AppSchema, threadId?: string) {
     this._schema = schema;
     this._props = Array.from(getPropertiesBySchemaKind(schema, SCHEMA_KIND_APP));
 
@@ -37,7 +37,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
     if (schema.fields) {
       this._fields = schema.fields.map(f => new AppFieldType(this, f));
       for (let field of this._fields) {
-        await field.load();
+        await field.load(threadId);
       }
     }
 
@@ -45,7 +45,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
     if (schema.workflows) {
       this._workflows = schema.workflows.map(w => new AppWorkflowType(this, w));
       for (let workflow of this._workflows) {
-        await workflow.load();
+        await workflow.load(threadId);
       }
     }
 
@@ -58,7 +58,7 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
       {
         const rtype = new RelationType(r, this);
         rtypes.push(rtype);
-        await rtype.load();
+        await rtype.load(threadId, SCHEMA_KIND_NODE_STRUCT_FIELD);
       }
       this._relations = rtypes;
     }
@@ -128,9 +128,9 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
   }
 
   /** Save an application schema */
-  saveSubAppSchema(schema: AppSchema | AppSchema[], reload= false): void {
+  saveSubAppSchema(schema: AppSchema | AppSchema[], reload= false, threadId?: string): void {
     if (Array.isArray(schema)) {
-      schema.forEach(s => this.saveSubAppSchema(s, reload));
+      schema.forEach(s => this.saveSubAppSchema(s, reload, threadId));
       return;
     }
 
@@ -157,9 +157,11 @@ export class AppType implements IValueTypeAccess, IRelationProvider, IAppType {
       let type = this._subApps?.get(name);
       if (!type) {
         type = new AppType(this);
-        type.load(schema).then(() => type!.loaded = false);
+        // Pre-build the sub app on the SAME loading thread so it never spawns a
+        // competing loader; it is marked not-loaded and (re)loaded on demand.
+        type.load(schema, threadId).then(() => type!.loaded = false);
       }
-      (type as AppType).saveSubAppSchema(subApps, reload);
+      (type as AppType).saveSubAppSchema(subApps, reload, threadId);
     }
   }
 

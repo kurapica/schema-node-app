@@ -55,8 +55,8 @@ export class AppFieldType implements IPropertyProvider, IAppFieldType {
   getFieldSchema(): AppFieldSchema { return deepClone(this._appFieldSchema); }
 
   /** Load the field. */
-  async load(): Promise<void> {
-    this._valueType = await getNodeType(this.type) as ValueType;
+  async load(threadId?: string): Promise<void> {
+    this._valueType = await getNodeType(this.type, undefined, undefined, undefined, threadId) as ValueType;
     this._props = Array.from(getPropertiesBySchemaKind(this._appFieldSchema, SCHEMA_KIND_APP_FIELD));
 
     // inputable check

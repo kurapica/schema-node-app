@@ -26,17 +26,17 @@ export class WorkflowType extends NodeType {
     return this._workflowSchema ? Array.from(getPropertiesBySchemaKind(this._workflowSchema, SCHEMA_KIND_NODE_WORKFLOW)) : [];
   }
 
-  override async load() {
+  override async load(threadId?: string) {
     if (this._workflowSchema?.payload) {
-      this._payload = await getNodeType(this._workflowSchema.payload) as ValueType;
+      this._payload = await getNodeType(this._workflowSchema.payload, undefined, undefined, undefined, threadId) as ValueType;
     }
 
     if (this._workflowSchema?.settings) {
-      this._state = await getNodeType(this._workflowSchema.settings) as ValueType;
+      this._state = await getNodeType(this._workflowSchema.settings, undefined, undefined, undefined, threadId) as ValueType;
     }
 
     if (this._workflowSchema?.session) {
-      this._session = await getNodeType(this._workflowSchema.session) as ValueType;
+      this._session = await getNodeType(this._workflowSchema.session, undefined, undefined, undefined, threadId) as ValueType;
     }
   }
 

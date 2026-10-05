@@ -67,7 +67,7 @@ export interface IAppType extends IValueTypeAccess, IPropertyProvider {
   loaded?: boolean;
 
   /** Save an application schema */
-  saveSubAppSchema(schema: AppSchema | AppSchema[], reload?:boolean): void;
+  saveSubAppSchema(schema: AppSchema | AppSchema[], reload?: boolean, threadId?: string): void;
 
   /** Remove a sub-application schema */
   removeSubAppSchema(name: string): void;
@@ -113,7 +113,7 @@ export interface IAppType extends IValueTypeAccess, IPropertyProvider {
 
   getRelations(): Generator<IRelation>;
 
-  load(schema: AppSchema): Promise<void>;
+  load(schema: AppSchema, threadId?: string): Promise<void>;
 }
 
 export interface IAppFieldType extends INodeReference, IPropertyProvider {
