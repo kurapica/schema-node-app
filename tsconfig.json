@@ -2,12 +2,15 @@
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
+    "experimentalDecorators": true,
     "outDir": "dist",
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "Node",
     "esModuleInterop": true,
-    "sourceMap": true
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "verbatimModuleSyntax": true
   },
   "include": ["src"]
 }

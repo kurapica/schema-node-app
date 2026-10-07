@@ -1,7 +1,10 @@
 /// <summary>
 /// The workflow status enum
 
-import { WorkflowMode } from "./workflowMode";
+import { FromEnum, Meta, OfNodeKind, SchemaType } from "schema-node-core";
+
+import { NODE_KIND_ENUM } from "schema-node-core";
+import { NS_SYSTEM_SCHEMA_WORKFLOW } from "../utils";
 
 /// </summary>
 export enum WorkflowStatus
@@ -13,4 +16,10 @@ export enum WorkflowStatus
     Terminated = "terminated"
 }
 
-export type WorkflowModeValue = `${WorkflowMode}`
+export type WorkflowStatusValue = `${WorkflowStatus}`
+
+/** The schema declaration */
+@Meta(OfNodeKind, NODE_KIND_ENUM)
+@Meta(SchemaType, `${NS_SYSTEM_SCHEMA_WORKFLOW}.status`)
+@Meta(FromEnum, WorkflowStatus)
+class WorkflowStatusMeta {}

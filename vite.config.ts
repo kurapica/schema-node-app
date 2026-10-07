@@ -5,20 +5,21 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'SchemaNode',
+      name: 'SchemaNodeApp',
       formats: ['es', 'cjs'],
       fileName: (format) => format === 'cjs' ? `index.js` : `index.${format}.js`,
     },
-    rollupOptions: {      
+    rollupOptions: {
       external: [
         'axios',
-        'bignumber.js'
+        'bignumber.js',
+        'schema-node-core'
       ],
       output: {
         globals: {
           'axios': 'axios',
           'bignumber.js': 'BigNumber',
-          'schema-node': 'SchemaNode'
+          'schema-node-core': 'SchemaNodeCore'
         }
       }
     }
