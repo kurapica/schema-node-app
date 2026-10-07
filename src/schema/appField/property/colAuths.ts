@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfNodeKind, SchemaType, Property, PropertyValueType, Relation, Visible, Call, buildFuncCall, Assign, CascadeDepth, EntrySource, ARRAY_ELEMENT } from "schema-node-core";
+import { Alias, Meta, ForSchema, OfNodeKind, SchemaType, Property, PropertyValueType, Relation, Visible, Call, buildFuncCall, Assign, CascadeDepth, EntrySource, ARRAY_ELEMENT } from "schema-node-core";
 
 import { NODE_KIND_PROPERTY, NS_SYSTEM_LIST, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, NS_SYSTEM_SCHEMA_REFLECT_GET_ACCESS_ENTRIES, NODE_KIND_STRUCT } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_APP } from "../../../utils/constant";
@@ -8,6 +8,7 @@ export interface ColPolicy {
     evaluators: string[];
 }
 
+@Meta(Alias, 'colAuths')
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.colAuths`)

@@ -1,8 +1,9 @@
-import { Meta, ForSchema, OfNodeKind, SchemaType, Property, buildFuncCall, Call, Relation, Visible, InVisible, PropertyValueType } from "schema-node-core";
+import { Alias, Meta, ForSchema, OfNodeKind, SchemaType, Property, buildFuncCall, Call, Relation, Visible, InVisible, PropertyValueType } from "schema-node-core";
 
 import { NODE_KIND_PROPERTY, NODE_KIND_ARRAY, NS_SYSTEM_LOGIC, NS_SYSTEM_BOOL, NS_SYSTEM_SCHEMA_REFLECT_ARRAY } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP } from "../../../utils/constant";
 
+@Meta(Alias, 'pageable')
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.pageable`)

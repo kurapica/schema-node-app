@@ -1,10 +1,11 @@
-import { Meta, ForSchema, OfNodeKind, SchemaType, Property, PrimaryIndex, PropertyValueType, EntrySource, buildFuncCall, Require, Default, Relation, Call, Visible } from "schema-node-core";
+import { Alias, Meta, ForSchema, OfNodeKind, SchemaType, Property, PrimaryIndex, PropertyValueType, EntrySource, buildFuncCall, Require, Default, Relation, Call, Visible } from "schema-node-core";
 import { AppScopeType } from "../../enum/appScopeType";
 
 import { NODE_KIND_PROPERTY, NS_SYSTEM_STRING, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NS_SYSTEM_CONTEXT, NODE_SELF, NS_SYSTEM_LOGIC_EQ } from "schema-node-core";
 import { SCHEMA_KIND_APP, NS_SYSTEM_SCHEMA_PRO_APP, NS_SYSTEM_SCHEMA_APP } from "../../utils/constant";
 
 /** The app property for node schema */
+@Meta(Alias, 'app')
 export class App extends Property<string> {}
 
 // =============== ScopePolicy ===============
@@ -19,6 +20,7 @@ export interface AppScopePolicy {
     contextMaps?: AppScopeContextMap[];
 }
 
+@Meta(Alias, 'scopePolicy')
 @Meta(ForSchema, [SCHEMA_KIND_APP])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.scopePolicy`)

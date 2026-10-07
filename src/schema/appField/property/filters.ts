@@ -1,4 +1,4 @@
-import { AccessEntryConsumer, AccessValueTypeResolver, buildFuncCall, Call, CascadeDepth, Default, DisplayOnly, ForSchema, InVisible, Meta, OfNodeKind, PrimaryIndex, Property, PropertyValueType, Relation, NODE_KIND_STRUCT, SchemaType, Valid, Visible } from "schema-node-core";
+import { AccessEntryConsumer, AccessValueTypeResolver, Alias, buildFuncCall, Call, CascadeDepth, Default, DisplayOnly, ForSchema, InVisible, Meta, OfNodeKind, PrimaryIndex, Property, PropertyValueType, Relation, NODE_KIND_STRUCT, SchemaType, Valid, Visible } from "schema-node-core";
 import { FieldFilterMode, FieldFilterResolve } from "../../../enum/fieldFilterMode";
 
 import { NODE_SELF, NS_SYSTEM_BOOL, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_ENUM, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, NODE_KIND_BOOL, NODE_KIND_DATE, NODE_KIND_DECIMAL, NODE_KIND_ENUM, NODE_KIND_INT, NODE_KIND_PROPERTY, NODE_KIND_STRING } from "schema-node-core";
@@ -11,6 +11,7 @@ export interface FieldFilter {
     resolve?: FieldFilterResolve;
 }
 
+@Meta(Alias, 'filters')
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.filters`)

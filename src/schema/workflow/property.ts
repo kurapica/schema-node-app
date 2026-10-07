@@ -1,4 +1,4 @@
-import { buildFuncCall, Call, ForSchema, Meta, OfNodeKind, Property, PropertyValueType, ReadOnly, Relation, SCHEMA_KIND_NODE, SchemaType, Static, Visible } from "schema-node-core";
+import { Alias, buildFuncCall, Call, ForSchema, Meta, OfNodeKind, Property, PropertyValueType, ReadOnly, Relation, SCHEMA_KIND_NODE, SchemaType, Static, Visible } from "schema-node-core";
 
 import type { WorkflowSchema } from "./type";
 
@@ -6,6 +6,7 @@ import { NS_SYSTEM_BOOL, NS_SYSTEM_LOGIC_EQ, NS_SYSTEM_SCHEMA_PRO, NS_SYSTEM_SCH
 import { NODE_KIND_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_NODE_WORKFLOW } from "../../utils/constant";
 
 /** The workflow property for node schema */
+@Meta(Alias, 'workflow')
 @Meta(ForSchema, [SCHEMA_KIND_NODE])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_CORE}.workflow`)
@@ -15,6 +16,7 @@ import { NODE_KIND_WORKFLOW, NS_SYSTEM_SCHEMA_WORKFLOW, SCHEMA_KIND_NODE_WORKFLO
 export class WorkflowProperty extends Property<WorkflowSchema> {}
 
 /** Allow the workflow to fork */
+@Meta(Alias, 'forkable')
 @Meta(ForSchema, SCHEMA_KIND_NODE_WORKFLOW)
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO}.workflow.forkable`)

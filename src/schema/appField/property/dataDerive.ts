@@ -1,4 +1,4 @@
-import { Any, ARRAY_ELEMENT, Assign, BlackList, buildFuncCall, Call, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, NS_SYSTEM_LOGIC, OfNodeKind, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
+import { Alias, Any, ARRAY_ELEMENT, Assign, BlackList, buildFuncCall, Call, Default, DisplayOnly, EntrySource, ForSchema, InVisible, Meta, NS_SYSTEM_LOGIC, OfNodeKind, PrimaryIndex, Property, PropertyValueType, Relation, Require, SchemaType, Static, Valid, Visible, WhiteList } from "schema-node-core";
 import { DataCombineType } from "../../../enum/dataCombineType";
 
 import { ARRAY_PREVIOUS, NODE_SELF, NS_SYSTEM_COLLECTION, NS_SYSTEM_IDENTIFIER, NS_SYSTEM_INTRINSIC, NS_SYSTEM_SCHEMA_FUNC_TYPE, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_ARGS, NS_SYSTEM_SCHEMA_REFLECT_FUNC_WITH_RETURN, NS_SYSTEM_SCHEMA_REFLECT_IS_NODE_KIND, NS_SYSTEM_SCHEMA_REFLECT_TYPE, NODE_KIND_BOOL, NODE_KIND_DATE, NODE_KIND_DECIMAL, NODE_KIND_ENUM, NODE_KIND_INT, NODE_KIND_PROPERTY, NODE_KIND_STRING, NODE_KIND_STRUCT } from "schema-node-core";
@@ -17,6 +17,7 @@ export interface FieldCombine {
   type?: DataCombineType;
 }
 
+@Meta(Alias, 'dataDerive')
 @Meta(ForSchema, [SCHEMA_KIND_APP_FIELD])
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.dataDerive`)
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)

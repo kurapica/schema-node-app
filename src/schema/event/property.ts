@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfNodeKind, SchemaType, Property, PropertyValueType, ReadOnly, Visible, Call, buildFuncCall, Relation, SCHEMA_KIND_NODE } from "schema-node-core";
+import { Alias, Meta, ForSchema, OfNodeKind, SchemaType, Property, PropertyValueType, ReadOnly, Visible, Call, buildFuncCall, Relation, SCHEMA_KIND_NODE } from "schema-node-core";
 
 import type { EventSchema } from "./type";
 
@@ -6,6 +6,7 @@ import { NODE_KIND_PROPERTY, NS_SYSTEM_SCHEMA_PRO, NS_SYSTEM_SCHEMA_PRO_CORE, NS
 import { NODE_KIND_EVENT, NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_NODE_EVENT } from "../../utils/constant";
 
 /** The event property for node schema */
+@Meta(Alias, 'event')
 @Meta(ForSchema, [SCHEMA_KIND_NODE])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_CORE}.event`)
@@ -15,6 +16,7 @@ import { NODE_KIND_EVENT, NS_SYSTEM_SCHEMA_EVENT, SCHEMA_KIND_NODE_EVENT } from 
 export class EventProperty extends Property<EventSchema> {}
 
 /** The payload evaluator */
+@Meta(Alias, 'payloadEvaluator')
 @Meta(ForSchema, [SCHEMA_KIND_NODE_EVENT])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO}.event.payloadEvaluator`)

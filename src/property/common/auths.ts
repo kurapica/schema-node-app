@@ -1,4 +1,4 @@
-import { Meta, ForSchema, OfNodeKind, SchemaType, Property, Base, buildFuncCall, Valid, PropertyValueType, DataNode, Attach, BlackList, NS_SYSTEM_BOOL, SCHEMA_KIND_NODE_ENUM, Static, InVisible } from "schema-node-core";
+import { Alias, Meta, ForSchema, OfNodeKind, SchemaType, Property, Base, buildFuncCall, Valid, PropertyValueType, DataNode, Attach, BlackList, NS_SYSTEM_BOOL, SCHEMA_KIND_NODE_ENUM, Static, InVisible } from "schema-node-core";
 import { PolicyScope } from "../../enum/policyScope";
 
 import type { IValueAccess } from "schema-node-core";
@@ -12,6 +12,7 @@ export interface PolicyItem {
 }
 
 /** The auths property for node schema and app schema. */
+@Meta(Alias, 'auths')
 @Meta(ForSchema, [SCHEMA_KIND_NODE, SCHEMA_KIND_APP, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_APP_WORKFLOW])
 @Meta(OfNodeKind, NODE_KIND_PROPERTY)
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_PRO_APP}.auths`)
@@ -32,6 +33,7 @@ class EvaluatorTypeMeta {}
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.policy.scopeblacklist`)
 @Meta(Static, true)
 @Meta(InVisible, true)
+@Meta(Alias, 'policyScopeResolver')
 class PolicyScopeResolver extends Property<boolean> {
   override effect(target: IValueAccess): void {
     setTimeout(() => {
