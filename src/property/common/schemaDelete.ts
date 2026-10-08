@@ -1,4 +1,4 @@
-import { Alias, Meta, ForSchema, OfNodeKind, SchemaType, Property, PropertyValueType, Static, InVisible, ReadOnly, NODE_KIND_PROPERTY, SCHEMA_KIND_NODE, NS_SYSTEM_BOOL } from "schema-node-core";
+import { Alias, Meta, ForSchema, OfNodeKind, SchemaType, Property, PropertyValueType, Static, InVisible, DisplayOnly, NODE_KIND_PROPERTY, SCHEMA_KIND_NODE, NS_SYSTEM_BOOL } from "schema-node-core";
 import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, SCHEMA_KIND_APP_WORKFLOW, SCHEMA_KIND_APP } from "../../utils/constant";
 
 /** Allow delete the schema */
@@ -9,5 +9,5 @@ import { SCHEMA_KIND_APP_FIELD, NS_SYSTEM_SCHEMA_PRO_APP, SCHEMA_KIND_APP_WORKFL
 @Meta(PropertyValueType, NS_SYSTEM_BOOL)
 @Meta(Static, true)
 @Meta(InVisible, true)
-@Meta(ReadOnly, true)
+@Meta(DisplayOnly, true)
 export class SchemaDelete extends Property<boolean> {}

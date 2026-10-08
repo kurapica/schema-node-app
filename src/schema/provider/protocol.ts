@@ -231,7 +231,7 @@ export async function postSchemaApi(
           }
         }
         
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: contentType }));
+        const url = window.URL.createObjectURL(new Blob([typeof response.data === "string" ? response.data : JSON.stringify(response.data)], { type: contentType }));
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', filename); //or any other extension
