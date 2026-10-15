@@ -156,28 +156,19 @@ export class AppNode implements IValueAccess, IAppNode {
     // attach relations from given infos
     relationInfos.forEach(info => {
       info.relations.forEach(r => {
-        const paths = splitString(r.target);
+        const paths = splitString(r.target, '.', 2);
         let curr: IValueAccess | undefined = info.owner;
-        for (let i = 0; i < paths.length; i++)
-        {
-          if (curr === undefined) return;
-          if (curr === this){
-            if (i < paths.length - 1) { // no relation for the app node
-              const next = paths[i].toLowerCase();
-              const fieldInfos = fieldRelations.get(next) ?? [];
-              const exist = fieldInfos.find(f => f.owner === info.owner);
-              if (exist){
-                exist.relations.push(r);
-              }
-              else{
-                fieldInfos.push({owner: info.owner, relations: [r]});
-              }
-              fieldRelations.set(next, fieldInfos);
-            }
-            break;
-          }
-          curr = curr?.getAccessValue(paths[i], this);
+        
+        const next = paths[0].toLowerCase();
+        const fieldInfos = fieldRelations.get(next) ?? [];
+        const exist = fieldInfos.find(f => f.owner === info.owner);
+        if (exist){
+          exist.relations.push(r);
         }
+        else{
+          fieldInfos.push({owner: info.owner, relations: [r]});
+        }
+        fieldRelations.set(next, fieldInfos);
       });
     });
 

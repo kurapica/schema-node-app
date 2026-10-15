@@ -4,6 +4,7 @@ import type { AppFieldSchema } from "./type";
 
 import { NS_SYSTEM_IDENTIFIER, NS_SYSTEM_SCHEMA_NODE_VALUE_TYPE, NS_SYSTEM_SCHEMA_REFLECT_TYPE } from "schema-node-core";
 import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_ORDER_APP_FIELD } from "../../utils/constant";
+import { AppProvider } from "../../property/common/appProvider";
 
 /** The meta of the app field schema */
 @Meta(SchemaKind, [SCHEMA_KIND_APP_FIELD, SCHEMA_KIND_ORDER_APP_FIELD])
@@ -11,6 +12,7 @@ import { NS_SYSTEM_SCHEMA_APP, NS_SYSTEM_SCHEMA_APP_FIELD, SCHEMA_KIND_APP_FIELD
 @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP_FIELD}.schema`)
 @Meta(Attach, SCHEMA_KIND_APP_FIELD)
 @Meta(TypeProvider, 'type')
+@Meta(AppProvider, "app")
 @Meta(EntrySourceProvider, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_ARRAY}.getelementaccessentries`, "@type", NODE_SELF))
 @Meta(AccessValueTypeProvider, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_ARRAY}.getelementaccessvaluetype`, "@type", NODE_SELF))
 class AppFieldSchemaMeta implements AppFieldSchema {

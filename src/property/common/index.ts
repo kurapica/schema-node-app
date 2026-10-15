@@ -4,3 +4,4 @@ export * from './schemaCreate';
 export * from './schemaDelete';
 export * from './schemaRead';
 export * from './schemaUpdate';
+export * from './appProvider';

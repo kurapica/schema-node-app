@@ -1,3 +1,5 @@
+export const APP_PROVIDER = "$app";
+
 export const SCHEMA_KIND_APP = "app";
 export const SCHEMA_KIND_APP_FIELD = "app.field";
 export const SCHEMA_KIND_APP_WORKFLOW = "app.workflow";
@@ -27,8 +29,8 @@ export const NS_SYSTEM_SCHEMA = "system.schema";
 export const NS_SYSTEM_SCHEMA_APP = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_APP}`;
 export const NS_SYSTEM_SCHEMA_APP_FIELD = `${NS_SYSTEM_SCHEMA_APP}.field`;
 export const NS_SYSTEM_SCHEMA_APP_WORKFLOW = `${NS_SYSTEM_SCHEMA_APP}.workflow`;
-export const NS_SYSTEM_SCHEMA_EVENT = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_NODE_EVENT}`;
-export const NS_SYSTEM_SCHEMA_WORKFLOW = `${NS_SYSTEM_SCHEMA}.${SCHEMA_KIND_NODE_WORKFLOW}`;
+export const NS_SYSTEM_SCHEMA_EVENT = `${NS_SYSTEM_SCHEMA}.event`;
+export const NS_SYSTEM_SCHEMA_WORKFLOW = `${NS_SYSTEM_SCHEMA}.workflow`;
 
 
 export const NS_SYSTEM_SCHEMA_REFLECT = `${NS_SYSTEM_SCHEMA}.reflect`;

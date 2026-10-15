@@ -1,4 +1,4 @@
-import { AccessValueTypeProvider, Append, Attach, Base, buildFuncCall, Call, Description, Display, EntrySource, EntrySourceProvider, Meta, NS_SYSTEM_LOGIC, OfNodeKind, PrimaryIndex, ReadOnly, Relation, Relations, Require, SchemaKind, SchemaType, SystemDefined, UpLimitString } from "schema-node-core";
+import { AccessValueTypeProvider, Append, Attach, Base, buildFuncCall, Call, Description, Display, EntrySource, EntrySourceProvider, KindProvider, Meta, NS_SYSTEM_LOGIC, OfNodeKind, PrimaryIndex, ReadOnly, Relation, Relations, Require, SCHEMA_KIND_NODE_STRUCT_FIELD, SchemaKind, SchemaType, SystemDefined, UpLimitString } from "schema-node-core";
 
 import type { AppSchema } from "./type";
 
@@ -15,6 +15,7 @@ class AppKind {}
 @Meta(Attach, SCHEMA_KIND_APP)
 @Meta(EntrySourceProvider, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getaccessentries`, '@container', '@name', NODE_SELF))
 @Meta(AccessValueTypeProvider, buildFuncCall(`${NS_SYSTEM_SCHEMA_REFLECT_APP}.getaccessvaluetype`, '@container', '@name', NODE_SELF))
+@Meta(KindProvider, SCHEMA_KIND_NODE_STRUCT_FIELD)
 class AppSchemaMeta implements AppSchema {
   @Meta(PrimaryIndex, 0)
   @Meta(SchemaType, `${NS_SYSTEM_SCHEMA_APP}.type`)

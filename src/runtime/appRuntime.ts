@@ -172,3 +172,7 @@ export async function getExportAppSchema(app: string, schemas?: NodeSchema[]): P
     schema.nodeSchemas = schemas;
   return schema;
 }
+
+
+// install
+if (typeof window !== 'undefined') (window as unknown as Record<string, Function>)!.getAppType = getAppType;
